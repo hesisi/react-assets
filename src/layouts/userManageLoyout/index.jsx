@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-13 17:02:36
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-13 22:54:01
+ * @LastEditTime: 2022-06-14 14:17:24
  */
 /*
  * @Descripttion: 
@@ -19,7 +19,7 @@ import { Table, Button } from 'antd';
 export default function IndexPage(props) {
   return (
     <div>
-        uuu
+      uuu
       { props.children }
     </div>
   );

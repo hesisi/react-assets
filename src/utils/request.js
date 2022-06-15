@@ -1,10 +1,10 @@
 /*
  * @Descripttion: 公共请求方法，封装了错误统一处理，参数处理，请求/响应拦截等
- * @version: 
+ * @version: 1.0
  * @Author: hesisi
  * @Date: 2022-06-15 11:21:33
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-15 19:22:23
+ * @LastEditTime: 2022-06-15 19:29:56
  */
 import axios from 'axios'
 import Cookies from 'js-cookie'

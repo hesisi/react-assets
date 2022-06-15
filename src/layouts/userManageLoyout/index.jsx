@@ -4,23 +4,15 @@
  * @Author: hesisi
  * @Date: 2022-06-13 17:02:36
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-14 14:17:24
+ * @LastEditTime: 2022-06-15 10:57:02
  */
-/*
- * @Descripttion: 
- * @version: 
- * @Author: hesisi
- * @Date: 2022-06-13 16:09:41
- * @LastEditors: hesisi
- * @LastEditTime: 2022-06-13 22:53:09
- */
-import { Table, Button } from 'antd';
+import React from 'react';
+import CommonLayout from '../index'
 
 export default function IndexPage(props) {
   return (
-    <div>
-      uuu
+    <CommonLayout pathPrefix="/userManage">
       { props.children }
-    </div>
+    </CommonLayout>
   );
 }

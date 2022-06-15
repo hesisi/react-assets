@@ -4,75 +4,75 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:48:59
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-14 15:03:36
+ * @LastEditTime: 2022-06-15 10:58:40
  */
-import { LaptopOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
 import { Breadcrumb, Layout, Menu } from 'antd';
+import { withRouter } from 'react-router-dom'
+import { Link } from 'umi'
 import React from 'react';
 import routes from '../../config/routes'
 import './index.less'
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const renderNavBar = routes[0].routes.map((item) => {
+const renderNavBar = routes.filter(item => item.name)?.map((item) => {
   return {
     key: item.path,
-    label: item.name,
+    label: item.path ? <Link to={item.path}>{item.name}</Link> : item.name,
   }
 });
-const items2 = [UserOutlined, LaptopOutlined, NotificationOutlined].map((icon, index) => {
-  const key = String(index + 1);
-  return {
-    key: `sub${key}`,
-    icon: React.createElement(icon),
-    label: `subnav ${key}`,
-    children: new Array(4).fill(null).map((_, j) => {
-      const subKey = index * 4 + j + 1;
-      return {
-        key: subKey,
-        label: `option${subKey}`,
-      };
-    }),
-  };
-});
 
-const App = (props) => {
-  console.log("===props;",props)
+
+const CommonLayout = (props) => {
+  const selectKey = `/${props.location.pathname?.split('/')[1]}`
+
+  const activePath = props.location.pathname
+  const curretnItem = routes?.filter(item => {
+    return item.path === props.pathPrefix
+  })
+
+  // 左侧菜单树
+  const MenuList = curretnItem && curretnItem[0] && curretnItem[0].routes || []
+
+  // 递归遍历左侧菜单
+  const renderItems = function(list=[]){
+    return list.map((item, index) => {
+      if(item.name && item.component){
+        return {
+          key: item.path,
+          icon: item.icon,
+          label: item.path ? <Link to={item.path}>{item.name}</Link> : item.name,
+          children: item.routes && renderItems(item.routes),
+        };
+      }
+    });
+  }
+
   return (
     <Layout>
       <Header className="header">
-        <div className="logo" />
-        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={['2']} items={renderNavBar} />
+        <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[selectKey]} items={renderNavBar} />
       </Header>
       <Content
         style={{
-          padding: '0 50px',
+          height: 'calc(100vh - 64px)'
         }}
       >
-        <Breadcrumb
-          style={{
-            margin: '16px 0',
-          }}
-        >
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>List</Breadcrumb.Item>
-          <Breadcrumb.Item>App</Breadcrumb.Item>
-        </Breadcrumb>
         <Layout
           className="site-layout-background"
           style={{
             padding: '24px 0',
+            height: '100%'
           }}
         >
           <Sider className="site-layout-background" width={200}>
             <Menu
               mode="inline"
-              defaultSelectedKeys={['1']}
-              defaultOpenKeys={['sub1']}
+              selectedKeys={[activePath]}
               style={{
                 height: '100%',
               }}
-              items={items2}
+              items={renderItems(MenuList)}
             />
           </Sider>
           <Content
@@ -81,23 +81,12 @@ const App = (props) => {
               minHeight: 280,
             }}
           >
-            { props.children }
+            {props.children}
           </Content>
         </Layout>
       </Content>
-      <Footer
-        style={{
-          textAlign: 'center',
-        }}
-      >
-        Ant Design ©2018 Created by Ant UED
-      </Footer>
     </Layout>
   )
 };
 
-export default App
-
-// export default (props) => {
-//   return <div style={{ padding: 20 }}>3323232{ props.children }</div>;
-// }
+export default withRouter(CommonLayout)

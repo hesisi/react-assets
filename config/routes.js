@@ -1,70 +1,83 @@
 /*
- * @Descripttion: 
+ * @Descripttion: 路由配置文件，会根据该文件生成头部一级菜单以及左侧菜单树，左侧菜单树可以不限层级添加（建议最好不要超过两级）
  * @version: 
  * @Author: hesisi
  * @Date: 2022-06-13 16:14:56
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-14 14:25:49
+ * @LastEditTime: 2022-06-15 11:24:23
  */
+import React from 'react';
+import { LaptopOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
+
+
 export default [
   {
     path: '/',
-    component: '@/layouts/index',
-    // exact: true,
+    redirect: '/userManage'
+  },
+  {
+    name: '用户管理',
+    path: '/userManage',
+    component: '@/layouts/userManageLoyout/index',
     routes: [{
-      name: '用户管理',
       path: '/userManage',
-      exact: true,
-      // component: '@/layouts/userManageLoyout/index',
+      redirect: '/userManage/authManage',
+    }, {
+      name: '权限管理',
+      icon: React.createElement(LaptopOutlined),
+      path: '/userManage/authManage',
+      component: '@/layouts/basicLayout',
       routes: [{
-        name: '权限管理',
-        path: '/auth',
-        // exact: true,
-        component: '@/pages/userManage/index',
-        // routes: [{
-        //   name: '账号管理',
-        //   path: '/account',
-        //   component: '@/pages/userManage/index',
-        //   exact: true,
-        // },{
-        //   name: '角色管理',
-        //   path: '/rile',
-        //   component: '@/pages/userManage/index',
-        //   exact: true,
-        // },{
-        //   name: '组织管理',
-        //   path: '/departmant',
-        //   component: '@/pages/userManage/index',
-        //   exact: true,
-        // }]
+        path: '/userManage/authManage',
+        redirect: '/userManage/authManage/account',
+      }, {
+        name: '账号管理',
+        path: '/userManage/authManage/account',
+        component: '@/pages/userManage/authManage/account',
+        exact: true,
+      }, {
+        name: '角色管理',
+        path: '/userManage/authManage/role',
+        component: '@/pages/userManage/authManage/role',
       }]
     }, {
-      name: '菜单管理',
-      path: '/menuManage',
-      // component: '@/layout/menuManageLayout',
-      // routes: [{
-      //   name: '系统管理',
-      //   path: '/system',
-      //   component: '@/pages/manuManage/index'
-      // },{
-      //   name: '菜单管理',
-      //   path: '/menuList',
-      //   component: '@/pages/manuManage/index'
-      // }]
-    }, {
-      name: '流程管理',
-      path: '/acticityManage',
-      // component: '@/layout/activityManageLayout',
-      // routes: [{
-      //   name: '流程管理',
-      //   path: '/activityList',
-      //   component: '@/pages/activityManage/index'
-      // },{
-      //   name: '流程配置',
-      //   path: '/activityConfig',
-      //   component: '@/pages/activityManage/index'
-      // }]
+      name: '组织管理',
+      icon: React.createElement(NotificationOutlined),
+      path: '/userManage/orginationManage',
+      component: '@/pages/userManage/orginationManage/index',
     }]
-  },
-
+  }, {
+    name: '菜单管理',
+    path: '/menuManage',
+    component: '@/layouts/menuManageLayout',
+    routes: [{
+      path: '/menuManage',
+      redirect: '/menuManage/systemManage'
+    },{
+      name: '系统管理',
+      path: '/menuManage/systemManage',
+      component: '@/pages/menuManage/systemManage'
+    },{
+      name: '菜单管理',
+      path: '/menuManage/menuList',
+      component: '@/pages/menuManage/menuList'
+    }]
+  }, {
+    name: '流程管理',
+    path: '/activityManage',
+    component: '@/layouts/activityManageLayout',
+    routes: [{
+      path: '/activityManage',
+      redirect: '/activityManage/activityList'
+    },{
+      name: '流程管理',
+      path: '/activityManage/activityList',
+      component: '@/pages/activityManage/activityList'
+    },{
+      name: '流程配置',
+      path: '/activityManage/activityConfig',
+      component: '@/pages/activityManage/activityConfig'
+    }]
+  }
 ]
+

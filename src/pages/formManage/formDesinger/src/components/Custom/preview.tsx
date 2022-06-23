@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-21 17:15:58
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-23 16:42:23
+ * @LastEditTime: 2022-06-23 17:40:32
  */
 import React, { useEffect, useState } from "react";
 import { observer } from "@formily/reactive-react";
@@ -16,7 +16,6 @@ import { AllSchemas } from '../../schemas'
 import { AllLocales } from '../../locales'
 
 interface FieldProps {
-  // isShow?: boolean;
   value?: {
     value1: string
     value2: string

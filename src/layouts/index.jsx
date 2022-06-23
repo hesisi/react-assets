@@ -4,14 +4,14 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:48:59
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-15 10:58:40
+ * @LastEditTime: 2022-06-20 14:25:59
  */
 import { Breadcrumb, Layout, Menu } from 'antd';
 import { withRouter } from 'react-router-dom'
 import { Link } from 'umi'
 import React from 'react';
 import routes from '../../config/routes'
-import './index.less'
+import Styles from './index.less'
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -61,7 +61,7 @@ const CommonLayout = (props) => {
         <Layout
           className="site-layout-background"
           style={{
-            padding: '24px 0',
+            // padding: '24px 0',
             height: '100%'
           }}
         >
@@ -77,11 +77,13 @@ const CommonLayout = (props) => {
           </Sider>
           <Content
             style={{
-              padding: '0 24px',
+              // padding: '0 24px',
               minHeight: 280,
             }}
           >
-            {props.children}
+            <div className={Styles.contentWrapper}>
+              {props.children}
+            </div>
           </Content>
         </Layout>
       </Content>

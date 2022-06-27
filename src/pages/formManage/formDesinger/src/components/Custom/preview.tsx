@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-21 17:15:58
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-23 17:40:32
+ * @LastEditTime: 2022-06-24 10:32:44
  */
 import React, { useEffect, useState } from "react";
 import { observer } from "@formily/reactive-react";
@@ -21,12 +21,13 @@ interface FieldProps {
     value2: string
     value3: string
   };
-  onChange?: (value: Object) => {}
+  onChange?: (value: Object) => {},
+  isShow?: boolean,  // 自定义的组件属性
 }
 
 export const Custom: DnFC<FieldProps> = observer(
   (props) => {
-    const { value, children, onChange } = props
+    const { value, children, onChange, isShow } = props
     console.log("=====props:", props)
 
     const [customValue, setCustomValue] = useState<{
@@ -39,28 +40,9 @@ export const Custom: DnFC<FieldProps> = observer(
       setCustomValue(value)
     }, [])
 
-    return (
+    return (isShow && (
       <div>
         自定义组件内容test
-        {/* <Input value={customValue?.value1 || ''} onChange={e => {
-          setCustomValue({
-            ...customValue,
-            value1: e.target.value
-          })
-        }} />
-        <Input value={customValue?.value2 || ''} onChange={e => {
-          setCustomValue({
-            ...customValue,
-            value2: e.target.value
-          })
-        }} />
-        <Input value={customValue?.value3 || ''} onChange={e => {
-          setCustomValue({
-            ...customValue,
-            value3: e.target.value
-          })
-        }} /> */}
-
         <div>{JSON.stringify(value)}</div>
 
         <Button onClick={() => {
@@ -71,7 +53,7 @@ export const Custom: DnFC<FieldProps> = observer(
           })
         }}>传值</Button>
       </div>
-    );
+    ))
   }
 );
 

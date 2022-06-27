@@ -4,108 +4,101 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:09:41
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-23 14:12:11
+ * @LastEditTime: 2022-06-24 17:46:13
  */
-import { Table, Button, message } from 'antd';
-import { PreviewWidget } from '../formDesinger/widgets/PreviewWidget'
-import { useEffect, useRef,useState } from 'react'
-import {
-	transformToTreeNode,
-} from '@designable/formily-transformer'
+import { Col, Row, Table, Form, Input } from 'antd';
+import { useEffect, useRef, useState } from 'react'
+import { initFormListData } from './dataJson'
+
+const columns = [
+  {
+    title: '表单名称',
+    dataIndex: 'formName',
+    key: 'formName',
+    render: (text) => <a>{text}</a>,
+  },
+  {
+    title: '表单code',
+    dataIndex: 'formCode',
+    key: 'formCode',
+  },
+  {
+    title: '创建人名称',
+    dataIndex: 'createName',
+    key: 'createName',
+  },
+	{
+    title: '创建人code',
+    dataIndex: 'createCode',
+    key: 'createCode',
+  },
+	{
+    title: '创建时间',
+    dataIndex: 'createTime',
+    key: 'createTime',
+  },
+	{
+    title: '修改时间',
+    dataIndex: 'updateTime',
+    key: 'updateTime',
+  },
+  {
+    title: 'Action',
+    key: 'action',
+    // render: (_, record) => (
+    //   <Space size="middle">
+    //     <a>Invite {record.name}</a>
+    //     <a>Delete</a>
+    //   </Space>
+    // ),
+  },
+];
 
 
-export default function IndexPage() {
-	const tree = transformToTreeNode(JSON.parse(localStorage.getItem('formily-schema')))
-	console.log("====tree:",tree)
+export default function FormList() {
+	const [ dataSource, setDataSource ] = useState([])
 	
-	const formRef = useRef(null)
-	const [form, setForm] = useState(null)
-
 	useEffect(() => {
-		setForm(formRef.current.form)
-		// console.log("===form:",formRef.current.form)
+		// 初始化dataSource
+		const data = localStorage.getItem("formList") && JSON.parse(localStorage.getItem("formList")) || initFormListData
+		setDataSource(data);
 	}, [])
-
-	const handleValidate = () => {
-		// formRef.current.form.validate();
-		form.validate()
-	}
-
-	const handleReset = () => {
-		// form.reset();
-		form.values = {}
-	}
-
-	const handleGetValues = () => {
-		const values = form.values;
-		message.info(`表单的值为: ${JSON.stringify(values)}`)
-	}
-
-	const handleAssign = () => {
-		const initValue = {
-			userName: '张三',
-			description: '这是描述内容XXXXX',
-			password: '123456',
-			rate: 3,
-			type: '2',
-			time: '09:23:18',
-			test1: {
-				value1: 'value1',
-				value2: 'value2',
-				value3: 'value3',
-			},
-			test2: {
-				value1: 'value1',
-				value2: 'value2',
-				value3: 'value3',
-			},
-		}
-
-		form.values = initValue
-	}
-
-	const handleReadOnly = () => {
-		form.disabled = true
-	}
-
-	const handlePreview = () => {
-		form.editable = false
-	}
-
-	const handleSetFieldValue = () => {
-		// form.setValues('userName', 'zhangsan')
-		form.values.userName = 'username'
-	}
-
-	
-
 
 	return (
 		<div>
-			<div style={{margin: "10px 0"}}>
-				{/* 校验按钮 */}
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleValidate}>校验</Button>
-				{/* 清空按钮 */}
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleReset}>清空</Button>
-				{/* 赋值按钮 */}
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleAssign}>赋值</Button>
-				{/* 禁用按钮 */}
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleReadOnly}>禁用</Button>
-				{/*  */}
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handlePreview}>预览模式</Button>
-				{/* 获取值 */}
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleGetValues}>获取值</Button>
-				{/* 设置username字段 */}
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleSetFieldValue}>setFiledValue</Button>
+			{/* 筛选框 */}
+			<div>
+				<Form
+					labelCol={{ span: 8 }}
+					wrapperCol={{ span: 16 }}
+				>
+					<Row>
+						<Col span={6}>
+							<Form.Item label="表单名称">
+								<Input />
+							</Form.Item>
+						</Col>
+						<Col span={6}>
+							<Form.Item label="表单code">
+								<Input />
+							</Form.Item>
+						</Col>
+						<Col span={6}>
+							<Form.Item label="创建人名称">
+								<Input />
+							</Form.Item>
+						</Col>
+						<Col span={6}>
+							<Form.Item label="创建人code">
+								<Input />
+							</Form.Item>
+						</Col>
+					</Row>
+				</Form>
 			</div>
 
-			<PreviewWidget 
-				tree={tree} 
-				ref={formRef}
-				// slot={{
-				// 	Custom: 
-				// }}
-			/>
+			{/* 列表部分 */}
+			<Table columns={columns} dataSource={dataSource} />
 		</div>
 	);
 }

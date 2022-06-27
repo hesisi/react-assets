@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:14:56
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-17 14:56:11
+ * @LastEditTime: 2022-06-24 16:01:18
  */
 import React from 'react';
 import { LaptopOutlined, NotificationOutlined, UserOutlined } from '@ant-design/icons';
@@ -87,13 +87,18 @@ export default [
       path: '/formManage',
       redirect: '/formManage/formAdd'
     },{
-      name: '设计器实例',
+      name: '新建表单',
       path: '/formManage/formAdd',
-      component: '@/pages/formManage/formDesinger'
+      component: '@/pages/formManage/formDesinger',
+      hidden: true,
     },{
       name: '动态表单',
       path: '/formManage/formList',
       component: '@/pages/formManage/formList'
+    },{
+      name: '动态表单demo',
+      path: '/formManage/formPreview',
+      component: '@/pages/formManage/formPreview'
     }]
   }
 ]

@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-16 16:39:48
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-23 10:51:44
+ * @LastEditTime: 2022-07-20 15:07:26
  */
 import React, { useEffect } from 'react';
 import { Space, Button, Radio } from 'antd';
@@ -28,19 +28,19 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
 
   useEffect(() => {
     // 初始化
-    if (localStorage.getItem('formily-form-schema') && type === 'form') {
+    const formilyFormSchema = localStorage.getItem('formily-form-schema');
+    if (formilyFormSchema && type === 'form') {
       designer.setCurrentTree(
         transformToTreeNode(
-          JSON.parse(localStorage.getItem('formily-form-schema')),
+          JSON.parse(formilyFormSchema),
         ),
       );
     }
 
-    if (localStorage.getItem('formily-table-schema') && type === 'table') {
+    const formilyTableSchema = localStorage.getItem('formily-table-schema')
+    if (formilyTableSchema && type === 'table') {
       const formSchema = transformToSchema(designer.getCurrentTree());
-      const tableSchema = JSON.parse(
-        localStorage.getItem('formily-table-schema'),
-      );
+      const tableSchema = JSON.parse(formilyTableSchema);
       const tableItems = {};
       Object.keys(formSchema).forEach((key) => {
         if (key === 'schema') {
@@ -48,7 +48,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
           let index = 0;
           item &&
             Object.keys(item).forEach((p) => {
-              if (item[p]?.title) {
+              if (item[p]!.title) {
                 // 默认列表数据
                 const randomStr = Math.random().toString(36).substr(2);
                 const randomStrT = Math.random().toString(36).substr(2);
@@ -56,7 +56,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
                   type: 'void',
                   'x-component': 'ArrayTable.Column',
                   'x-component-props': {
-                    title: item[p]?.title,
+                    title: item[p]!.title,
                   },
                   'x-designable-id': randomStrT,
                   'x-index': index,
@@ -70,7 +70,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
         const item = tableSchema['schema']?.properties[key];
         if (item?.type === 'array' && item?.['x-component'] === 'ArrayTable') {
           if (tableSchema['schema']?.properties?.[key]) {
-            tableSchema['schema']!.properties?.[key]?.['items'] = {
+            tableSchema['schema']!.properties!.[key]!.['items'] = {
               type: 'object',
               'x-designable-id': Math.random().toString(36).substr(2),
               properties: tableItems,

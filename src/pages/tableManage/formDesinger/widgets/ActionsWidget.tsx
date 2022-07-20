@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-16 16:39:48
  * @LastEditors: hesisi
- * @LastEditTime: 2022-07-20 15:07:26
+ * @LastEditTime: 2022-07-20 16:38:44
  */
 import React, { useEffect } from 'react';
 import { Space, Button, Radio } from 'antd';
@@ -28,8 +28,12 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
 
   useEffect(() => {
     // 初始化
-    const formilyFormSchema = localStorage.getItem('formily-form-schema');
+    const formilyFormSchema = localStorage.getItem('formily-form-schema')
     if (formilyFormSchema && type === 'form') {
+      const schemaJsonStr = JSON.stringify(
+        transformToSchema(designer.getCurrentTree()),
+      );
+      localStorage.setItem('formily-table-schema', schemaJsonStr);
       designer.setCurrentTree(
         transformToTreeNode(
           JSON.parse(formilyFormSchema),
@@ -39,6 +43,10 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
 
     const formilyTableSchema = localStorage.getItem('formily-table-schema')
     if (formilyTableSchema && type === 'table') {
+      const schemaJsonStr = JSON.stringify(
+        transformToSchema(designer.getCurrentTree()),
+      );
+      localStorage.setItem('formily-form-schema', schemaJsonStr);
       const formSchema = transformToSchema(designer.getCurrentTree());
       const tableSchema = JSON.parse(formilyTableSchema);
       const tableItems = {};
@@ -69,7 +77,10 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
       Object.keys(tableSchema['schema']?.properties).forEach((key) => {
         const item = tableSchema['schema']?.properties[key];
         if (item?.type === 'array' && item?.['x-component'] === 'ArrayTable') {
-          if (tableSchema['schema']?.properties?.[key]) {
+          if (
+            tableSchema['schema']?.properties?.[key] &&
+            tableSchema['schema']?.properties?.[key]?.['items']
+          ) {
             tableSchema['schema']!.properties!.[key]!.['items'] = {
               type: 'object',
               'x-designable-id': Math.random().toString(36).substr(2),
@@ -78,7 +89,6 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
           }
         }
       });
-      console.log('==========tableSchema', tableSchema);
       if (tableSchema) {
         designer.setCurrentTree(transformToTreeNode(tableSchema));
       }
@@ -115,7 +125,11 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
           const schemaJsonStr = JSON.stringify(
             transformToSchema(designer.getCurrentTree()),
           );
-          localStorage.setItem('formily-form-schema', schemaJsonStr);
+          if (type === 'form') {
+            localStorage.setItem('formily-form-schema', schemaJsonStr);
+          } else {
+            localStorage.setItem('formily-table-schema', schemaJsonStr);
+          }
         }}
       >
         <TextWidget>Save</TextWidget>

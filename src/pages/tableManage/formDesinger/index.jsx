@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-16 15:29:56
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-23 16:11:02
+ * @LastEditTime: 2022-07-21 14:31:27
  */
 import 'antd/dist/antd.less';
 import Style from './index.less';
@@ -95,7 +95,7 @@ GlobalRegistry.registerDesignerLocales({
 });
 
 const FormDesigner = (props) => {
-  const { type = 'form' } = props;
+  const { type = 'form', getDesigner,onSave } = props;
 
   const [inputsSource, setInputsSource] = useState([]);
   const [layoutsSource, setLayoutsSource] = useState([
@@ -171,7 +171,7 @@ const FormDesigner = (props) => {
     <Designer engine={engine}>
       <StudioPanel
         logo={<LogoWidget />}
-        actions={<ActionsWidget type={type} />}
+        actions={<ActionsWidget type={type} getDesigner={getDesigner} onSave={onSave} />}
       >
         <CompositePanel>
           <CompositePanel.Item title="panels.Component" icon="Component">

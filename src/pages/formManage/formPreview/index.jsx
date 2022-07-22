@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:09:41
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-23 14:12:11
+ * @LastEditTime: 2022-07-21 10:06:18
  */
 import { Table, Button, message } from 'antd';
 import { PreviewWidget } from '../formDesinger/widgets/PreviewWidget'
@@ -16,7 +16,6 @@ import {
 
 export default function IndexPage() {
 	const tree = transformToTreeNode(JSON.parse(localStorage.getItem('formily-schema')))
-	console.log("====tree:",tree)
 	
 	const formRef = useRef(null)
 	const [form, setForm] = useState(null)
@@ -76,9 +75,6 @@ export default function IndexPage() {
 		// form.setValues('userName', 'zhangsan')
 		form.values.userName = 'username'
 	}
-
-	
-
 
 	return (
 		<div>

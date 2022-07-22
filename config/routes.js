@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:14:56
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-24 16:01:18
+ * @LastEditTime: 2022-07-22 10:20:44
  */
 import React from 'react';
 import {
@@ -131,6 +131,11 @@ export default [
         name: '动态表单demo',
         path: '/formManage/formPreview',
         component: '@/pages/formManage/formPreview',
+      },
+      {
+        name: 'editor demo',
+        path: '/formManage/mdEditor',
+        component: '@/pages/formManage/mdEditor',
       },
     ],
   },

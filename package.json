@@ -25,6 +25,7 @@
     "@formily/antd": "^2.1.5",
     "@formily/core": "^2.1.5",
     "@formily/react": "^2.1.5",
+    "@uiw/react-md-editor": "^3.14.5",
     "axios": "^0.27.2",
     "js-cookie": "^3.0.1",
     "react": "17.x",

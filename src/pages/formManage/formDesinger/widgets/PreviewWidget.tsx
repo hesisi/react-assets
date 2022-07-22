@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-16 16:40:28
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-23 16:47:48
+ * @LastEditTime: 2022-07-20 20:57:18
  */
 import React, { useMemo, useImperativeHandle, forwardRef } from 'react'
 import { createForm } from '@formily/core'
@@ -93,18 +93,19 @@ export interface IPreviewWidgetProps {
 }
 
 export const PreviewWidget: React.FC<IPreviewWidgetProps> = forwardRef((props, ref) => {
-  const form = useMemo(() => createForm(), [])
-  const { form: formProps, schema } = transformToSchema(props.tree)  // treeNode模式 json-》treeNode -> schema
-
-  useImperativeHandle(ref, () => {
-    return {
-      form: form,
-    }
-  })
-
-  return (
-    <Form {...formProps} form={form}>
-      <SchemaField schema={schema} />
-    </Form>
-  )
+  console.log("===44ref:",ref)
+    const form = useMemo(() => createForm(), [])
+    const { form: formProps, schema } = transformToSchema(props.tree)  // treeNode模式 json-》treeNode -> schema
+  
+    useImperativeHandle(ref, () => {
+      return {
+        form: form,
+      }
+    })
+  
+    return (
+      <Form {...formProps} form={form}>
+        <SchemaField schema={schema} />
+      </Form>
+    )
 })

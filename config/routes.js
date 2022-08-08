@@ -4,7 +4,7 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:14:56
  * @LastEditors: hesisi
- * @LastEditTime: 2022-08-01 09:49:58
+ * @LastEditTime: 2022-08-08 10:05:37
  */
 import React from 'react';
 import {
@@ -109,13 +109,12 @@ export default [
         path: '/formManage',
         redirect: '/formManage/formAdd',
       },
-      {
-        name: '新建表单',
-        path: '/formManage/formAdd',
-        component: '@/pages/formManage/formDesinger',
-        // component: '@/pages/tableManage/formDesinger',
-        hidden: true,
-      },
+      // {
+      //   name: '新建表单',
+      //   path: '/formManage/formAdd',
+      //   component: '@/pages/formManage/formDesinger',
+      //   hidden: true,
+      // },
       {
         name: '新建表单/列表',
         path: '/formManage/formAndTable',
@@ -131,7 +130,13 @@ export default [
         name: '动态表单demo',
         path: '/formManage/formPreview',
         component: '@/pages/formManage/formPreview',
+        meta: { showMenu: false },
       },
     ],
   },
+  {
+    name: '动态报表',
+    // path: 'http://www.baidu.com',
+    // component: '@/layouts/formManageLayout',
+  }
 ];

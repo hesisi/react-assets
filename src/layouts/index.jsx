@@ -4,24 +4,40 @@
  * @Author: hesisi
  * @Date: 2022-06-13 16:48:59
  * @LastEditors: hesisi
- * @LastEditTime: 2022-06-20 14:25:59
+ * @LastEditTime: 2022-08-08 11:46:00
  */
 import { Breadcrumb, Layout, Menu } from 'antd';
 import { withRouter } from 'react-router-dom'
 import { Link } from 'umi'
-import React from 'react';
+import React,{ useMemo }  from 'react';
 import routes from '../../config/routes'
 import Styles from './index.less'
+import logo from '@/assets/logo.png'
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const renderNavBar = routes.filter(item => item.name)?.map((item) => {
   return {
     key: item.path,
-    label: item.path ? <Link to={item.path}>{item.name}</Link> : item.name,
+    label: item.path ? <Link to={item.path}>{item.name}</Link> : <div onClick={() => {
+      if(item.name === "动态报表"){
+        window.location.href = 'http://101.34.8.240:8085/tool-datav/index'
+      }
+    }}>{item.name}</div>,
   }
 });
 
+const getMetaInfoByPath = (routesData, path, result=[]) => {
+  routesData.forEach(item => {
+    if(item.path === path){
+      result.push(item.meta)
+    }else if(item.routes && item.routes.length){
+      getMetaInfoByPath(item.routes, path, result)
+    }
+  });
+
+  return result
+}
 
 const CommonLayout = (props) => {
   const selectKey = `/${props.location.pathname?.split('/')[1]}`
@@ -48,9 +64,19 @@ const CommonLayout = (props) => {
     });
   }
 
+  const meta = useMemo(() => {
+    const path = props.location.pathname
+    const metaInfo = getMetaInfoByPath(routes, path, []) && getMetaInfoByPath(routes, path, [])[0]
+
+    return metaInfo
+  })
+
   return (
     <Layout>
-      <Header className="header">
+      <Header className={Styles.header} style={{display: !meta.showMenu ? 'none' : 'block'}}>
+        <div className={Styles.logo}>
+          <img src={logo} />
+        </div>
         <Menu theme="dark" mode="horizontal" defaultSelectedKeys={[selectKey]} items={renderNavBar} />
       </Header>
       <Content
@@ -59,13 +85,20 @@ const CommonLayout = (props) => {
         }}
       >
         <Layout
-          className="site-layout-background"
+          className={Styles["site-layout-background"]}
           style={{
             // padding: '24px 0',
             height: '100%'
           }}
         >
-          <Sider className="site-layout-background" width={200}>
+          <Sider 
+            className={Styles["site-layout-background"]} 
+            width={200}
+            style={{
+              // height: '100%',
+              display: !meta.showMenu ? 'none' : 'block'
+            }}
+          >
             <Menu
               mode="inline"
               selectedKeys={[activePath]}

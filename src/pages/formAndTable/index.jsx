@@ -4,15 +4,16 @@
  * @Author: hesisi
  * @Date: 2022-07-20 14:55:02
  * @LastEditors: hesisi
- * @LastEditTime: 2022-07-21 15:31:32
+ * @LastEditTime: 2022-08-05 17:14:29
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef,useMemo } from 'react';
 import { Tabs, Radio } from 'antd';
+import moment from 'moment'
 import {
   transformToSchema,
   transformToTreeNode,
 } from '@designable/formily-transformer';
-import FormDesigner from '../tableManage/formDesinger';
+import FormDesigner from '../Desinger';
 import { tableConfig } from './designerConfig';
 
 const { Group, Button } = Radio;
@@ -21,9 +22,9 @@ export default function (props) {
   const [desingerType, setDesingerType] = useState('form');
   const [designer, setDesigner] = useState();
 
-  // form schema
+  // 保存当前设计器的form schema
   const [formilyFormSchema, setFormilyFormSchema] = useState()
-  // table schema
+  // 保存当前设计器的table schema
   const [formilyTableSchema, setFormilyTableSchema] = useState()
 
   const getDesigner = designer => {
@@ -32,28 +33,37 @@ export default function (props) {
     getSchemaData(designer)
   }
 
-  // 模拟接口获取schem参数
-  const getSchemaData = (designer) => {
-    // return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        const formilyFormSchema = localStorage.getItem('formily-form-schema') && JSON.parse(localStorage.getItem('formily-form-schema')) || null
-        const formilyTableSchema = localStorage.getItem('formily-table-schema') && JSON.parse(localStorage.getItem('formily-table-schema')) || null
-    
-        setFormilyFormSchema(formilyFormSchema)
-        setFormilyTableSchema(formilyTableSchema) 
+  const formCode = useMemo(() => {
+    return props.location.query.formCode
+  })
 
-        if(formilyFormSchema){
-          designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
-        }
-        clearTimeout(timer)
-      }, 1000)
-      
-    // })
-  }
+  // useEffect(() => {
+  //   const formCode = props.location.query.formCode
+  //   setFormCode(formCode)
+  // }, [])
 
   useEffect(() => {
     initDesigner()
   }, [desingerType])
+
+  // 模拟接口获取schem参数
+  const getSchemaData = (designer) => {
+    const timer = setTimeout(() => {
+      const formMap = localStorage.getItem('formMap') && JSON.parse(localStorage.getItem('formMap')) || {}
+      const curretnItem = formMap[formCode]
+
+      const formilyFormSchema = curretnItem && curretnItem["formily-form-schema"] || null
+      const formilyTableSchema = curretnItem && curretnItem["formily-table-schema"] || null
+      setFormilyFormSchema(formilyFormSchema)
+      setFormilyTableSchema(formilyTableSchema)
+
+      if (formilyFormSchema) {
+        designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
+      }
+      clearTimeout(timer)
+    }, 1000)
+  }
+ 
 
   const initDesigner = () => {
     if (!designer) return
@@ -70,7 +80,7 @@ export default function (props) {
         const initTableSchema = transformFormToTable(schemaJson);
         setFormilyTableSchema(initTableSchema)
         designer.setCurrentTree(transformToTreeNode(initTableSchema));
-      }else{
+      } else {
         designer.setCurrentTree(transformToTreeNode(formilyTableSchema));
       }
     }
@@ -124,12 +134,28 @@ export default function (props) {
   // 保存，暂时保存至localStorage中
   const onSave = () => {
     const schemaJsonStr = transformToSchema(designer.getCurrentTree());
-    if(desingerType === 'form'){
-      localStorage.setItem('formily-form-schema', JSON.stringify(schemaJsonStr))
-      localStorage.setItem('formily-table-schema', JSON.stringify(formilyTableSchema))
-    }else{
-      localStorage.setItem('formily-form-schema', JSON.stringify(formilyFormSchema))
-      localStorage.setItem('formily-table-schema', JSON.stringify(schemaJsonStr))
+
+    // 修改
+    let formList = localStorage.getItem("formList") && JSON.parse(localStorage.getItem("formList")) || []
+    let formMap = localStorage.getItem("formMap") && JSON.parse(localStorage.getItem("formMap")) || {}
+    if (formCode) {
+      formList = formList.map(item => {
+        if (item.formCode === formCode) {
+          item.updateTime = moment().format("YYYY-MM-DD HH:mm:ss")
+          item.updateName = 'admin'
+        }
+        return item
+      })
+      // 将更新后的list保存在缓存中
+      localStorage.setItem("formList", JSON.stringify(formList))
+
+      formMap[formCode] = {
+        'formily-form-schema': desingerType === 'form' ? schemaJsonStr : formilyFormSchema,
+        'formily-table-schema': desingerType === 'form' ? formilyTableSchema : schemaJsonStr
+      }
+
+      // 更新后的mp存到缓存中去
+      localStorage.setItem("formMap", JSON.stringify(formMap))
     }
   }
 

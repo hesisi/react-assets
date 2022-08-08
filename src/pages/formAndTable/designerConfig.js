@@ -23,22 +23,16 @@ export const tableConfig = {
             'x-designable-id': 'r24vptcrwst',
             'x-index': 0,
           },
-          '4a4d2bieve4': {
-            title: 'Select',
+          r24vptcrwst2: {
+            type: 'string',
+            title: 'title',
             'x-decorator': 'FormItem',
-            'x-component': 'Select',
+            'x-component': 'Input',
             'x-validator': [],
             'x-component-props': {},
             'x-decorator-props': {},
-            enum: [
-              {
-                children: [],
-                Earth: 'earth',
-                Sun: 'sun',
-              },
-            ],
-            'x-designable-id': '4a4d2bieve4',
-            'x-index': 1,
+            'x-designable-id': 'r24vptcrwst2',
+            'x-index': 0,
           },
         },
         'x-index': 0,
@@ -52,6 +46,18 @@ export const tableConfig = {
         'x-decorator-props': {},
         'x-designable-id': 'qhdq07trq9e',
         'x-index': 1,
+      },
+      // 按钮
+      qhdq07tr32tv: {
+        type: 'string',
+        'x-decorator': 'FormItem',
+        'x-component': 'Button',
+        
+        // 'x-validator': [],
+        'x-component-props': {},
+        'x-decorator-props': {},
+        'x-designable-id': 'qhdq07tr32tv',
+        'x-index': 2,
       },
     },
     'x-designable-id': '9irvllu35im',

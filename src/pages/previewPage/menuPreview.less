@@ -1,0 +1,21 @@
+.layout-background(@bgColor:#fff) {
+  background: @bgColor;
+}
+.background-light {
+  .layout-background(#fff);
+}
+.background-dark {
+  .layout-background(#001529);
+}
+
+.header-menu {
+  // height: 64px;
+  .ant-menu-item {
+    line-height: 64px;
+  }
+}
+
+.menu-preview__iframe {
+  width: calc(100vw - 200px);
+  height: calc(100vh - 64px);
+}

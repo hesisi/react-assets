@@ -1,6 +1,6 @@
 /*
- * @Descripttion: 
- * @version: 
+ * @Descripttion:
+ * @version:
  * @Author: hesisi
  * @Date: 2022-07-20 14:55:02
  * @LastEditors: hesisi
@@ -22,59 +22,65 @@ export default function (props) {
   const [designer, setDesigner] = useState();
 
   // form schema
-  const [formilyFormSchema, setFormilyFormSchema] = useState()
+  const [formilyFormSchema, setFormilyFormSchema] = useState();
   // table schema
-  const [formilyTableSchema, setFormilyTableSchema] = useState()
+  const [formilyTableSchema, setFormilyTableSchema] = useState();
 
-  const getDesigner = designer => {
+  const getDesigner = (designer) => {
     setDesigner(designer);
 
-    getSchemaData(designer)
-  }
+    getSchemaData(designer);
+  };
 
   // 模拟接口获取schem参数
   const getSchemaData = (designer) => {
     // return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => {
-        const formilyFormSchema = localStorage.getItem('formily-form-schema') && JSON.parse(localStorage.getItem('formily-form-schema')) || null
-        const formilyTableSchema = localStorage.getItem('formily-table-schema') && JSON.parse(localStorage.getItem('formily-table-schema')) || null
-    
-        setFormilyFormSchema(formilyFormSchema)
-        setFormilyTableSchema(formilyTableSchema) 
+    const timer = setTimeout(() => {
+      const formilyFormSchema =
+        (localStorage.getItem('formily-form-schema') &&
+          JSON.parse(localStorage.getItem('formily-form-schema'))) ||
+        null;
+      const formilyTableSchema =
+        (localStorage.getItem('formily-table-schema') &&
+          JSON.parse(localStorage.getItem('formily-table-schema'))) ||
+        null;
 
-        if(formilyFormSchema){
-          designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
-        }
-        clearTimeout(timer)
-      }, 1000)
-      
+      setFormilyFormSchema(formilyFormSchema);
+      setFormilyTableSchema(formilyTableSchema);
+
+      if (formilyFormSchema) {
+        designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
+      }
+      clearTimeout(timer);
+    }, 1000);
+
     // })
-  }
+  };
 
   useEffect(() => {
-    initDesigner()
-  }, [desingerType])
+    initDesigner();
+  }, [desingerType]);
 
   const initDesigner = () => {
-    if (!designer) return
-    const schemaJson = transformToSchema(designer.getCurrentTree())
+    if (!designer) return;
+    const schemaJson = transformToSchema(designer.getCurrentTree());
     if (desingerType === 'form') {
       // 保存table schema并将设计器初始化成 form schema
-      setFormilyTableSchema(schemaJson)
+      setFormilyTableSchema(schemaJson);
       designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
     } else {
       // 保存form schema并将设计器初始化成 table schema
-      setFormilyFormSchema(schemaJson)
+      setFormilyFormSchema(schemaJson);
 
       if (!formilyTableSchema) {
         const initTableSchema = transformFormToTable(schemaJson);
-        setFormilyTableSchema(initTableSchema)
+        setFormilyTableSchema(initTableSchema);
         designer.setCurrentTree(transformToTreeNode(initTableSchema));
-      }else{
+      } else {
         designer.setCurrentTree(transformToTreeNode(formilyTableSchema));
       }
     }
-  }
+  };
 
   // transformFormToTable: 如果table schema为空则，讲form的字段转成table的列
   const transformFormToTable = (schemaJson) => {
@@ -109,7 +115,7 @@ export default function (props) {
       Object.keys(tableSchema['schema']?.properties).forEach((key) => {
         const item = tableSchema['schema']?.properties[key];
         if (item?.type === 'array' && item?.['x-component'] === 'ArrayTable') {
-          tableSchema['schema'].properties.[key].['items'] = {
+          tableSchema['schema'].properties[key]['items'] = {
             type: 'object',
             'x-designable-id': Math.random().toString(36).substr(2),
             properties: tableItems,
@@ -118,20 +124,32 @@ export default function (props) {
       });
     }
 
-    return tableSchema
-  }
+    return tableSchema;
+  };
 
   // 保存，暂时保存至localStorage中
   const onSave = () => {
     const schemaJsonStr = transformToSchema(designer.getCurrentTree());
-    if(desingerType === 'form'){
-      localStorage.setItem('formily-form-schema', JSON.stringify(schemaJsonStr))
-      localStorage.setItem('formily-table-schema', JSON.stringify(formilyTableSchema))
-    }else{
-      localStorage.setItem('formily-form-schema', JSON.stringify(formilyFormSchema))
-      localStorage.setItem('formily-table-schema', JSON.stringify(schemaJsonStr))
+    if (desingerType === 'form') {
+      localStorage.setItem(
+        'formily-form-schema',
+        JSON.stringify(schemaJsonStr),
+      );
+      localStorage.setItem(
+        'formily-table-schema',
+        JSON.stringify(formilyTableSchema),
+      );
+    } else {
+      localStorage.setItem(
+        'formily-form-schema',
+        JSON.stringify(formilyFormSchema),
+      );
+      localStorage.setItem(
+        'formily-table-schema',
+        JSON.stringify(schemaJsonStr),
+      );
     }
-  }
+  };
 
   return (
     <>
@@ -146,7 +164,11 @@ export default function (props) {
         <Button value="table">列表设计</Button>
       </Group>
 
-      <FormDesigner type={desingerType} getDesigner={getDesigner} onSave={onSave} />
+      <FormDesigner
+        type={desingerType}
+        getDesigner={getDesigner}
+        onSave={onSave}
+      />
     </>
   );
 }

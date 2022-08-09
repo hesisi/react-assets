@@ -134,4 +134,9 @@ export default [
       },
     ],
   },
+  {
+    name: '菜单预览',
+    path: '/previewPage/menuPreview',
+    component: '@/pages/previewPage/menuPreview',
+  },
 ];

@@ -57,6 +57,11 @@ export default function IndexPage() {
   const nodeClear = () => {
     // 结点清空
     eventBus.emit('nodeClear', []);
+    setForm({
+      formValue: {},
+      comIcons: {},
+      isEdit: false,
+    });
   };
   const configClear = () => {
     // 配置缓存清空
@@ -90,7 +95,7 @@ export default function IndexPage() {
           <Col span={5}>
             <div className="menu-config__tree">
               <span>菜单配置</span>
-              <Button onClick={configClear}>清空配置缓存</Button>
+              <Button onClick={configClear}>重置配置</Button>
             </div>
           </Col>
           <Col span={11}>配置面板</Col>

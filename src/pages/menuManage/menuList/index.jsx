@@ -12,7 +12,7 @@ import './index.less';
 import ConfigPanel from './configPanel';
 import MenuTree from './menuTree';
 import MenuConfig from './menuConfig';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import eventBus from '../../../utils/eventBus';
 
@@ -23,6 +23,8 @@ export default function IndexPage() {
   const [formData, setForm] = useState(); // 配置面板
 
   const [menuConfig, setMenuConfig] = useState({}); //菜单配置
+
+  const menuConfigRef = useRef(null);
 
   const configSubmit = (formValue, comIcons, iconIndex) => {
     // 配置面板提交
@@ -58,6 +60,7 @@ export default function IndexPage() {
   };
   const configClear = () => {
     // 配置缓存清空
+    menuConfigRef.current.resetFields();
     window.localStorage.removeItem('menuConfig');
   };
 
@@ -100,7 +103,7 @@ export default function IndexPage() {
 
           {/* 内容部分 */}
           <Col span={5}>
-            <MenuConfig setMenuConfig={setMenuConfig} />
+            <MenuConfig setMenuConfig={setMenuConfig} ref={menuConfigRef} />
           </Col>
           <Col span={11} className="config-panel__form-box">
             <ConfigPanel

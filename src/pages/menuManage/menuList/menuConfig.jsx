@@ -1,7 +1,7 @@
 import { Form, Select } from 'antd';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 
-export default function menuConfig(props) {
+const menuConfig = forwardRef((props, ref) => {
   const modeList = ['inline', 'horizontalAndVertical']; // 激活显示type
 
   const selectList = {
@@ -27,7 +27,7 @@ export default function menuConfig(props) {
     theme2: 'dark',
     type: 'inline',
   });
-  const [form] = Form.useForm();
+  const [form, setForm] = Form.useForm();
   const handleChange = (e) => {
     setModeSelectShow(modeList.includes(e) ? true : false);
   };
@@ -62,6 +62,7 @@ export default function menuConfig(props) {
       initialValues={formData}
       form={form}
       onValuesChange={onValuesChange}
+      ref={ref}
     >
       <Form.Item label="形态" name="mode">
         <Select onChange={(e) => handleChange(e)}>
@@ -74,24 +75,24 @@ export default function menuConfig(props) {
           )
         </Select>
       </Form.Item>
-
+      {/*
       {modeSelectShow ? (
-        <>
-          <Form.Item label="类型" name="type">
-            <Select>
-              (
-              {selectList.type.map((e, i) => (
-                <Select.Option value={e.value} key={i}>
-                  {e.label}
-                </Select.Option>
-              ))}
-              )
-            </Select>
-          </Form.Item>
-        </>
+        <> */}
+      <Form.Item label="类型" name="type">
+        <Select>
+          (
+          {selectList.type.map((e, i) => (
+            <Select.Option value={e.value} key={i}>
+              {e.label}
+            </Select.Option>
+          ))}
+          )
+        </Select>
+      </Form.Item>
+      {/* </>
       ) : (
         <></>
-      )}
+      )} */}
 
       <Form.Item label="侧边栏风格" name="theme1">
         <Select>
@@ -118,4 +119,6 @@ export default function menuConfig(props) {
       </Form.Item>
     </Form>
   );
-}
+});
+
+export default menuConfig;

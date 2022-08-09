@@ -11,17 +11,33 @@ import eventBus from '../../utils/eventBus';
 const { Header, Content, Sider } = Layout;
 let items = [];
 let config = {};
+let treeObj = {};
+
 eventBus.addListener('setTree', (tree, menuConfig) => {
   // 不写话第一次打开无法显示
   items = tree;
   config = menuConfig;
+  const temp = (data) => {
+    data.forEach((item) => {
+      treeObj[item.key] = item.address;
+      if (item.children) {
+        temp(item.children);
+      }
+    });
+  };
+  temp(tree);
 });
 
 export default function menuPreview() {
   const header = ['horizontal', 'horizontalAndVertical'];
   const sider = ['inline', 'horizontalAndVertical'];
+
+  const [iframeShow, setIframeShow] = useState(false);
+  const [iframeSrc, setIframeSrc] = useState('');
+
   const onClick = (e) => {
-    console.log('click ', e);
+    setIframeShow(true);
+    setIframeSrc(treeObj[e.key]);
   };
 
   const [mode, setMode] = useState('inline');
@@ -126,12 +142,20 @@ export default function menuPreview() {
               minHeight: 280,
             }}
           >
-            <iframe
-              title="iframe"
-              scrolling="auto"
-              src="/formManage/formPreview"
-              className="menu-preview__iframe"
-            ></iframe>
+            {iframeShow ? (
+              <iframe
+                title="iframe"
+                scrolling="auto"
+                src={iframeSrc}
+                className={
+                  config.mode === 'horizontal'
+                    ? 'menu-preview__iframe iframe-horizontal'
+                    : 'menu-preview__iframe'
+                }
+              ></iframe>
+            ) : (
+              <h1 className="menu-preview__title">Welcome</h1>
+            )}
           </Content>
         </Layout>
       </Content>

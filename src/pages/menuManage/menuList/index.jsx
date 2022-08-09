@@ -38,6 +38,8 @@ export default function IndexPage() {
         item.label = item.title;
         delete item.iconIndex;
         delete item.isEdit;
+        delete item.formValue;
+        delete item.comIcon;
         if (item.children?.length > 0) {
           temp(item.children);
           return;

@@ -42,7 +42,7 @@ export default function menuTree(props) {
         data.forEach((item) => {
           if (item.key === form.key) {
             item = Object.assign(item, {
-              ...props.config,
+              ...form,
               key: nanoid(),
               title: form.menuname,
               icon: props.config.comIcons,
@@ -159,6 +159,11 @@ export default function menuTree(props) {
     setGData([...arr]); // 这样才可以动态更新掉视图上的数据
     props.setTree(arr);
     deleteFlag = true; // 删除标识
+    props.setForm({
+      formValue: {},
+      comIcons: {},
+      isEdit: false,
+    });
   };
 
   const onSelect = (selectedKeys, { selected, selectedNodes, node, event }) => {
@@ -178,6 +183,7 @@ export default function menuTree(props) {
       comIcons: selectedNodes[0]?.icon || null,
       isEdit: true,
     });
+
     deleteFlag = false;
   };
 

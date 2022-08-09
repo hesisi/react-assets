@@ -13,19 +13,23 @@ export default function configPanel(props) {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (!props.formData || !props.formData.formValue) return;
-    const value = props.formData.formValue;
+    // debugger;
+    // if (!props.formData || !props.formData.formValue) return;
+    const value = props?.formData?.formValue || {};
     form.setFieldsValue({
-      menuname: value.menuname,
-      address: value.address,
-      icon: value.icon,
+      menuname: value?.menuname || '',
+      address: value?.address || '',
+      icon: value?.icon || null,
     });
-    setIconSelect(value.icon);
-    setIconIndex(value.iconIndex);
-    setIsEdit(props.formData.isEdit);
-    if (props.formData.isEdit) {
-      setIsShowEdit(true);
+    if (value) {
+      setIconSelect(value.icon);
+      setIconIndex(value.iconIndex);
     }
+    const isEdit = props.formData?.isEdit || false;
+    setIsEdit(isEdit); // 是否是编辑
+    // if (isEdit) {
+    setIsShowEdit(isEdit);
+    // }
   }, [props.formData]);
 
   const onFinish = (values) => {
@@ -99,19 +103,24 @@ export default function configPanel(props) {
 
       <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
         <Space>
-          <Button type="primary" htmlType="submit">
+          {/* <Button type="primary" htmlType="submit">
             <PlusOutlined />
             添加菜单结点
-          </Button>
+          </Button> */}
 
           {isShowEdit ? (
             <>
-              <Button htmlType="submit">
+              <Button type="primary" htmlType="submit">
                 <EditOutlined />
                 修改菜单结点
               </Button>
             </>
-          ) : null}
+          ) : (
+            <Button type="primary" htmlType="submit">
+              <PlusOutlined />
+              添加菜单结点
+            </Button>
+          )}
         </Space>
       </Form.Item>
     </Form>

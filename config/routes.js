@@ -136,6 +136,22 @@ export default [
     ],
   },
   {
+    name: '页面管理',
+    path: '/pageManage',
+    component: '@/layouts/pageManageLayout/index',
+    routes: [
+      {
+        path: '/pageManage',
+        redirect: '/pageManage/homePage',
+      },
+      {
+        name: '首页管理',
+        path: '/pageManage/homePage',
+        component: '@/pages/pageManage/homePage/index',
+      },
+    ],
+  },
+  {
     name: '菜单预览',
     path: '/previewPage/menuPreview',
     component: '@/pages/previewPage/menuPreview',

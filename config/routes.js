@@ -125,6 +125,7 @@ export default [
         name: '动态表单',
         path: '/formManage/formList',
         component: '@/pages/formManage/formList',
+        meta: { showMenu: false },
       },
       {
         name: '动态表单demo',
@@ -135,8 +136,13 @@ export default [
     ],
   },
   {
+    name: '菜单预览',
+    path: '/previewPage/menuPreview',
+    component: '@/pages/previewPage/menuPreview',
+  },
+  {
     name: '动态报表',
     // path: 'http://www.baidu.com',
     // component: '@/layouts/formManageLayout',
-  }
+  },
 ];

@@ -157,6 +157,11 @@ export default [
     component: '@/pages/previewPage/menuPreview',
   },
   {
+    name: '页面预览',
+    path: '/previewPage/pagePreview',
+    component: '@/pages/previewPage/pagePreview',
+  },
+  {
     name: '动态报表',
     // path: 'http://www.baidu.com',
     // component: '@/layouts/formManageLayout',

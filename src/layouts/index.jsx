@@ -27,8 +27,7 @@ const renderNavBar = routes
         <div
           onClick={() => {
             if (item.name === '动态报表') {
-              window.location.href =
-                'http://101.34.8.240:8085/tool-datav/index';
+              window.location.href = 'http://10.173.50.7:9996/tool-datav/index';
             }
           }}
         >
@@ -38,7 +37,11 @@ const renderNavBar = routes
     };
   });
 
-const navBar = renderNavBar.filter((e) => e.key !== '/previewPage/menuPreview'); // 过滤掉菜单预览
+const navBar = renderNavBar.filter(
+  (e) =>
+    e.key !== '/previewPage/menuPreview' ||
+    e.key !== '/previewPage/pagePreview',
+); // 过滤掉菜单预览
 
 const getMetaInfoByPath = (routesData, path, result = []) => {
   routesData.forEach((item) => {

@@ -155,7 +155,7 @@ export default [
         component: '@/pages/pageManage/homePage/index',
       },
       {
-        name: '首页管理',
+        name: '自定义配置',
         path: '/pageManage/pageBuild',
         component: '@/pages/pageManage/pageBuild',
       },
@@ -171,6 +171,12 @@ export default [
     name: '页面预览',
     path: '/previewPage/pagePreview',
     component: '@/pages/previewPage/pagePreview',
+    meta: { navHidden: true },
+  },
+  {
+    name: '布局预览',
+    path: '/previewPage/layoutPreview',
+    component: '@/pages/previewPage/layoutPreview',
     meta: { navHidden: true },
   },
   {

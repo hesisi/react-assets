@@ -13,12 +13,16 @@ import {
 } from 'antd';
 import { nanoid } from 'nanoid';
 const { Option } = Select;
-import './index.less';
+import './layoutPreview.less';
 import React, { useEffect, useState, useRef } from 'react';
-import image from './test.jpg';
+import image from '../../assets/test.jpg';
 
 export default function pageBuid() {
+  let domStorage = window.localStorage.getItem('layoutTemplate');
   const [dom, setDom] = useState([]);
+  useEffect(() => {
+    setDom(JSON.parse(domStorage));
+  }, []);
   const [targetDom, setTargetDom] = useState('');
   const [targetID, setTargetID] = useState('');
 
@@ -88,9 +92,7 @@ export default function pageBuid() {
     console.log('Success:', values);
     setDomStyle(values);
   };
-  const preview = () => {
-    window.localStorage.setItem('layoutTemplate', JSON.stringify(dom));
-  };
+  const preview = () => {};
   function renderChild(children) {
     return children.map((child) => (
       <Col
@@ -250,72 +252,9 @@ export default function pageBuid() {
   return (
     <div style={{ padding: '10px', height: '100%' }}>
       <Row style={{ height: '100%' }}>
-        <Col span={18}>
+        <Col span={24}>
           <div className="build-cont" onClick={() => clearPanel()}>
             {renderDoms(dom)}
-          </div>
-        </Col>
-        <Col span={6}>
-          <div className="right-menu">
-            <div className={'tool'}>
-              <Button
-                type="primary"
-                id={'test1'}
-                onClick={addCol}
-                style={{ marginRight: '10px' }}
-              >
-                Add Col
-              </Button>
-              <Button type="primary" id={'test1'} onClick={preview}>
-                Save
-              </Button>
-            </div>
-            <div className={'cont-panel'}>
-              <h4>属性</h4>
-              <Form
-                ref={formRef}
-                form={form}
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                autoComplete="off"
-                onFinish={onFinish}
-              >
-                <Form.Item label="Target" name="target">
-                  <Input disabled={true} value={targetID} />
-                </Form.Item>
-                {/*<Form.Item*/}
-                {/*  label="Width"*/}
-                {/*  name="width"*/}
-                {/*>*/}
-                {/*  <Input />*/}
-                {/*</Form.Item>*/}
-                <Form.Item label="Col-Span" name="col">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Height" name="height">
-                  <Input />
-                </Form.Item>
-                <Form.Item label="Type" name="type">
-                  <Select
-                    defaultValue=""
-                    style={{ width: 120 }}
-                    onChange={handleChange}
-                  >
-                    <Option value="table">Table</Option>
-                    <Option value="banner">Banner</Option>
-                    <Option value="image">Image</Option>
-                  </Select>
-                </Form.Item>
-              </Form>
-              <div style={{ padding: '10px' }}>
-                <Button onClick={save} style={{ marginRight: '10px' }}>
-                  Save
-                </Button>
-                <Button onClick={handleDelete} style={{ marginRight: '10px' }}>
-                  Delete
-                </Button>
-              </div>
-            </div>
           </div>
         </Col>
       </Row>

@@ -86,12 +86,17 @@ export default [
     routes: [
       {
         path: '/activityManage',
-        redirect: '/activityManage/activityList',
+        redirect: '/activityManage/activitConfig2',
       },
       {
         name: '流程管理',
-        path: '/activityManage/activityList',
-        component: '@/pages/activityManage/activityList',
+        path: '/activityList/',
+        component: '@/pages/activityManage/activityList/activityList',
+      },
+      {
+        name: '流程配置2',
+        path: '/activityManage/activitConfig2',
+        component: '@/pages/activityManage/activitConfig2',
       },
       {
         name: '流程配置',
@@ -148,6 +153,11 @@ export default [
         name: '首页管理',
         path: '/pageManage/homePage',
         component: '@/pages/pageManage/homePage/index',
+      },
+      {
+        name: '首页管理',
+        path: '/pageManage/pageBuild',
+        component: '@/pages/pageManage/pageBuild',
       },
     ],
   },

@@ -40,7 +40,8 @@ const renderNavBar = routes
 const navBar = renderNavBar.filter(
   (e) =>
     e.key !== '/previewPage/menuPreview' &&
-    e.key !== '/previewPage/pagePreview',
+    e.key !== '/previewPage/pagePreview' &&
+    e.key !== '/previewPage/layoutPreview',
 ); // 过滤掉菜单预览
 
 const getMetaInfoByPath = (routesData, path, result = []) => {

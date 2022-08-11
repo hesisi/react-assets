@@ -11,12 +11,14 @@ import {
   Popconfirm,
   Row,
   Col,
+  InputNumber,
 } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   CloseOutlined,
   SearchOutlined,
+  RedoOutlined,
 } from '@ant-design/icons';
 import React, {
   useState,
@@ -82,7 +84,11 @@ const App = (props) => {
   };
   objInit(formItemObj, formInit);
   objInit(tableProp, searchFormInit);
-
+  const FormattedDateTime = (dateString) => {
+    const momth = (dateString.getMonth() + 1).toString().padStart(2, '0');
+    const date = dateString.getDate().toString().padStart(2, '0');
+    return `${dateString.getFullYear()}-${momth}-${date}`;
+  };
   // 设置表格
   const columnsInit = formItem.map((e) => {
     if (e.type === 'DatePicker') {
@@ -91,6 +97,9 @@ const App = (props) => {
         dataIndex: e.name,
         key: e.id,
         render: (time) => {
+          if (!time) return '';
+          if (typeof time === 'string')
+            return FormattedDateTime(new Date(time));
           return time.format('YYYY-MM-DD');
         },
       };
@@ -113,7 +122,6 @@ const App = (props) => {
               rowDelete(_, record, index);
             }}
           >
-            <CloseOutlined />
             Delete
           </Button>
           <Button
@@ -122,7 +130,6 @@ const App = (props) => {
               rowEdit(_, record, index);
             }}
           >
-            <EditOutlined />
             Edit
           </Button>
         </>
@@ -132,10 +139,10 @@ const App = (props) => {
 
   const rowDelete = (_, record, index) => {
     //  行删除
-    if (index === 0) {
+    if (index === 0 && dataSource.length === 1) {
       setDataSource([]);
     } else {
-      setDataSource(dataSource.splice(index, 1));
+      setDataSource(dataSource.filter((e, i) => i !== index));
     }
   };
   const rowEdit = (_, record, index) => {
@@ -164,6 +171,7 @@ const App = (props) => {
         setDataSource(arr);
       }
 
+      setEditFlag(false);
       setFormVisible(false);
       formRef.current.resetFields();
     });
@@ -173,7 +181,7 @@ const App = (props) => {
     // 取消
     formRef.current.resetFields();
     setFormVisible(false);
-    setEditFlag(!editFlag);
+    setEditFlag(false);
   };
   const createElementList = (type) => {
     switch (type) {
@@ -190,6 +198,33 @@ const App = (props) => {
       default:
         break;
     }
+  };
+
+  const onSearch = () => {
+    window.localStorage.setItem('dataSource', JSON.stringify(dataSource));
+
+    if (dataSource.length === 0) return;
+    const obj = { ...searchFormRef.current.getFieldsValue() };
+    const keys = Object.keys(searchFormRef.current.getFieldsValue());
+    const values = Object.values(searchFormRef.current.getFieldsValue()).filter(
+      (e) => e !== null,
+    );
+    if (values.length === 0) return;
+    const arr = [];
+    dataSource.forEach((item) => {
+      keys.forEach((e) => {
+        if (item[e]?.indexOf(obj[e]) === undefined) return;
+        if (item[e]?.indexOf(obj[e]) !== -1) {
+          arr.push(item);
+        }
+      });
+    });
+    setDataSource([...new Set(arr)]);
+  };
+
+  const onReset = () => {
+    searchFormRef.current.resetFields();
+    setDataSource(JSON.parse(window.localStorage.getItem('dataSource')));
   };
 
   return (
@@ -220,7 +255,7 @@ const App = (props) => {
         </Form>
       </Modal>
 
-      <Space direction="vertical">
+      <Space direction="vertical" size={30}>
         <Row wrap justify="space-between">
           <Col>
             <Form
@@ -248,7 +283,7 @@ const App = (props) => {
             </Form>
           </Col>
 
-          <Col span={4}>
+          <Col span={5}>
             <Space>
               <Button
                 onClick={() => {
@@ -259,15 +294,25 @@ const App = (props) => {
                 <PlusOutlined />
                 add
               </Button>
-              <Button>
+
+              <Button onClick={onSearch}>
                 <SearchOutlined />
                 search
+              </Button>
+
+              <Button onClick={onReset} type="primary">
+                <RedoOutlined />
+                reset
               </Button>
             </Space>
           </Col>
         </Row>
 
-        <Table columns={columns} dataSource={dataSource} />
+        <Table
+          columns={columns}
+          dataSource={dataSource}
+          pagination={{ position: ['none', 'none'] }}
+        />
       </Space>
     </div>
   );

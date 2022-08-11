@@ -57,7 +57,7 @@ const App = (props) => {
   const objSetFunc = (data, arr) => {
     for (let key in data) {
       arr.push({
-        name: data[key].name,
+        name: data[key].name || data[key].title,
         label: data[key].title,
         type: data[key]['x-component'],
         rules: [

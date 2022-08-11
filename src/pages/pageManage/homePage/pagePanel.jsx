@@ -20,7 +20,6 @@ const data = [
   'Los Angeles battles huge wildfires.',
 ];
 
-const echarts = [{ code: 1, count: '操' }];
 export default function pagePanel(props) {
   const layoutOne = useRef(null);
   const layoutHeaderRef = useRef(null);

@@ -27,7 +27,7 @@ const renderNavBar = routes
         <div
           onClick={() => {
             if (item.name === '动态报表') {
-              window.location.href = 'http://10.173.50.2:9996/tool-datav/index';
+              window.location.href = ' http://localhost:9996/tool-datav/index';
             }
           }}
         >

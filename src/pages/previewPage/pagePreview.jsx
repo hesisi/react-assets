@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import Background from '../../assets/panda.jpg';
+import Background from '../../assets/bg.jpg';
 import { Layout, Menu, Row, Col, List } from 'antd';
 const { Sider, Content, Header } = Layout;
 import './pagePreview.less';

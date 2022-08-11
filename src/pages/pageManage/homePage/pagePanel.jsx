@@ -1,16 +1,25 @@
 import { useEffect, useRef, useState } from 'react';
 import { Layout, Menu, Row, Col, List } from 'antd';
 const { Sider, Content, Header } = Layout;
-import Background from '../../../assets/panda.jpg';
+import Background from '../../../assets/bg.jpg';
+// import Background from '../../../assets/panda.jpg';
 import TestChart from '../../echarts/testChart';
 
+// const blueList = [
+//   '#e6f7ff',
+//   '#bae7ff',
+//   '#91d5ff',
+//   '#69c0ff',
+//   '#40a9ff',
+//   '#1890ff',
+// ];
 const blueList = [
-  '#e6f7ff',
-  '#bae7ff',
-  '#91d5ff',
-  '#69c0ff',
-  '#40a9ff',
-  '#1890ff',
+  '#ffffff',
+  '#ffffff',
+  '#ffffff',
+  '#ffffff',
+  '#ffffff',
+  '#ffffff',
 ];
 const data = [
   'Racing car sprays burning fuel into crowd.',
@@ -20,6 +29,7 @@ const data = [
   'Los Angeles battles huge wildfires.',
 ];
 
+const echarts = [{ code: 1, count: '' }];
 export default function pagePanel(props) {
   const layoutOne = useRef(null);
   const layoutHeaderRef = useRef(null);
@@ -56,9 +66,9 @@ export default function pagePanel(props) {
         <Layout className="layout-two">
           <Header className="layout-two__header" ref={layoutHeaderRef}></Header>
           <Content className="layout-two__content">
-            <Row>
+            <Row justify="space-evenly">
               {blueList.slice(1, 4).map((e, i) => (
-                <Col span={8} style={{ backgroundColor: e }} key={e}>
+                <Col span={7} style={{ backgroundColor: e }} key={e}>
                   {i === 0 && props.comKey.includes('standard-2') ? (
                     <>
                       <List

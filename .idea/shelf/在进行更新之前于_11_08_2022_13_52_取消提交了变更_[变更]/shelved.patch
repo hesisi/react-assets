@@ -1,0 +1,403 @@
+Index: src/pages/activityManage/activityConfig/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion: \r\n * @version: \r\n * @Author: hesisi\r\n * @Date: 2022-06-13 16:09:41\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-06-15 11:06:46\r\n */\r\nimport { Table, Button } from 'antd';\r\n\r\nexport default function IndexPage() {\r\n  return (\r\n    <div>\r\n      <Button>activityConfig page</Button>\r\n    </div>\r\n  );\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/pages/activityManage/activityConfig/index.jsx b/src/pages/activityManage/activityConfig/index.jsx
+--- a/src/pages/activityManage/activityConfig/index.jsx	(revision 6422d1a7656cc25c86138ecff5f732449e3c8346)
++++ b/src/pages/activityManage/activityConfig/index.jsx	(date 1660123941036)
+@@ -1,17 +1,62 @@
+ /*
+- * @Descripttion: 
+- * @version: 
++ * @Descripttion:
++ * @version:
+  * @Author: hesisi
+  * @Date: 2022-06-13 16:09:41
+  * @LastEditors: hesisi
+  * @LastEditTime: 2022-06-15 11:06:46
+  */
+ import { Table, Button } from 'antd';
++import BpmnViewer from 'bpmn-js';
++import Modeler from 'bpmn-js/lib/Modeler';
++/*属性栏组件*/
++import {
++  BpmnPropertiesPanelModule,
++  BpmnPropertiesProviderModule,
++} from 'bpmn-js-properties-panel';
++
++import {xmlstr} from '../xml/testXml'
++// import pizzaDiagram from './xml/pizza-collaboration.bpmn';
++import {useEffect,useRef} from "react";
++import './index.less'
++import 'bpmn-js/dist/assets/diagram-js.css'
++import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
++import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
++import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css'
++/*右边属性控制栏*/
++import 'bpmn-js-properties-panel/dist/assets/properties-panel.css'
++import 'bpmn-js-properties-panel/dist/assets/element-templates.css'
+ 
++
++
++function Panel(){
++  const refPanel = useRef()
++  return (
++    <div ref={refPanel} id="panel" className={"panel"}></div>
++  )
++}
+ export default function IndexPage() {
++  const refContainer = useRef();
++  useEffect(() => {
++    const modeler = new Modeler({
++      container: '#canvas',
++      width:'100%',// 查看器宽度
++      height: '100%', // 查看器高度
++      propertiesPanel: {
++        parent: '#panel'
++      },
++      additionalModules: [
++        BpmnPropertiesPanelModule,
++        BpmnPropertiesProviderModule
++      ]
++    });
++    modeler.importXML(xmlstr);
++  });
++
+   return (
+-    <div>
+-      <Button>activityConfig page</Button>
++    <div className={'main-container'}>
++      <div ref={refContainer} id="canvas" className="container" />
++      <Panel></Panel>
+     </div>
+   );
+ }
+Index: src/pages/formManage/formPreview/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion: \r\n * @version: \r\n * @Author: hesisi\r\n * @Date: 2022-06-13 16:09:41\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-08-05 17:21:04\r\n */\r\nimport { Table, Button, message, Modal } from 'antd';\r\nimport { PreviewWidget } from '../../Desinger/widgets'\r\nimport { useEffect, useRef, useState, useMemo } from 'react'\r\nimport {\r\n\ttransformToTreeNode,\r\n} from '@designable/formily-transformer'\r\n\r\n\r\nexport default function IndexPage(props) {\r\n\tconst [visible, setVisible] = useState(false)\r\n\tconst [operateType, setOperateType] = useState(\"add\")\r\n\tconst [formTree, setFormTree] = useState(null)\r\n\tconst [tableTree, setTableTree] = useState(null)\r\n\tconst [formSchema, setFormSchema] = useState({\r\n\t\t\"formily-form-schema\": null,\r\n\t\t\"formily-table-schema\": null\r\n\t})\r\n\r\n\tconst tableRef = useRef(null)\r\n\tconst formRef = useRef(null)\r\n\r\n\tconst formCode = useMemo(() => {\r\n\t\treturn props.location.query.formCode\r\n\t})\r\n\r\n\tuseEffect(() => {\r\n\t\tconst formMap = localStorage.getItem(\"formMap\") && JSON.parse(localStorage.getItem(\"formMap\"))\r\n\t\tsetFormSchema(formMap[formCode])\r\n\r\n\t\tconst formilyTableSchema = formMap[formCode] && formMap[formCode][\"formily-table-schema\"]\r\n\t\tconst formilyFormSchema = formMap[formCode] && formMap[formCode][\"formily-form-schema\"]\r\n\t\tif (formilyTableSchema) {\r\n\t\t\tsetTableTree(transformToTreeNode(formilyTableSchema))\r\n\t\t}\r\n\r\n\t\tif (formilyFormSchema) {\r\n\t\t\tsetFormTree(transformToTreeNode(formilyFormSchema))\r\n\t\t}\r\n\r\n\t}, [])\r\n\r\n\t// const handleValidate = () => {\r\n\t// \t// formRef.current.form.validate();\r\n\t// \tform.validate()\r\n\t// }\r\n\r\n\t// const handleReset = () => {\r\n\t// \t// form.reset();\r\n\t// \tform.values = {}\r\n\t// }\r\n\r\n\t// const handleGetValues = () => {\r\n\t// \tconst values = form.values;\r\n\t// \tmessage.info(`表单的值为: ${JSON.stringify(values)}`)\r\n\t// }\r\n\r\n\tconst handleAssign = () => {\r\n\t\tconst initValue = {\r\n\t\t\tuserName: '张三',\r\n\t\t\tdescription: '这是描述内容XXXXX',\r\n\t\t\tpassword: '123456',\r\n\t\t\trate: 3,\r\n\t\t\ttype: '2',\r\n\t\t\ttime: '09:23:18',\r\n\t\t\ttest1: {\r\n\t\t\t\tvalue1: 'value1',\r\n\t\t\t\tvalue2: 'value2',\r\n\t\t\t\tvalue3: 'value3',\r\n\t\t\t},\r\n\t\t\ttest2: {\r\n\t\t\t\tvalue1: 'value1',\r\n\t\t\t\tvalue2: 'value2',\r\n\t\t\t\tvalue3: 'value3',\r\n\t\t\t},\r\n\t\t}\r\n\r\n\t\tform.values = initValue\r\n\t}\r\n\r\n\tconst handleReadOnly = () => {\r\n\t\tform.disabled = true\r\n\t}\r\n\r\n\tconst handlePreview = () => {\r\n\t\tform.editable = false\r\n\t}\r\n\r\n\tconst handleSetFieldValue = () => {\r\n\t\t// form.setValues('userName', 'zhangsan')\r\n\t\tform.values.userName = 'username'\r\n\t}\r\n\r\n\tconst handleAdd = () => {\r\n\t\tsetOperateType(\"add\")\r\n\t\tsetVisible(true)\r\n\t}\r\n\r\n\tconst handleCancel = () => {\r\n\t\tsetVisible(false)\r\n\t}\r\n\r\n\t// 弹框确认\r\n\tconst handleOk = () => {\r\n\t\tconst form = formRef.current.form\r\n\t\t// form.validate().then(values => {\r\n\t\t// \tconsole.log(\"====values:\",values)\r\n\t\t// })\r\n\r\n\t\tconsole.log(\"=====\",tableRef.current.form.values)\r\n\t\tconst values = tableRef.current.form.values\r\n\t\t// tableRef.current.form = [form.values]\r\n\t\t\r\n\t\t// form.validate(values => {\r\n\t\t\t// console.log(\"====values:\", form.values)\r\n\t\t// })\r\n\t}\r\n\r\n\treturn (\r\n\t\t<div>\r\n\t\t\t{/* <div style={{margin: \"10px 0\"}}>\r\n\t\t\t\t<Button type=\"primary\" style={{margin: '0 10px'}} onClick={handleValidate}>校验</Button>\r\n\t\t\t\t\r\n\t\t\t\t<Button type=\"primary\" style={{margin: '0 10px'}} onClick={handleReset}>清空</Button>\r\n\t\t\t\t\r\n\t\t\t\t<Button type=\"primary\" style={{margin: '0 10px'}} onClick={handleAssign}>赋值</Button>\r\n\t\t\t\t\r\n\t\t\t\t<Button type=\"primary\" style={{margin: '0 10px'}} onClick={handleReadOnly}>禁用</Button>\r\n\t\t\t\r\n\t\t\t\t<Button type=\"primary\" style={{margin: '0 10px'}} onClick={handlePreview}>预览模式</Button>\r\n\t\t\t\t\r\n\t\t\t\t<Button type=\"primary\" style={{margin: '0 10px'}} onClick={handleGetValues}>获取值</Button>\r\n\r\n\t\t\t\t<Button type=\"primary\" style={{margin: '0 10px'}} onClick={handleSetFieldValue}>setFiledValue</Button>\r\n\t\t\t</div> */}\r\n\r\n\t\t\t{/* 操作按钮 */}\r\n\t\t\t<div>\r\n\t\t\t\t<Button onClick={handleAdd}>新建</Button>\r\n\t\t\t</div>\r\n\r\n\t\t\t{/* 列表 */}\r\n\t\t\t<PreviewWidget\r\n\t\t\t\tkey=\"table\"\r\n\t\t\t\ttree={tableTree}\r\n\t\t\t\tref={tableRef}\r\n\t\t\t// handleAdd={handleAdd}\r\n\t\t\t// slot={{\r\n\t\t\t// \tCustom: \r\n\t\t\t// }}\r\n\t\t\t/>\r\n\r\n\t\t\t{/* 弹框: 表格 */}\r\n\t\t\t<Modal \r\n\t\t\t\tvisible={visible} \r\n\t\t\t\ttitle={operateType === \"add\" ? \"新增\" : \"修改\"}\r\n\t\t\t\tonCancel={handleCancel}\r\n\t\t\t\tonOk={handleOk}\r\n\t\t\t>\r\n\t\t\t\t<PreviewWidget\r\n\t\t\t\t\tkey=\"form\"\r\n\t\t\t\t\ttree={formTree}\r\n\t\t\t\t\tref={formRef}\r\n\t\t\t\t/>\r\n\t\t\t</Modal>\r\n\t\t</div>\r\n\t);\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/pages/formManage/formPreview/index.jsx b/src/pages/formManage/formPreview/index.jsx
+--- a/src/pages/formManage/formPreview/index.jsx	(revision 6422d1a7656cc25c86138ecff5f732449e3c8346)
++++ b/src/pages/formManage/formPreview/index.jsx	(date 1660197029285)
+@@ -1,6 +1,6 @@
+ /*
+- * @Descripttion: 
+- * @version: 
++ * @Descripttion:
++ * @version:
+  * @Author: hesisi
+  * @Date: 2022-06-13 16:09:41
+  * @LastEditors: hesisi
+@@ -30,9 +30,11 @@
+ 	const formCode = useMemo(() => {
+ 		return props.location.query.formCode
+ 	})
++  console.log(formCode)
+ 
+ 	useEffect(() => {
+ 		const formMap = localStorage.getItem("formMap") && JSON.parse(localStorage.getItem("formMap"))
++    console.log(formMap)
+ 		setFormSchema(formMap[formCode])
+ 
+ 		const formilyTableSchema = formMap[formCode] && formMap[formCode]["formily-table-schema"]
+@@ -117,7 +119,7 @@
+ 		console.log("=====",tableRef.current.form.values)
+ 		const values = tableRef.current.form.values
+ 		// tableRef.current.form = [form.values]
+-		
++
+ 		// form.validate(values => {
+ 			// console.log("====values:", form.values)
+ 		// })
+@@ -127,15 +129,15 @@
+ 		<div>
+ 			{/* <div style={{margin: "10px 0"}}>
+ 				<Button type="primary" style={{margin: '0 10px'}} onClick={handleValidate}>校验</Button>
+-				
++
+ 				<Button type="primary" style={{margin: '0 10px'}} onClick={handleReset}>清空</Button>
+-				
++
+ 				<Button type="primary" style={{margin: '0 10px'}} onClick={handleAssign}>赋值</Button>
+-				
++
+ 				<Button type="primary" style={{margin: '0 10px'}} onClick={handleReadOnly}>禁用</Button>
+-			
++
+ 				<Button type="primary" style={{margin: '0 10px'}} onClick={handlePreview}>预览模式</Button>
+-				
++
+ 				<Button type="primary" style={{margin: '0 10px'}} onClick={handleGetValues}>获取值</Button>
+ 
+ 				<Button type="primary" style={{margin: '0 10px'}} onClick={handleSetFieldValue}>setFiledValue</Button>
+@@ -153,13 +155,13 @@
+ 				ref={tableRef}
+ 			// handleAdd={handleAdd}
+ 			// slot={{
+-			// 	Custom: 
++			// 	Custom:
+ 			// }}
+ 			/>
+ 
+ 			{/* 弹框: 表格 */}
+-			<Modal 
+-				visible={visible} 
++			<Modal
++				visible={visible}
+ 				title={operateType === "add" ? "新增" : "修改"}
+ 				onCancel={handleCancel}
+ 				onOk={handleOk}
+Index: config/routes.js
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion: 路由配置文件，会根据该文件生成头部一级菜单以及左侧菜单树，左侧菜单树可以不限层级添加（建议最好不要超过两级）\r\n * @version:\r\n * @Author: hesisi\r\n * @Date: 2022-06-13 16:14:56\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-08-08 10:05:37\r\n */\r\nimport React from 'react';\r\nimport {\r\n  LaptopOutlined,\r\n  NotificationOutlined,\r\n  UserOutlined,\r\n} from '@ant-design/icons';\r\n\r\nexport default [\r\n  {\r\n    path: '/',\r\n    redirect: '/userManage',\r\n  },\r\n  {\r\n    name: '用户管理',\r\n    path: '/userManage',\r\n    component: '@/layouts/userManageLoyout/index',\r\n    routes: [\r\n      {\r\n        path: '/userManage',\r\n        redirect: '/userManage/authManage',\r\n      },\r\n      {\r\n        name: '权限管理',\r\n        icon: React.createElement(LaptopOutlined),\r\n        path: '/userManage/authManage',\r\n        component: '@/layouts/basicLayout',\r\n        routes: [\r\n          {\r\n            path: '/userManage/authManage',\r\n            redirect: '/userManage/authManage/account',\r\n          },\r\n          {\r\n            name: '账号管理',\r\n            path: '/userManage/authManage/account',\r\n            component: '@/pages/userManage/authManage/account',\r\n            exact: true,\r\n          },\r\n          {\r\n            name: '角色管理',\r\n            path: '/userManage/authManage/role',\r\n            component: '@/pages/userManage/authManage/role',\r\n          },\r\n        ],\r\n      },\r\n      {\r\n        name: '组织管理',\r\n        icon: React.createElement(NotificationOutlined),\r\n        path: '/userManage/orginationManage',\r\n        component: '@/pages/userManage/orginationManage/index',\r\n      },\r\n    ],\r\n  },\r\n  {\r\n    name: '菜单管理',\r\n    path: '/menuManage',\r\n    component: '@/layouts/menuManageLayout',\r\n    routes: [\r\n      {\r\n        path: '/menuManage',\r\n        redirect: '/menuManage/systemManage',\r\n      },\r\n      {\r\n        name: '系统管理',\r\n        path: '/menuManage/systemManage',\r\n        component: '@/pages/menuManage/systemManage',\r\n      },\r\n      {\r\n        name: '菜单管理',\r\n        path: '/menuManage/menuList',\r\n        component: '@/pages/menuManage/menuList',\r\n      },\r\n    ],\r\n  },\r\n  {\r\n    name: '流程管理',\r\n    path: '/activityManage',\r\n    component: '@/layouts/activityManageLayout',\r\n    routes: [\r\n      {\r\n        path: '/activityManage',\r\n        redirect: '/activityManage/activityList',\r\n      },\r\n      {\r\n        name: '流程管理',\r\n        path: '/activityManage/activityList',\r\n        component: '@/pages/activityManage/activityList',\r\n      },\r\n      {\r\n        name: '流程配置',\r\n        path: '/activityManage/activityConfig',\r\n        component: '@/pages/activityManage/activityConfig',\r\n      },\r\n    ],\r\n  },\r\n  {\r\n    name: '表单管理',\r\n    path: '/formManage',\r\n    component: '@/layouts/formManageLayout',\r\n    routes: [\r\n      {\r\n        path: '/formManage',\r\n        redirect: '/formManage/formAdd',\r\n      },\r\n      // {\r\n      //   name: '新建表单',\r\n      //   path: '/formManage/formAdd',\r\n      //   component: '@/pages/formManage/formDesinger',\r\n      //   hidden: true,\r\n      // },\r\n      {\r\n        name: '新建表单/列表',\r\n        path: '/formManage/formAndTable',\r\n        component: '@/pages/formAndTable',\r\n        hidden: true,\r\n      },\r\n      {\r\n        name: '动态表单',\r\n        path: '/formManage/formList',\r\n        component: '@/pages/formManage/formList',\r\n        meta: { showMenu: false },\r\n      },\r\n      {\r\n        name: '动态表单demo',\r\n        path: '/formManage/formPreview',\r\n        component: '@/pages/formManage/formPreview',\r\n        meta: { showMenu: false },\r\n      },\r\n    ],\r\n  },\r\n  {\r\n    name: '页面管理',\r\n    path: '/pageManage',\r\n    component: '@/layouts/pageManageLayout/index',\r\n    routes: [\r\n      {\r\n        path: '/pageManage',\r\n        redirect: '/pageManage/homePage',\r\n      },\r\n      {\r\n        name: '首页管理',\r\n        path: '/pageManage/homePage',\r\n        component: '@/pages/pageManage/homePage/index',\r\n      },\r\n    ],\r\n  },\r\n  {\r\n    name: '菜单预览',\r\n    path: '/previewPage/menuPreview',\r\n    component: '@/pages/previewPage/menuPreview',\r\n  },\r\n  {\r\n    name: '动态报表',\r\n    // path: 'http://www.baidu.com',\r\n    // component: '@/layouts/formManageLayout',\r\n  },\r\n];\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/config/routes.js b/config/routes.js
+--- a/config/routes.js	(revision 6422d1a7656cc25c86138ecff5f732449e3c8346)
++++ b/config/routes.js	(date 1660184123944)
+@@ -86,12 +86,17 @@
+     routes: [
+       {
+         path: '/activityManage',
+-        redirect: '/activityManage/activityList',
++        redirect: '/activityManage/activitConfig2',
+       },
+       {
+         name: '流程管理',
+-        path: '/activityManage/activityList',
+-        component: '@/pages/activityManage/activityList',
++        path: '/activityList/',
++        component: '@/pages/activityManage/activityList/activityList',
++      },
++      {
++        name: '流程配置2',
++        path: '/activityManage/activitConfig2',
++        component: '@/pages/activityManage/activitConfig2',
+       },
+       {
+         name: '流程配置',
+Index: src/pages/activityManage/activityList/index.jsx
+===================================================================
+diff --git a/src/pages/activityManage/activityList/index.jsx b/src/pages/activityManage/activityList/index.jsx
+deleted file mode 100644
+--- a/src/pages/activityManage/activityList/index.jsx	(revision 6422d1a7656cc25c86138ecff5f732449e3c8346)
++++ /dev/null	(revision 6422d1a7656cc25c86138ecff5f732449e3c8346)
+@@ -1,17 +0,0 @@
+-/*
+- * @Descripttion: 
+- * @version: 
+- * @Author: hesisi
+- * @Date: 2022-06-13 16:09:41
+- * @LastEditors: hesisi
+- * @LastEditTime: 2022-06-15 11:06:40
+- */
+-import { Table, Button } from 'antd';
+-
+-export default function IndexPage() {
+-  return (
+-    <div>
+-      <Button>activityList page</Button>
+-    </div>
+-  );
+-}
+Index: src/layouts/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion:\r\n * @version:\r\n * @Author: hesisi\r\n * @Date: 2022-06-13 16:48:59\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-08-08 11:46:00\r\n */\r\nimport { Breadcrumb, Layout, Menu } from 'antd';\r\nimport { withRouter } from 'react-router-dom';\r\nimport { Link } from 'umi';\r\nimport React, { useMemo } from 'react';\r\nimport routes from '../../config/routes';\r\nimport Styles from './index.less';\r\nimport logo from '@/assets/logo.png';\r\n\r\nconst { Header, Content, Footer, Sider } = Layout;\r\n\r\nconst renderNavBar = routes\r\n  .filter((item) => item.name)\r\n  ?.map((item) => {\r\n    return {\r\n      key: item.path,\r\n      label: item.path ? (\r\n        <Link to={item.path}>{item.name}</Link>\r\n      ) : (\r\n        <div\r\n          onClick={() => {\r\n            if (item.name === '动态报表') {\r\n              window.location.href =\r\n                'http://101.34.8.240:8085/tool-datav/index';\r\n            }\r\n          }}\r\n        >\r\n          {item.name}\r\n        </div>\r\n      ),\r\n    };\r\n  });\r\n\r\nconst navBar = renderNavBar.filter((e) => e.key !== '/previewPage/menuPreview'); // 过滤掉菜单预览\r\n\r\nconst getMetaInfoByPath = (routesData, path, result = []) => {\r\n  routesData.forEach((item) => {\r\n    if (item.path === path) {\r\n      result.push(item.meta);\r\n    } else if (item.routes && item.routes.length) {\r\n      getMetaInfoByPath(item.routes, path, result);\r\n    }\r\n  });\r\n\r\n  return result;\r\n};\r\n\r\nconst CommonLayout = (props) => {\r\n  const selectKey = `/${props.location.pathname?.split('/')[1]}`;\r\n\r\n  const activePath = props.location.pathname;\r\n  const curretnItem = routes?.filter((item) => {\r\n    return item.path === props.pathPrefix;\r\n  });\r\n\r\n  // 左侧菜单树\r\n  const MenuList =\r\n    (curretnItem && curretnItem[0] && curretnItem[0].routes) || [];\r\n\r\n  // 递归遍历左侧菜单\r\n  const renderItems = function (list = []) {\r\n    return list.map((item, index) => {\r\n      if (item.name && item.component) {\r\n        return {\r\n          key: item.path,\r\n          icon: item.icon,\r\n          label: item.path ? (\r\n            <Link to={item.path}>{item.name}</Link>\r\n          ) : (\r\n            item.name\r\n          ),\r\n          children: item.routes && renderItems(item.routes),\r\n        };\r\n      }\r\n    });\r\n  };\r\n\r\n  const meta = useMemo(() => {\r\n    const path = props.location.pathname;\r\n    const metaInfo =\r\n      getMetaInfoByPath(routes, path, []) &&\r\n      getMetaInfoByPath(routes, path, [])[0];\r\n\r\n    return metaInfo;\r\n  });\r\n\r\n  return (\r\n    <Layout>\r\n      <Header\r\n        className={Styles.header}\r\n        style={{ display: meta && !meta.showMenu ? 'none' : 'block' }}\r\n      >\r\n        <div className={Styles.logo}>\r\n          <img src={logo} />\r\n        </div>\r\n        <Menu\r\n          theme=\"dark\"\r\n          mode=\"horizontal\"\r\n          defaultSelectedKeys={[selectKey]}\r\n          items={navBar}\r\n        />\r\n      </Header>\r\n      <Content\r\n        style={{\r\n          height: 'calc(100vh - 64px)',\r\n        }}\r\n      >\r\n        <Layout\r\n          className={Styles['site-layout-background']}\r\n          style={{\r\n            // padding: '24px 0',\r\n            height: '100%',\r\n          }}\r\n        >\r\n          <Sider\r\n            className={Styles['site-layout-background']}\r\n            width={200}\r\n            style={{\r\n              // height: '100%',\r\n              display: meta && !meta.showMenu ? 'none' : 'block',\r\n            }}\r\n          >\r\n            <Menu\r\n              mode=\"inline\"\r\n              selectedKeys={[activePath]}\r\n              style={{\r\n                height: '100%',\r\n              }}\r\n              items={renderItems(MenuList)}\r\n            />\r\n          </Sider>\r\n          <Content\r\n            style={{\r\n              // padding: '0 24px',\r\n              minHeight: 280,\r\n            }}\r\n          >\r\n            <div className={Styles.contentWrapper}>{props.children}</div>\r\n          </Content>\r\n        </Layout>\r\n      </Content>\r\n    </Layout>\r\n  );\r\n};\r\n\r\nexport default withRouter(CommonLayout);\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/layouts/index.jsx b/src/layouts/index.jsx
+--- a/src/layouts/index.jsx	(revision 6422d1a7656cc25c86138ecff5f732449e3c8346)
++++ b/src/layouts/index.jsx	(date 1660114318466)
+@@ -28,7 +28,7 @@
+           onClick={() => {
+             if (item.name === '动态报表') {
+               window.location.href =
+-                'http://101.34.8.240:8085/tool-datav/index';
++                ' http://localhost:9996/tool-datav/index';
+             }
+           }}
+         >
+Index: package.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\r\n  \"private\": true,\r\n  \"scripts\": {\r\n    \"start\": \"umi dev\",\r\n    \"build\": \"umi build\",\r\n    \"postinstall\": \"umi generate tmp\",\r\n    \"prettier\": \"prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'\",\r\n    \"test\": \"umi-test\",\r\n    \"test:coverage\": \"umi-test --coverage\"\r\n  },\r\n  \"gitHooks\": {\r\n    \"pre-commit\": \"lint-staged\"\r\n  },\r\n  \"lint-staged\": {\r\n    \"*.{js,jsx,less,md,json}\": [\r\n      \"prettier --write\"\r\n    ],\r\n    \"*.ts?(x)\": [\r\n      \"prettier --parser=typescript --write\"\r\n    ]\r\n  },\r\n  \"dependencies\": {\r\n    \"@ant-design/pro-layout\": \"^6.5.0\",\r\n    \"@designable/formily-antd\": \"^1.0.0-beta.45\",\r\n    \"@formily/antd\": \"^2.1.5\",\r\n    \"@formily/core\": \"^2.1.5\",\r\n    \"@formily/react\": \"^2.1.5\",\r\n    \"axios\": \"^0.27.2\",\r\n    \"events\": \"^3.3.0\",\r\n    \"crypto\": \"^1.0.1\",\r\n    \"js-cookie\": \"^3.0.1\",\r\n    \"moment\": \"^2.29.4\",\r\n    \"react\": \"17.x\",\r\n    \"react-dom\": \"17.x\",\r\n    \"react-draft-wysiwyg\": \"^1.15.0\",\r\n    \"react-router-dom\": \"^6.3.0\",\r\n    \"umi\": \"^3.5.26\"\r\n  },\r\n  \"devDependencies\": {\r\n    \"@babel/plugin-proposal-nullish-coalescing-operator\": \"^7.18.6\",\r\n    \"@babel/plugin-proposal-optional-chaining\": \"^7.18.9\",\r\n    \"@types/react\": \"^17.0.0\",\r\n    \"@types/react-dom\": \"^17.0.0\",\r\n    \"@umijs/preset-react\": \"1.x\",\r\n    \"@umijs/test\": \"^3.5.26\",\r\n    \"lint-staged\": \"^10.0.7\",\r\n    \"nanoid\": \"^4.0.0\",\r\n    \"prettier\": \"^2.2.0\",\r\n    \"typescript\": \"^4.1.2\",\r\n    \"yorkie\": \"^2.0.0\"\r\n  }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/package.json b/package.json
+--- a/package.json	(revision 6422d1a7656cc25c86138ecff5f732449e3c8346)
++++ b/package.json	(date 1660123223991)
+@@ -21,13 +21,18 @@
+   },
+   "dependencies": {
+     "@ant-design/pro-layout": "^6.5.0",
++    "@bpmn-io/properties-panel": "^0.18.0",
+     "@designable/formily-antd": "^1.0.0-beta.45",
+     "@formily/antd": "^2.1.5",
+     "@formily/core": "^2.1.5",
+     "@formily/react": "^2.1.5",
++    "@logicflow/core": "^1.1.23",
++    "@logicflow/extension": "^1.1.23",
+     "axios": "^0.27.2",
+-    "events": "^3.3.0",
++    "bpmn-js": "^9.3.2",
++    "bpmn-js-properties-panel": "^1.4.0",
+     "crypto": "^1.0.1",
++    "events": "^3.3.0",
+     "js-cookie": "^3.0.1",
+     "moment": "^2.29.4",
+     "react": "17.x",
+@@ -49,4 +54,4 @@
+     "typescript": "^4.1.2",
+     "yorkie": "^2.0.0"
+   }
+-}
+\ No newline at end of file
++}
+Index: src/pages/activityManage/activitConfig2/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/pages/activityManage/activitConfig2/index.jsx b/src/pages/activityManage/activitConfig2/index.jsx
+new file mode 100644
+--- /dev/null	(date 1660112480676)
++++ b/src/pages/activityManage/activitConfig2/index.jsx	(date 1660112480676)
+@@ -0,0 +1,127 @@
++/*
++ * @Descripttion:
++ * @version:
++ * @Author: hesisi
++ * @Date: 2022-06-13 16:09:41
++ * @LastEditors: hesisi
++ * @LastEditTime: 2022-06-15 11:06:40
++ */
++import { Table, Button } from 'antd';
++import LogicFlow from "@logicflow/core";
++import "@logicflow/core/dist/style/index.css";
++import { DndPanel, SelectionSelect, } from '@logicflow/extension';
++import '@logicflow/extension/lib/style/index.css'
++import {useEffect,useRef} from "react";
++import UserTask from '../nodes/UserTaskNode.js'
++import {BpmnElement,BpmnAdapter} from '@logicflow/extension'
++
++
++LogicFlow.use(DndPanel);
++LogicFlow.use(SelectionSelect);
++LogicFlow.use(BpmnElement);
++LogicFlow.use(BpmnAdapter);
++
++export default function IndexPage() {
++  const refContainer = useRef();
++  useEffect(() => {
++    const logicflow = new LogicFlow({
++      container: refContainer.current,
++      keyboard: {
++        enabled: true
++      },
++      grid: true,
++      width: 1000,
++      height: 500,
++    });
++    logicflow.register(UserTask);
++
++    logicflow.setTheme({
++      rect: {
++        fill: '#f3f3f3',
++        stroke: '#000000',
++        strokeWidth: 2,
++      }
++    })
++    logicflow.extension.dndPanel.setPatternItems([
++      {
++        label: '选区',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAAH6ji2bAAAABGdBTUEAALGPC/xhBQAAAOVJREFUOBGtVMENwzAIjKP++2026ETdpv10iy7WFbqFyyW6GBywLCv5gI+Dw2Bluj1znuSjhb99Gkn6QILDY2imo60p8nsnc9bEo3+QJ+AKHfMdZHnl78wyTnyHZD53Zzx73MRSgYvnqgCUHj6gwdck7Zsp1VOrz0Uz8NbKunzAW+Gu4fYW28bUYutYlzSa7B84Fh7d1kjLwhcSdYAYrdkMQVpsBr5XgDGuXwQfQr0y9zwLda+DUYXLaGKdd2ZTtvbolaO87pdo24hP7ov16N0zArH1ur3iwJpXxm+v7oAJNR4JEP8DoAuSFEkYH7cAAAAASUVORK5CYII=',
++        callback: () => {
++          logicflow.extension.selectionSelect.openSelectionSelect();
++          logicflow.once('selection:selected', () => {
++            logicflow.extension.selectionSelect.closeSelectionSelect();
++          });
++        }
++      },
++      {
++        type: 'bpmn:startEvent',
++        text: '开始',
++        label: '开始节点',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAAH6ji2bAAAABGdBTUEAALGPC/xhBQAAAnBJREFUOBGdVL1rU1EcPfdGBddmaZLiEhdx1MHZQXApraCzQ7GKLgoRBxMfcRELuihWKcXFRcEWF8HBf0DdDCKYRZpnl7p0svLe9Zzbd29eQhTbC8nv+9zf130AT63jvooOGS8Vf9Nt5zxba7sXQwODfkWpkbjTQfCGUd9gIp3uuPP8bZ946g56dYQvnBg+b1HB8VIQmMFrazKcKSvFW2dQTxJnJdQ77urmXWOMBCmXM2Rke4S7UAW+/8ywwFoewmBps2tu7mbTdp8VMOkIRAkKfrVawalJTtIliclFbaOBqa0M2xImHeVIfd/nKAfVq/LGnPss5Kh00VEdSzfwnBXPUpmykNss4lUI9C1ga+8PNrBD5YeqRY2Zz8PhjooIbfJXjowvQJBqkmEkVnktWhwu2SM7SMx7Cj0N9IC0oQXRo8xwAGzQms+xrB/nNSUWVveI48ayrFGyC2+E2C+aWrZHXvOuz+CiV6iycWe1Rd1Q6+QUG07nb5SbPrL4426d+9E1axKjY3AoRrlEeSQo2Eu0T6BWAAr6COhTcWjRaYfKG5csnvytvUr/WY4rrPMB53Uo7jZRjXaG6/CFfNMaXEu75nG47X+oepU7PKJvvzGDY1YLSKHJrK7vFUwXKkaxwhCW3u+sDFMVrIju54RYYbFKpALZAo7sB6wcKyyrd+aBMryMT2gPyD6GsQoRFkGHr14TthZni9ck0z+Pnmee460mHXbRAypKNy3nuMdrWgVKj8YVV8E7PSzp1BZ9SJnJAsXdryw/h5ctboUVi4AFiCd+lQaYMw5z3LGTBKjLQOeUF35k89f58Vv/tGh+l+PE/wG0rgfIUbZK5AAAAABJRU5ErkJggg==',
++      },
++      {
++        type: 'bpmn:userTask',
++        label: '用户任务',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAEFVwZaAAAABGdBTUEAALGPC/xhBQAAAqlJREFUOBF9VM9rE0EUfrMJNUKLihGbpLGtaCOIR8VjQMGDePCgCCIiCNqzCAp2MyYUCXhUtF5E0D+g1t48qAd7CCLqQUQKEWkStcEfVGlLdp/fm3aW2QQdyLzf33zz5m2IsAZ9XhDpyaaIZkTS4ASzK41TFao88GuJ3hsr2pAbipHxuSYyKRugagICGANkfFnNh3HeE2N0b3nN2cgnpcictw5veJIzxmDamSlxxQZicq/mflxhbaH8BLRbuRwNtZp0JAhoplVRUdzmCe/vO27wFuuA3S5qXruGdboy5/PRGFsbFGKo/haRtQHIrM83bVeTrOgNhZReWaYGnE4aUQgTJNvijJFF4jQ8BxJE5xfKatZWmZcTQ+BVgh7s8SgPlCkcec4mGTmieTP4xd7PcpIEg1TX6gdeLW8rTVMVLVvb7ctXoH0Cydl2QOPJBG21STE5OsnbweVYzAnD3A7PVILuY0yiiyDwSm2g441r6rMSgp6iK42yqroI2QoXeJVeA+YeZSa47gZdXaZWQKTrG93rukk/l2Al6Kzh5AZEl7dDQy+JjgFahQjRopSxPbrbvK7GRe9ePWBo1wcU7sYrFZtavXALwGw/7Dnc50urrHJuTPSoO2IMV3gUQGNg87IbSOIY9BpiT9HV7FCZ94nPXb3MSnwHn/FFFE1vG6DTby+r31KAkUktB3Qf6ikUPWxW1BkXSPQeMHHiW0+HAd2GelJsZz1OJegCxqzl+CLVHa/IibuHeJ1HAKzhuDR+ymNaRFM+4jU6UWKXorRmbyqkq/D76FffevwdCp+jN3UAN/C9JRVTDuOxC/oh+EdMnqIOrlYteKSfadVRGLJFJPSB/ti/6K8f0CNymg/iH2gO/f0DwE0yjAFO6l8JaR5j0VPwPwfaYHqOqrCI319WzwhwzNW/aQAAAABJRU5ErkJggg==',
++        className: 'important-node'
++      },
++      {
++        type: 'bpmn:serviceTask',
++        label: '系统任务',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAEFVwZaAAAABGdBTUEAALGPC/xhBQAAAqlJREFUOBF9VM9rE0EUfrMJNUKLihGbpLGtaCOIR8VjQMGDePCgCCIiCNqzCAp2MyYUCXhUtF5E0D+g1t48qAd7CCLqQUQKEWkStcEfVGlLdp/fm3aW2QQdyLzf33zz5m2IsAZ9XhDpyaaIZkTS4ASzK41TFao88GuJ3hsr2pAbipHxuSYyKRugagICGANkfFnNh3HeE2N0b3nN2cgnpcictw5veJIzxmDamSlxxQZicq/mflxhbaH8BLRbuRwNtZp0JAhoplVRUdzmCe/vO27wFuuA3S5qXruGdboy5/PRGFsbFGKo/haRtQHIrM83bVeTrOgNhZReWaYGnE4aUQgTJNvijJFF4jQ8BxJE5xfKatZWmZcTQ+BVgh7s8SgPlCkcec4mGTmieTP4xd7PcpIEg1TX6gdeLW8rTVMVLVvb7ctXoH0Cydl2QOPJBG21STE5OsnbweVYzAnD3A7PVILuY0yiiyDwSm2g441r6rMSgp6iK42yqroI2QoXeJVeA+YeZSa47gZdXaZWQKTrG93rukk/l2Al6Kzh5AZEl7dDQy+JjgFahQjRopSxPbrbvK7GRe9ePWBo1wcU7sYrFZtavXALwGw/7Dnc50urrHJuTPSoO2IMV3gUQGNg87IbSOIY9BpiT9HV7FCZ94nPXb3MSnwHn/FFFE1vG6DTby+r31KAkUktB3Qf6ikUPWxW1BkXSPQeMHHiW0+HAd2GelJsZz1OJegCxqzl+CLVHa/IibuHeJ1HAKzhuDR+ymNaRFM+4jU6UWKXorRmbyqkq/D76FffevwdCp+jN3UAN/C9JRVTDuOxC/oh+EdMnqIOrlYteKSfadVRGLJFJPSB/ti/6K8f0CNymg/iH2gO/f0DwE0yjAFO6l8JaR5j0VPwPwfaYHqOqrCI319WzwhwzNW/aQAAAABJRU5ErkJggg==',
++        className: 'import_icon'
++      },
++      {
++        type: 'bpmn:exclusiveGateway',
++        label: '条件判断',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAAHeEJUAAAAABGdBTUEAALGPC/xhBQAAAvVJREFUOBGNVEFrE0EU/mY3bQoiFlOkaUJrQUQoWMGePLX24EH0IIoHKQiCV0G8iE1covgLiqA/QTzVm1JPogc9tIJYFaQtlhQxqYjSpunu+L7JvmUTU3AgmTfvffPNN++9WSA1DO182f6xwILzD5btfAoQmwL5KJEwiQyVbSVZ0IgRyV6PTpIJ81E5ZvqfHQR0HUOBHW4L5Et2kQ6Zf7iAOhTFAA8s0pEP7AXO1uAA52SbqGk6h/6J45LaLhO64ByfcUzM39V7ZiAdS2yCePPEIQYvTUHqM/n7dgQNfBKWPjpF4ISk8q3J4nB11qw6X8l+FsF3EhlkEMfrjIer3wJTLwS2aCNcj4DbGxXTw00JmAuO+Ni6bBxVUCvS5d9aa04+so4pHW5jLTywuXAL7jJ+D06sl82Sgl2JuVBQn498zkc2bGKxULHjCnSMadBKYDYYHAtsby1EQ5lNGrQd4Y3v4Zo0XdGEmDno46yCM9Tk+RiJmUYHS/aXHPNTcjxcbTFna000PFJHIVZ5lFRqRpJWk9/+QtlOUYJj9HG5pVFEU7zqIYDVsw2s+AJaD8wTd2umgSCCyUxgGsS1Y6TBwXQQTFuZaHcd8gAGioE90hlsY+wMcs30RduYtxanjMGal8H5dMW67dmT1JFtYUEe8LiQLRsPZ6IIc7A4J5tqco3T0pnv/4u0kyzrYUq7gASuEyI8VXKvB9Odytv6jS/PNaZBln0nioJG/AVQRZvApOdhjj3Jt8QC8Im09SafwdBdvIpztpxWxpeKCC+EsFdS8DCyuCn2munFpL7ctHKp+Xc5cMybeIyMAN33SPL3ZR9QV1XVwLyzHm6Iv0/yeUuUb7PPlZC4D4HZkeu6dpF4v9j9MreGtMbxMMRLIcjJic9yHi7WQ3yVKzZVWUr5UrViJvn1FfUlwe/KYVfYyWRLSGNu16hR01U9IacajXPei0wx/5BqgInvJN+MMNtNme7ReU9SBbgntovn0kKHpFg7UogZvaZiOue/q1SBo9ktHzQAAAAASUVORK5CYII=',
++      },
++      {
++        type: 'bpmn:endEvent',
++        text: '结束',
++        label: '结束节点',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAAH6ji2bAAAABGdBTUEAALGPC/xhBQAAA1BJREFUOBFtVE1IVUEYPXOf+tq40Y3vPcmFIdSjIorWoRG0ERWUgnb5FwVhYQSl72oUoZAboxKNFtWiwKRN0M+jpfSzqJAQclHo001tKkjl3emc8V69igP3znzfnO/M9zcDcKT67azmjYWTwl9Vn7Vumeqzj1DVb6cleQY4oAVnIOPb+mKAGxQmKI5CWNJ2aLPatxWa3aB9K7/fB+/Z0jUF6TmMlFLQqrkECWQzOZxYGjTlOl8eeKaIY5yHnFn486xBustDjWT6dG7pmjHOJd+33t0iitTPkK6tEvjxq4h2MozQ6WFSX/LkDUGfFwfhEZj1Auz/U4pyAi5Sznd7uKzznXeVHlI/Aywmk6j7fsUsEuCGADrWARXXwjxWQsUbIupDHJI7kF5dRktg0eN81IbiZXiTESic50iwS+t1oJgL83jAiBupLDCQqwziaWSoAFSeIR3P5Xv5az00wyIn35QRYTwdSYbz8pH8fxUUAtxnFvYmEmgI0wYXUXcCCSpeEVpXlsRhBnCEATxWylL9+EKCAYhe1NGstUa6356kS9NVvt3DU2fd+Wtbm/+lSbylJqsqkSm9CRhvoJVlvKPvF1RKY/FcPn5j4UfIMLn8D4UYb54BNsilTDXKnF4CfTobA0FpoW/LSp306wkXM+XaOJhZaFkcNM82ASNAWMrhrUbRfmyeI1FvRBTpN06WKxa9BK0o2E4Pd3zfBBEwPsv9sQBnmLVbLEIZ/Xe9LYwJu/Er17W6HYVBc7vmuk0xUQ+pqxdom5Fnp55SiytXLPYoMXNM4u4SNSCFWnrVIzKG3EGyMXo6n/BQOe+bX3FClY4PwydVhthOZ9NnS+ntiLh0fxtlUJHAuGaFoVmttpVMeum0p3WEXbcll94l1wM/gZ0Ccczop77VvN2I7TlsZCsuXf1WHvWEhjO8DPtyOVg2/mvK9QqboEth+7pD6NUQC1HN/TwvydGBARi9MZSzLE4b8Ru3XhX2PBxf8E1er2A6516o0w4sIA+lwURhAON82Kwe2iDAC1Watq4XHaGQ7skLcFOtI5lDxuM2gZe6WFIotPAhbaeYlU4to5cuarF1QrcZ/lwrLaCJl66JBocYZnrNlvm2+MBCTmUymPrYZVbjdlr/BxlMjmNmNI3SAAAAAElFTkSuQmCC',
++      }
++    ]);
++    logicflow.render({
++      nodes: [
++        {
++          id: "1",
++          type: "bpmn:startEvent",
++          x: 100,
++          y: 100,
++          text: "节点1"
++        },
++        {
++          id: "3",
++          type: "bpmn:endEvent",
++          x: 500,
++          y: 300,
++          text: "节点1"
++        },
++        {
++          id: "2",
++          type: "circle",
++          x: 300,
++          y: 200,
++          text: "节点2"
++        }
++      ],
++      edges: [
++        {
++          sourceNodeId: "1",
++          targetNodeId: "2",
++          type: "polyline",
++          text: "连线"
++        }
++      ]
++    });
++    console.log(logicflow)
++  }, []);
++  return (
++    <div style={{padding:'20px 10px'}}>
++      activity list
++      <div ref={refContainer}></div>
++    </div>
++  );
++}

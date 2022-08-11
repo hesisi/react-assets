@@ -1,0 +1,321 @@
+Index: src/layouts/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion: \r\n * @version: \r\n * @Author: hesisi\r\n * @Date: 2022-06-13 16:48:59\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-08-08 11:46:00\r\n */\r\nimport { Breadcrumb, Layout, Menu } from 'antd';\r\nimport { withRouter } from 'react-router-dom'\r\nimport { Link } from 'umi'\r\nimport React,{ useMemo }  from 'react';\r\nimport routes from '../../config/routes'\r\nimport Styles from './index.less'\r\nimport logo from '@/assets/logo.png'\r\n\r\nconst { Header, Content, Footer, Sider } = Layout;\r\n\r\nconst renderNavBar = routes.filter(item => item.name)?.map((item) => {\r\n  return {\r\n    key: item.path,\r\n    label: item.path ? <Link to={item.path}>{item.name}</Link> : <div onClick={() => {\r\n      if(item.name === \"动态报表\"){\r\n        window.location.href = 'http://101.34.8.240:8085/tool-datav/index'\r\n      }\r\n    }}>{item.name}</div>,\r\n  }\r\n});\r\n\r\nconst getMetaInfoByPath = (routesData, path, result=[]) => {\r\n  routesData.forEach(item => {\r\n    if(item.path === path){\r\n      result.push(item.meta)\r\n    }else if(item.routes && item.routes.length){\r\n      getMetaInfoByPath(item.routes, path, result)\r\n    }\r\n  });\r\n\r\n  return result\r\n}\r\n\r\nconst CommonLayout = (props) => {\r\n  const selectKey = `/${props.location.pathname?.split('/')[1]}`\r\n\r\n  const activePath = props.location.pathname\r\n  const curretnItem = routes?.filter(item => {\r\n    return item.path === props.pathPrefix\r\n  })\r\n\r\n  // 左侧菜单树\r\n  const MenuList = curretnItem && curretnItem[0] && curretnItem[0].routes || []\r\n\r\n  // 递归遍历左侧菜单\r\n  const renderItems = function(list=[]){\r\n    return list.map((item, index) => {\r\n      if(item.name && item.component){\r\n        return {\r\n          key: item.path,\r\n          icon: item.icon,\r\n          label: item.path ? <Link to={item.path}>{item.name}</Link> : item.name,\r\n          children: item.routes && renderItems(item.routes),\r\n        };\r\n      }\r\n    });\r\n  }\r\n\r\n  const meta = useMemo(() => {\r\n    const path = props.location.pathname\r\n    const metaInfo = getMetaInfoByPath(routes, path, []) && getMetaInfoByPath(routes, path, [])[0]\r\n\r\n    return metaInfo\r\n  })\r\n\r\n  return (\r\n    <Layout>\r\n      <Header className={Styles.header} style={{display: !meta.showMenu ? 'none' : 'block'}}>\r\n        <div className={Styles.logo}>\r\n          <img src={logo} />\r\n        </div>\r\n        <Menu theme=\"dark\" mode=\"horizontal\" defaultSelectedKeys={[selectKey]} items={renderNavBar} />\r\n      </Header>\r\n      <Content\r\n        style={{\r\n          height: 'calc(100vh - 64px)'\r\n        }}\r\n      >\r\n        <Layout\r\n          className={Styles[\"site-layout-background\"]}\r\n          style={{\r\n            // padding: '24px 0',\r\n            height: '100%'\r\n          }}\r\n        >\r\n          <Sider \r\n            className={Styles[\"site-layout-background\"]} \r\n            width={200}\r\n            style={{\r\n              // height: '100%',\r\n              display: !meta.showMenu ? 'none' : 'block'\r\n            }}\r\n          >\r\n            <Menu\r\n              mode=\"inline\"\r\n              selectedKeys={[activePath]}\r\n              style={{\r\n                height: '100%',\r\n              }}\r\n              items={renderItems(MenuList)}\r\n            />\r\n          </Sider>\r\n          <Content\r\n            style={{\r\n              // padding: '0 24px',\r\n              minHeight: 280,\r\n            }}\r\n          >\r\n            <div className={Styles.contentWrapper}>\r\n              {props.children}\r\n            </div>\r\n          </Content>\r\n        </Layout>\r\n      </Content>\r\n    </Layout>\r\n  )\r\n};\r\n\r\nexport default withRouter(CommonLayout)
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/layouts/index.jsx b/src/layouts/index.jsx
+--- a/src/layouts/index.jsx	(revision 23fd162825ce3b70e73c01c62e262a2da9516266)
++++ b/src/layouts/index.jsx	(date 1659944101528)
+@@ -1,6 +1,6 @@
+ /*
+- * @Descripttion: 
+- * @version: 
++ * @Descripttion:
++ * @version:
+  * @Author: hesisi
+  * @Date: 2022-06-13 16:48:59
+  * @LastEditors: hesisi
+@@ -67,13 +67,12 @@
+   const meta = useMemo(() => {
+     const path = props.location.pathname
+     const metaInfo = getMetaInfoByPath(routes, path, []) && getMetaInfoByPath(routes, path, [])[0]
+-
+     return metaInfo
+   })
+ 
+   return (
+     <Layout>
+-      <Header className={Styles.header} style={{display: !meta.showMenu ? 'none' : 'block'}}>
++      <Header className={Styles.header} style={{display: meta?.showMenu ? 'none' : 'block'}}>
+         <div className={Styles.logo}>
+           <img src={logo} />
+         </div>
+@@ -91,12 +90,12 @@
+             height: '100%'
+           }}
+         >
+-          <Sider 
+-            className={Styles["site-layout-background"]} 
++          <Sider
++            className={Styles["site-layout-background"]}
+             width={200}
+             style={{
+               // height: '100%',
+-              display: !meta.showMenu ? 'none' : 'block'
++              display: meta?.showMenu ? 'none' : 'block'
+             }}
+           >
+             <Menu
+@@ -124,4 +123,4 @@
+   )
+ };
+ 
+-export default withRouter(CommonLayout)
+\ No newline at end of file
++export default withRouter(CommonLayout)
+Index: src/pages/activityManage/activityConfig/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion: \r\n * @version: \r\n * @Author: hesisi\r\n * @Date: 2022-06-13 16:09:41\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-06-15 11:06:46\r\n */\r\nimport { Table, Button } from 'antd';\r\n\r\nexport default function IndexPage() {\r\n  return (\r\n    <div>\r\n      <Button>activityConfig page</Button>\r\n    </div>\r\n  );\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/pages/activityManage/activityConfig/index.jsx b/src/pages/activityManage/activityConfig/index.jsx
+--- a/src/pages/activityManage/activityConfig/index.jsx	(revision 23fd162825ce3b70e73c01c62e262a2da9516266)
++++ b/src/pages/activityManage/activityConfig/index.jsx	(date 1660099980634)
+@@ -1,17 +1,53 @@
+ /*
+- * @Descripttion: 
+- * @version: 
++ * @Descripttion:
++ * @version:
+  * @Author: hesisi
+  * @Date: 2022-06-13 16:09:41
+  * @LastEditors: hesisi
+  * @LastEditTime: 2022-06-15 11:06:46
+  */
+ import { Table, Button } from 'antd';
++import Modeler from 'bpmn-js';
++import {useEffect} from "react";
+ 
+ export default function IndexPage() {
++  useEffect(() => {
++    initBpmn();
++  }, []);
++  const initBpmn = () => {
++
++     bpmnModeler = new Modeler({
++      container: '#canvas', // 这里为数组的第一个元素
++      height: '100vh',
++      //添加控制板
++      propertiesPanel: {
++        parent: '.properties-panel'
++      },
++      additionalModules: [
++        // 左边工具栏以及节点
++      ],
++      moddleExtensions: {
++
++      }
++    });
++
++    createBpmnDiagram();
++  }
++
++  const createBpmnDiagram = async (value) => {
++    // 开始绘制出事bpmn的图
++    try {
++      const result = await bpmnModeler.importXML(xmlstr);
++      // console.log(result);
++      // console.log('属性面板数据: ', bpmnModeler.get('propertiesPanel'));
++    } catch (error) {
++      console.error(error)
++    }
++  }
+   return (
+     <div>
+       <Button>activityConfig page</Button>
++      <div id="canvas" className="container" />
+     </div>
+   );
+ }
+Index: package.json
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>{\r\n  \"private\": true,\r\n  \"scripts\": {\r\n    \"start\": \"umi dev\",\r\n    \"build\": \"umi build\",\r\n    \"postinstall\": \"umi generate tmp\",\r\n    \"prettier\": \"prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'\",\r\n    \"test\": \"umi-test\",\r\n    \"test:coverage\": \"umi-test --coverage\"\r\n  },\r\n  \"gitHooks\": {\r\n    \"pre-commit\": \"lint-staged\"\r\n  },\r\n  \"lint-staged\": {\r\n    \"*.{js,jsx,less,md,json}\": [\r\n      \"prettier --write\"\r\n    ],\r\n    \"*.ts?(x)\": [\r\n      \"prettier --parser=typescript --write\"\r\n    ]\r\n  },\r\n  \"dependencies\": {\r\n    \"@ant-design/pro-layout\": \"^6.5.0\",\r\n    \"@designable/formily-antd\": \"^1.0.0-beta.45\",\r\n    \"@formily/antd\": \"^2.1.5\",\r\n    \"@formily/core\": \"^2.1.5\",\r\n    \"@formily/react\": \"^2.1.5\",\r\n    \"axios\": \"^0.27.2\",\r\n    \"crypto\": \"^1.0.1\",\r\n    \"js-cookie\": \"^3.0.1\",\r\n    \"moment\": \"^2.29.4\",\r\n    \"react\": \"17.x\",\r\n    \"react-dom\": \"17.x\",\r\n    \"react-draft-wysiwyg\": \"^1.15.0\",\r\n    \"umi\": \"^3.5.26\"\r\n  },\r\n  \"devDependencies\": {\r\n    \"@types/react\": \"^17.0.0\",\r\n    \"@types/react-dom\": \"^17.0.0\",\r\n    \"@umijs/preset-react\": \"1.x\",\r\n    \"@umijs/test\": \"^3.5.26\",\r\n    \"lint-staged\": \"^10.0.7\",\r\n    \"prettier\": \"^2.2.0\",\r\n    \"typescript\": \"^4.1.2\",\r\n    \"yorkie\": \"^2.0.0\"\r\n  }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/package.json b/package.json
+--- a/package.json	(revision 23fd162825ce3b70e73c01c62e262a2da9516266)
++++ b/package.json	(date 1660098982033)
+@@ -25,7 +25,10 @@
+     "@formily/antd": "^2.1.5",
+     "@formily/core": "^2.1.5",
+     "@formily/react": "^2.1.5",
++    "@logicflow/core": "^1.1.23",
++    "@logicflow/extension": "^1.1.23",
+     "axios": "^0.27.2",
++    "bpmn-js": "^9.3.2",
+     "crypto": "^1.0.1",
+     "js-cookie": "^3.0.1",
+     "moment": "^2.29.4",
+Index: src/pages/activityManage/activityList/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion: \r\n * @version: \r\n * @Author: hesisi\r\n * @Date: 2022-06-13 16:09:41\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-06-15 11:06:40\r\n */\r\nimport { Table, Button } from 'antd';\r\n\r\nexport default function IndexPage() {\r\n  return (\r\n    <div>\r\n      <Button>activityList page</Button>\r\n    </div>\r\n  );\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/pages/activityManage/activityList/index.jsx b/src/pages/activityManage/activityList/index.jsx
+--- a/src/pages/activityManage/activityList/index.jsx	(revision 23fd162825ce3b70e73c01c62e262a2da9516266)
++++ b/src/pages/activityManage/activityList/index.jsx	(date 1660031676855)
+@@ -1,17 +1,124 @@
+ /*
+- * @Descripttion: 
+- * @version: 
++ * @Descripttion:
++ * @version:
+  * @Author: hesisi
+  * @Date: 2022-06-13 16:09:41
+  * @LastEditors: hesisi
+  * @LastEditTime: 2022-06-15 11:06:40
+  */
+ import { Table, Button } from 'antd';
++import LogicFlow from "@logicflow/core";
++import "@logicflow/core/dist/style/index.css";
++import { DndPanel, SelectionSelect } from '@logicflow/extension';
++import '@logicflow/extension/lib/style/index.css'
++import {useEffect,useRef} from "react";
++import UserTask from '../activityConfig/nodes/UserTaskNode.js'
++
++
++LogicFlow.use(DndPanel);
++LogicFlow.use(SelectionSelect);
+ 
+ export default function IndexPage() {
++  const refContainer = useRef();
++  useEffect(() => {
++    const logicflow = new LogicFlow({
++      container: refContainer.current,
++      keyboard: {
++        enabled: true
++      },
++      grid: true,
++      width: 1000,
++      height: 500,
++    });
++    logicflow.register(UserTask);
++
++    logicflow.setTheme({
++      rect: {
++        fill: '#f3f3f3',
++        stroke: '#000000',
++        strokeWidth: 2,
++      }
++    })
++    logicflow.extension.dndPanel.setPatternItems([
++      {
++        label: '选区',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAAH6ji2bAAAABGdBTUEAALGPC/xhBQAAAOVJREFUOBGtVMENwzAIjKP++2026ETdpv10iy7WFbqFyyW6GBywLCv5gI+Dw2Bluj1znuSjhb99Gkn6QILDY2imo60p8nsnc9bEo3+QJ+AKHfMdZHnl78wyTnyHZD53Zzx73MRSgYvnqgCUHj6gwdck7Zsp1VOrz0Uz8NbKunzAW+Gu4fYW28bUYutYlzSa7B84Fh7d1kjLwhcSdYAYrdkMQVpsBr5XgDGuXwQfQr0y9zwLda+DUYXLaGKdd2ZTtvbolaO87pdo24hP7ov16N0zArH1ur3iwJpXxm+v7oAJNR4JEP8DoAuSFEkYH7cAAAAASUVORK5CYII=',
++        callback: () => {
++          logicflow.extension.selectionSelect.openSelectionSelect();
++          logicflow.once('selection:selected', () => {
++            logicflow.extension.selectionSelect.closeSelectionSelect();
++          });
++        }
++      },
++      {
++        type: 'circle',
++        text: '开始',
++        label: '开始节点',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAAH6ji2bAAAABGdBTUEAALGPC/xhBQAAAnBJREFUOBGdVL1rU1EcPfdGBddmaZLiEhdx1MHZQXApraCzQ7GKLgoRBxMfcRELuihWKcXFRcEWF8HBf0DdDCKYRZpnl7p0svLe9Zzbd29eQhTbC8nv+9zf130AT63jvooOGS8Vf9Nt5zxba7sXQwODfkWpkbjTQfCGUd9gIp3uuPP8bZ946g56dYQvnBg+b1HB8VIQmMFrazKcKSvFW2dQTxJnJdQ77urmXWOMBCmXM2Rke4S7UAW+/8ywwFoewmBps2tu7mbTdp8VMOkIRAkKfrVawalJTtIliclFbaOBqa0M2xImHeVIfd/nKAfVq/LGnPss5Kh00VEdSzfwnBXPUpmykNss4lUI9C1ga+8PNrBD5YeqRY2Zz8PhjooIbfJXjowvQJBqkmEkVnktWhwu2SM7SMx7Cj0N9IC0oQXRo8xwAGzQms+xrB/nNSUWVveI48ayrFGyC2+E2C+aWrZHXvOuz+CiV6iycWe1Rd1Q6+QUG07nb5SbPrL4426d+9E1axKjY3AoRrlEeSQo2Eu0T6BWAAr6COhTcWjRaYfKG5csnvytvUr/WY4rrPMB53Uo7jZRjXaG6/CFfNMaXEu75nG47X+oepU7PKJvvzGDY1YLSKHJrK7vFUwXKkaxwhCW3u+sDFMVrIju54RYYbFKpALZAo7sB6wcKyyrd+aBMryMT2gPyD6GsQoRFkGHr14TthZni9ck0z+Pnmee460mHXbRAypKNy3nuMdrWgVKj8YVV8E7PSzp1BZ9SJnJAsXdryw/h5ctboUVi4AFiCd+lQaYMw5z3LGTBKjLQOeUF35k89f58Vv/tGh+l+PE/wG0rgfIUbZK5AAAAABJRU5ErkJggg==',
++      },
++      {
++        type: 'UserTask',
++        label: '用户任务',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAEFVwZaAAAABGdBTUEAALGPC/xhBQAAAqlJREFUOBF9VM9rE0EUfrMJNUKLihGbpLGtaCOIR8VjQMGDePCgCCIiCNqzCAp2MyYUCXhUtF5E0D+g1t48qAd7CCLqQUQKEWkStcEfVGlLdp/fm3aW2QQdyLzf33zz5m2IsAZ9XhDpyaaIZkTS4ASzK41TFao88GuJ3hsr2pAbipHxuSYyKRugagICGANkfFnNh3HeE2N0b3nN2cgnpcictw5veJIzxmDamSlxxQZicq/mflxhbaH8BLRbuRwNtZp0JAhoplVRUdzmCe/vO27wFuuA3S5qXruGdboy5/PRGFsbFGKo/haRtQHIrM83bVeTrOgNhZReWaYGnE4aUQgTJNvijJFF4jQ8BxJE5xfKatZWmZcTQ+BVgh7s8SgPlCkcec4mGTmieTP4xd7PcpIEg1TX6gdeLW8rTVMVLVvb7ctXoH0Cydl2QOPJBG21STE5OsnbweVYzAnD3A7PVILuY0yiiyDwSm2g441r6rMSgp6iK42yqroI2QoXeJVeA+YeZSa47gZdXaZWQKTrG93rukk/l2Al6Kzh5AZEl7dDQy+JjgFahQjRopSxPbrbvK7GRe9ePWBo1wcU7sYrFZtavXALwGw/7Dnc50urrHJuTPSoO2IMV3gUQGNg87IbSOIY9BpiT9HV7FCZ94nPXb3MSnwHn/FFFE1vG6DTby+r31KAkUktB3Qf6ikUPWxW1BkXSPQeMHHiW0+HAd2GelJsZz1OJegCxqzl+CLVHa/IibuHeJ1HAKzhuDR+ymNaRFM+4jU6UWKXorRmbyqkq/D76FffevwdCp+jN3UAN/C9JRVTDuOxC/oh+EdMnqIOrlYteKSfadVRGLJFJPSB/ti/6K8f0CNymg/iH2gO/f0DwE0yjAFO6l8JaR5j0VPwPwfaYHqOqrCI319WzwhwzNW/aQAAAABJRU5ErkJggg==',
++        className: 'important-node'
++      },
++      {
++        type: 'rect',
++        label: '系统任务',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAEFVwZaAAAABGdBTUEAALGPC/xhBQAAAqlJREFUOBF9VM9rE0EUfrMJNUKLihGbpLGtaCOIR8VjQMGDePCgCCIiCNqzCAp2MyYUCXhUtF5E0D+g1t48qAd7CCLqQUQKEWkStcEfVGlLdp/fm3aW2QQdyLzf33zz5m2IsAZ9XhDpyaaIZkTS4ASzK41TFao88GuJ3hsr2pAbipHxuSYyKRugagICGANkfFnNh3HeE2N0b3nN2cgnpcictw5veJIzxmDamSlxxQZicq/mflxhbaH8BLRbuRwNtZp0JAhoplVRUdzmCe/vO27wFuuA3S5qXruGdboy5/PRGFsbFGKo/haRtQHIrM83bVeTrOgNhZReWaYGnE4aUQgTJNvijJFF4jQ8BxJE5xfKatZWmZcTQ+BVgh7s8SgPlCkcec4mGTmieTP4xd7PcpIEg1TX6gdeLW8rTVMVLVvb7ctXoH0Cydl2QOPJBG21STE5OsnbweVYzAnD3A7PVILuY0yiiyDwSm2g441r6rMSgp6iK42yqroI2QoXeJVeA+YeZSa47gZdXaZWQKTrG93rukk/l2Al6Kzh5AZEl7dDQy+JjgFahQjRopSxPbrbvK7GRe9ePWBo1wcU7sYrFZtavXALwGw/7Dnc50urrHJuTPSoO2IMV3gUQGNg87IbSOIY9BpiT9HV7FCZ94nPXb3MSnwHn/FFFE1vG6DTby+r31KAkUktB3Qf6ikUPWxW1BkXSPQeMHHiW0+HAd2GelJsZz1OJegCxqzl+CLVHa/IibuHeJ1HAKzhuDR+ymNaRFM+4jU6UWKXorRmbyqkq/D76FffevwdCp+jN3UAN/C9JRVTDuOxC/oh+EdMnqIOrlYteKSfadVRGLJFJPSB/ti/6K8f0CNymg/iH2gO/f0DwE0yjAFO6l8JaR5j0VPwPwfaYHqOqrCI319WzwhwzNW/aQAAAABJRU5ErkJggg==',
++        className: 'import_icon'
++      },
++      {
++        type: 'diamond',
++        label: '条件判断',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAVCAYAAAHeEJUAAAAABGdBTUEAALGPC/xhBQAAAvVJREFUOBGNVEFrE0EU/mY3bQoiFlOkaUJrQUQoWMGePLX24EH0IIoHKQiCV0G8iE1covgLiqA/QTzVm1JPogc9tIJYFaQtlhQxqYjSpunu+L7JvmUTU3AgmTfvffPNN++9WSA1DO182f6xwILzD5btfAoQmwL5KJEwiQyVbSVZ0IgRyV6PTpIJ81E5ZvqfHQR0HUOBHW4L5Et2kQ6Zf7iAOhTFAA8s0pEP7AXO1uAA52SbqGk6h/6J45LaLhO64ByfcUzM39V7ZiAdS2yCePPEIQYvTUHqM/n7dgQNfBKWPjpF4ISk8q3J4nB11qw6X8l+FsF3EhlkEMfrjIer3wJTLwS2aCNcj4DbGxXTw00JmAuO+Ni6bBxVUCvS5d9aa04+so4pHW5jLTywuXAL7jJ+D06sl82Sgl2JuVBQn498zkc2bGKxULHjCnSMadBKYDYYHAtsby1EQ5lNGrQd4Y3v4Zo0XdGEmDno46yCM9Tk+RiJmUYHS/aXHPNTcjxcbTFna000PFJHIVZ5lFRqRpJWk9/+QtlOUYJj9HG5pVFEU7zqIYDVsw2s+AJaD8wTd2umgSCCyUxgGsS1Y6TBwXQQTFuZaHcd8gAGioE90hlsY+wMcs30RduYtxanjMGal8H5dMW67dmT1JFtYUEe8LiQLRsPZ6IIc7A4J5tqco3T0pnv/4u0kyzrYUq7gASuEyI8VXKvB9Odytv6jS/PNaZBln0nioJG/AVQRZvApOdhjj3Jt8QC8Im09SafwdBdvIpztpxWxpeKCC+EsFdS8DCyuCn2munFpL7ctHKp+Xc5cMybeIyMAN33SPL3ZR9QV1XVwLyzHm6Iv0/yeUuUb7PPlZC4D4HZkeu6dpF4v9j9MreGtMbxMMRLIcjJic9yHi7WQ3yVKzZVWUr5UrViJvn1FfUlwe/KYVfYyWRLSGNu16hR01U9IacajXPei0wx/5BqgInvJN+MMNtNme7ReU9SBbgntovn0kKHpFg7UogZvaZiOue/q1SBo9ktHzQAAAAASUVORK5CYII=',
++      },
++      {
++        type: 'circle',
++        text: '结束',
++        label: '结束节点',
++        icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAAH6ji2bAAAABGdBTUEAALGPC/xhBQAAA1BJREFUOBFtVE1IVUEYPXOf+tq40Y3vPcmFIdSjIorWoRG0ERWUgnb5FwVhYQSl72oUoZAboxKNFtWiwKRN0M+jpfSzqJAQclHo001tKkjl3emc8V69igP3znzfnO/M9zcDcKT67azmjYWTwl9Vn7Vumeqzj1DVb6cleQY4oAVnIOPb+mKAGxQmKI5CWNJ2aLPatxWa3aB9K7/fB+/Z0jUF6TmMlFLQqrkECWQzOZxYGjTlOl8eeKaIY5yHnFn486xBustDjWT6dG7pmjHOJd+33t0iitTPkK6tEvjxq4h2MozQ6WFSX/LkDUGfFwfhEZj1Auz/U4pyAi5Sznd7uKzznXeVHlI/Aywmk6j7fsUsEuCGADrWARXXwjxWQsUbIupDHJI7kF5dRktg0eN81IbiZXiTESic50iwS+t1oJgL83jAiBupLDCQqwziaWSoAFSeIR3P5Xv5az00wyIn35QRYTwdSYbz8pH8fxUUAtxnFvYmEmgI0wYXUXcCCSpeEVpXlsRhBnCEATxWylL9+EKCAYhe1NGstUa6356kS9NVvt3DU2fd+Wtbm/+lSbylJqsqkSm9CRhvoJVlvKPvF1RKY/FcPn5j4UfIMLn8D4UYb54BNsilTDXKnF4CfTobA0FpoW/LSp306wkXM+XaOJhZaFkcNM82ASNAWMrhrUbRfmyeI1FvRBTpN06WKxa9BK0o2E4Pd3zfBBEwPsv9sQBnmLVbLEIZ/Xe9LYwJu/Er17W6HYVBc7vmuk0xUQ+pqxdom5Fnp55SiytXLPYoMXNM4u4SNSCFWnrVIzKG3EGyMXo6n/BQOe+bX3FClY4PwydVhthOZ9NnS+ntiLh0fxtlUJHAuGaFoVmttpVMeum0p3WEXbcll94l1wM/gZ0Ccczop77VvN2I7TlsZCsuXf1WHvWEhjO8DPtyOVg2/mvK9QqboEth+7pD6NUQC1HN/TwvydGBARi9MZSzLE4b8Ru3XhX2PBxf8E1er2A6516o0w4sIA+lwURhAON82Kwe2iDAC1Watq4XHaGQ7skLcFOtI5lDxuM2gZe6WFIotPAhbaeYlU4to5cuarF1QrcZ/lwrLaCJl66JBocYZnrNlvm2+MBCTmUymPrYZVbjdlr/BxlMjmNmNI3SAAAAAElFTkSuQmCC',
++      }
++    ]);
++    logicflow.render({
++      nodes: [
++        {
++          id: "1",
++          type: "rect",
++          x: 100,
++          y: 100,
++          text: "节点1"
++        },
++        {
++          id: "3",
++          type: "UserTask",
++          x: 500,
++          y: 300,
++          text: "节点1"
++        },
++        {
++          id: "2",
++          type: "circle",
++          x: 300,
++          y: 200,
++          text: "节点2"
++        }
++      ],
++      edges: [
++        {
++          sourceNodeId: "1",
++          targetNodeId: "2",
++          type: "polyline",
++          text: "连线"
++        }
++      ]
++    });
++    console.log(logicflow)
++  }, []);
+   return (
+-    <div>
+-      <Button>activityList page</Button>
++    <div style={{padding:'20px 10px'}}>
++      activity list
++      <div ref={refContainer}></div>
+     </div>
+   );
+ }
+Index: src/pages/formAndTable/index.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * @Descripttion: \r\n * @version: \r\n * @Author: hesisi\r\n * @Date: 2022-07-20 14:55:02\r\n * @LastEditors: hesisi\r\n * @LastEditTime: 2022-08-05 17:14:29\r\n */\r\nimport React, { useState, useEffect, useRef,useMemo } from 'react';\r\nimport { Tabs, Radio } from 'antd';\r\nimport moment from 'moment'\r\nimport {\r\n  transformToSchema,\r\n  transformToTreeNode,\r\n} from '@designable/formily-transformer';\r\nimport FormDesigner from '../Desinger';\r\nimport { tableConfig } from './designerConfig';\r\n\r\nconst { Group, Button } = Radio;\r\n\r\nexport default function (props) {\r\n  const [desingerType, setDesingerType] = useState('form');\r\n  const [designer, setDesigner] = useState();\r\n\r\n  // 保存当前设计器的form schema\r\n  const [formilyFormSchema, setFormilyFormSchema] = useState()\r\n  // 保存当前设计器的table schema\r\n  const [formilyTableSchema, setFormilyTableSchema] = useState()\r\n\r\n  const getDesigner = designer => {\r\n    setDesigner(designer);\r\n\r\n    getSchemaData(designer)\r\n  }\r\n\r\n  const formCode = useMemo(() => {\r\n    return props.location.query.formCode\r\n  })\r\n\r\n  // useEffect(() => {\r\n  //   const formCode = props.location.query.formCode\r\n  //   setFormCode(formCode)\r\n  // }, [])\r\n\r\n  useEffect(() => {\r\n    initDesigner()\r\n  }, [desingerType])\r\n\r\n  // 模拟接口获取schem参数\r\n  const getSchemaData = (designer) => {\r\n    const timer = setTimeout(() => {\r\n      const formMap = localStorage.getItem('formMap') && JSON.parse(localStorage.getItem('formMap')) || {}\r\n      const curretnItem = formMap[formCode]\r\n\r\n      const formilyFormSchema = curretnItem && curretnItem[\"formily-form-schema\"] || null\r\n      const formilyTableSchema = curretnItem && curretnItem[\"formily-table-schema\"] || null\r\n      setFormilyFormSchema(formilyFormSchema)\r\n      setFormilyTableSchema(formilyTableSchema)\r\n\r\n      if (formilyFormSchema) {\r\n        designer.setCurrentTree(transformToTreeNode(formilyFormSchema));\r\n      }\r\n      clearTimeout(timer)\r\n    }, 1000)\r\n  }\r\n \r\n\r\n  const initDesigner = () => {\r\n    if (!designer) return\r\n    const schemaJson = transformToSchema(designer.getCurrentTree())\r\n    if (desingerType === 'form') {\r\n      // 保存table schema并将设计器初始化成 form schema\r\n      setFormilyTableSchema(schemaJson)\r\n      designer.setCurrentTree(transformToTreeNode(formilyFormSchema));\r\n    } else {\r\n      // 保存form schema并将设计器初始化成 table schema\r\n      setFormilyFormSchema(schemaJson)\r\n\r\n      if (!formilyTableSchema) {\r\n        const initTableSchema = transformFormToTable(schemaJson);\r\n        setFormilyTableSchema(initTableSchema)\r\n        designer.setCurrentTree(transformToTreeNode(initTableSchema));\r\n      } else {\r\n        designer.setCurrentTree(transformToTreeNode(formilyTableSchema));\r\n      }\r\n    }\r\n  }\r\n\r\n  // transformFormToTable: 如果table schema为空则，讲form的字段转成table的列\r\n  const transformFormToTable = (schemaJson) => {\r\n    const tableSchema = tableConfig;\r\n    const tableItems = {};\r\n    if (schemaJson) {\r\n      Object.keys(schemaJson).forEach((key) => {\r\n        if (key === 'schema') {\r\n          const item = schemaJson[key]?.properties;\r\n          let index = 0;\r\n          item &&\r\n            Object.keys(item).forEach((p) => {\r\n              if (item[p]?.title) {\r\n                // 默认列表数据\r\n                const randomStr = Math.random().toString(36).substr(2);\r\n                const randomStrT = Math.random().toString(36).substr(2);\r\n                tableItems[randomStr] = {\r\n                  type: 'void',\r\n                  'x-component': 'ArrayTable.Column',\r\n                  'x-component-props': {\r\n                    title: item[p]?.title,\r\n                  },\r\n                  'x-designable-id': randomStrT,\r\n                  'x-index': index,\r\n                };\r\n                index += 1;\r\n              }\r\n            });\r\n        }\r\n      });\r\n\r\n      Object.keys(tableSchema['schema']?.properties).forEach((key) => {\r\n        const item = tableSchema['schema']?.properties[key];\r\n        if (item?.type === 'array' && item?.['x-component'] === 'ArrayTable') {\r\n          tableSchema['schema'].properties.[key].['items'] = {\r\n            type: 'object',\r\n            'x-designable-id': Math.random().toString(36).substr(2),\r\n            properties: tableItems,\r\n          };\r\n        }\r\n      });\r\n    }\r\n\r\n    return tableSchema\r\n  }\r\n\r\n  // 保存，暂时保存至localStorage中\r\n  const onSave = () => {\r\n    const schemaJsonStr = transformToSchema(designer.getCurrentTree());\r\n\r\n    // 修改\r\n    let formList = localStorage.getItem(\"formList\") && JSON.parse(localStorage.getItem(\"formList\")) || []\r\n    let formMap = localStorage.getItem(\"formMap\") && JSON.parse(localStorage.getItem(\"formMap\")) || {}\r\n    if (formCode) {\r\n      formList = formList.map(item => {\r\n        if (item.formCode === formCode) {\r\n          item.updateTime = moment().format(\"YYYY-MM-DD HH:mm:ss\")\r\n          item.updateName = 'admin'\r\n        }\r\n        return item\r\n      })\r\n      // 将更新后的list保存在缓存中\r\n      localStorage.setItem(\"formList\", JSON.stringify(formList))\r\n\r\n      formMap[formCode] = {\r\n        'formily-form-schema': desingerType === 'form' ? schemaJsonStr : formilyFormSchema,\r\n        'formily-table-schema': desingerType === 'form' ? formilyTableSchema : schemaJsonStr\r\n      }\r\n\r\n      // 更新后的mp存到缓存中去\r\n      localStorage.setItem(\"formMap\", JSON.stringify(formMap))\r\n    }\r\n  }\r\n\r\n  return (\r\n    <>\r\n      <Group\r\n        defaultValue={desingerType}\r\n        buttonStyle=\"solid\"\r\n        onChange={(e) => {\r\n          setDesingerType(e?.target?.value || 'form');\r\n        }}\r\n      >\r\n        <Button value=\"form\">表单设计</Button>\r\n        <Button value=\"table\">列表设计</Button>\r\n      </Group>\r\n\r\n      <FormDesigner type={desingerType} getDesigner={getDesigner} onSave={onSave} />\r\n    </>\r\n  );\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/pages/formAndTable/index.jsx b/src/pages/formAndTable/index.jsx
+--- a/src/pages/formAndTable/index.jsx	(revision 23fd162825ce3b70e73c01c62e262a2da9516266)
++++ b/src/pages/formAndTable/index.jsx	(date 1659943203601)
+@@ -1,6 +1,6 @@
+ /*
+- * @Descripttion: 
+- * @version: 
++ * @Descripttion:
++ * @version:
+  * @Author: hesisi
+  * @Date: 2022-07-20 14:55:02
+  * @LastEditors: hesisi
+@@ -63,7 +63,7 @@
+       clearTimeout(timer)
+     }, 1000)
+   }
+- 
++
+ 
+   const initDesigner = () => {
+     if (!designer) return
+@@ -119,7 +119,8 @@
+       Object.keys(tableSchema['schema']?.properties).forEach((key) => {
+         const item = tableSchema['schema']?.properties[key];
+         if (item?.type === 'array' && item?.['x-component'] === 'ArrayTable') {
+-          tableSchema['schema'].properties.[key].['items'] = {
++          // tableSchema['schema'].properties.[key].['items'] = {
++          tableSchema['schema'].properties[key]['items'] = {
+             type: 'object',
+             'x-designable-id': Math.random().toString(36).substr(2),
+             properties: tableItems,

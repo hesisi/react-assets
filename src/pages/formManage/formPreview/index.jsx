@@ -10,6 +10,7 @@ import { Table, Button, message, Modal } from 'antd';
 import { PreviewWidget } from '../../Desinger/widgets';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { transformToTreeNode } from '@designable/formily-transformer';
+import Test from './test';
 
 export default function IndexPage(props) {
   const [visible, setVisible] = useState(false);
@@ -125,48 +126,51 @@ export default function IndexPage(props) {
   };
 
   return (
+    // <div>
+    //   {/* <div style={{margin: "10px 0"}}>
+    // 		<Button type="primary" style={{margin: '0 10px'}} onClick={handleValidate}>校验</Button>
+
+    // 		<Button type="primary" style={{margin: '0 10px'}} onClick={handleReset}>清空</Button>
+
+    // 		<Button type="primary" style={{margin: '0 10px'}} onClick={handleAssign}>赋值</Button>
+
+    // 		<Button type="primary" style={{margin: '0 10px'}} onClick={handleReadOnly}>禁用</Button>
+
+    // 		<Button type="primary" style={{margin: '0 10px'}} onClick={handlePreview}>预览模式</Button>
+
+    // 		<Button type="primary" style={{margin: '0 10px'}} onClick={handleGetValues}>获取值</Button>
+
+    // 		<Button type="primary" style={{margin: '0 10px'}} onClick={handleSetFieldValue}>setFiledValue</Button>
+    // 	</div> */}
+
+    //   {/* 操作按钮 */}
+    //   <div>
+    //     <Button onClick={handleAdd}>新建</Button>
+    //   </div>
+
+    //   {/* 列表 */}
+    //   <PreviewWidget
+    //     key="table"
+    //     tree={tableTree}
+    //     ref={tableRef}
+    //     // handleAdd={handleAdd}
+    //     // slot={{
+    //     // 	Custom:
+    //     // }}
+    //   />
+
+    //   {/* 弹框: 表格 */}
+    //   <Modal
+    //     visible={visible}
+    //     title={operateType === 'add' ? '新增' : '修改'}
+    //     onCancel={handleCancel}
+    //     onOk={handleOk}
+    //   >
+    //     <PreviewWidget key="form" tree={formTree} ref={formRef} />
+    //   </Modal>
+    // </div>
     <div>
-      {/* <div style={{margin: "10px 0"}}>
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleValidate}>校验</Button>
-
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleReset}>清空</Button>
-
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleAssign}>赋值</Button>
-
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleReadOnly}>禁用</Button>
-
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handlePreview}>预览模式</Button>
-
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleGetValues}>获取值</Button>
-
-				<Button type="primary" style={{margin: '0 10px'}} onClick={handleSetFieldValue}>setFiledValue</Button>
-			</div> */}
-
-      {/* 操作按钮 */}
-      <div>
-        <Button onClick={handleAdd}>新建</Button>
-      </div>
-
-      {/* 列表 */}
-      <PreviewWidget
-        key="table"
-        tree={tableTree}
-        ref={tableRef}
-        // handleAdd={handleAdd}
-        // slot={{
-        // 	Custom:
-        // }}
-      />
-
-      {/* 弹框: 表格 */}
-      <Modal
-        visible={visible}
-        title={operateType === 'add' ? '新增' : '修改'}
-        onCancel={handleCancel}
-        onOk={handleOk}
-      >
-        <PreviewWidget key="form" tree={formTree} ref={formRef} />
-      </Modal>
+      <Test formCode={formCode} />
     </div>
   );
 }

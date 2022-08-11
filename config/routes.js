@@ -155,11 +155,13 @@ export default [
     name: '菜单预览',
     path: '/previewPage/menuPreview',
     component: '@/pages/previewPage/menuPreview',
+    meta: { navHidden: true },
   },
   {
     name: '页面预览',
     path: '/previewPage/pagePreview',
     component: '@/pages/previewPage/pagePreview',
+    meta: { navHidden: true },
   },
   {
     name: '动态报表',

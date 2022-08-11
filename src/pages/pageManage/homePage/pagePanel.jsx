@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Layout, Menu, Row, Col, List } from 'antd';
 const { Sider, Content, Header } = Layout;
 import Background from '../../../assets/panda.jpg';
+import TestChart from '../../echarts/testChart';
 
 const blueList = [
   '#e6f7ff',
@@ -18,10 +19,11 @@ const data = [
   'Man charged over missing wedding girl.',
   'Los Angeles battles huge wildfires.',
 ];
+
+const echarts = [{ code: 1, count: '操' }];
 export default function pagePanel(props) {
   const layoutOne = useRef(null);
   const layoutHeaderRef = useRef(null);
-  const [index, setIndex] = useState(0);
 
   // useEffect(() => {}, [props.form, props.comKey]);
   useEffect(() => {
@@ -33,9 +35,6 @@ export default function pagePanel(props) {
       layoutHeaderRef.current.style.backgroundImage = `url(${Background})`;
       layoutHeaderRef.current.style.backgroundSize = '100%, 100%';
       layoutHeaderRef.current.style.backgroundRepeat = 'no-repeat';
-      setIndex(0);
-    } else if (props.comKey.includes('standard-2')) {
-      setIndex(1);
     }
   }, [props.active]);
 
@@ -61,7 +60,7 @@ export default function pagePanel(props) {
             <Row>
               {blueList.slice(1, 4).map((e, i) => (
                 <Col span={8} style={{ backgroundColor: e }} key={e}>
-                  {index === i && props.comKey.includes('standard-2') ? (
+                  {i === 0 && props.comKey.includes('standard-2') ? (
                     <>
                       <List
                         size="small"
@@ -71,6 +70,12 @@ export default function pagePanel(props) {
                         renderItem={(item) => <List.Item>{item}</List.Item>}
                       />
                     </>
+                  ) : (
+                    <></>
+                  )}
+
+                  {i === 1 && props.comKey.includes('standard-3') ? (
+                    <TestChart />
                   ) : (
                     <></>
                   )}

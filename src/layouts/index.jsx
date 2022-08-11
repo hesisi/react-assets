@@ -27,7 +27,7 @@ const renderNavBar = routes
         <div
           onClick={() => {
             if (item.name === '动态报表') {
-              window.location.href = 'http://10.173.50.7:9996/tool-datav/index';
+              window.location.href = 'http://10.173.50.2:9996/tool-datav/index';
             }
           }}
         >
@@ -39,7 +39,7 @@ const renderNavBar = routes
 
 const navBar = renderNavBar.filter(
   (e) =>
-    e.key !== '/previewPage/menuPreview' ||
+    e.key !== '/previewPage/menuPreview' &&
     e.key !== '/previewPage/pagePreview',
 ); // 过滤掉菜单预览
 

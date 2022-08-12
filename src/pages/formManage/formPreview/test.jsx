@@ -12,6 +12,9 @@ import {
   Row,
   Col,
   InputNumber,
+  Slider,
+  TimePicker,
+  Switch,
 } from 'antd';
 import {
   PlusOutlined,
@@ -31,8 +34,10 @@ import { nanoid } from 'nanoid';
 import moment from 'moment';
 import './index.less';
 const { TextArea } = Input;
+const { RangePicker } = DatePicker;
 
 const App = (props) => {
+  // const [formVisible, setFormVisible] = useState(true); //TODO:
   const [formVisible, setFormVisible] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [editFlag, setEditFlag] = useState(false);
@@ -42,7 +47,8 @@ const App = (props) => {
 
   const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
   const formItemObj =
-    formColumn[props.formCode]['formily-form-schema']['schema']['properties'];
+    formColumn[props.formCode]['formily-form-schema']?.schema?.properties;
+  console.log('formItemObj', formItemObj);
   const labelCol =
     formColumn[props.formCode]['formily-form-schema']['form']['labelCol'];
   const wrapperCol =
@@ -50,14 +56,14 @@ const App = (props) => {
   const formItem = [];
   const searchItem = [];
   const tableProp =
-    formColumn[props.formCode]['formily-table-schema']['schema']['properties'][
+    formColumn[props.formCode]['formily-table-schema']?.schema?.properties[
       'f47t417jdf5'
     ]['properties'];
 
   const objSetFunc = (data, arr) => {
     for (let key in data) {
       arr.push({
-        name: data[key].name || data[key].title,
+        name: data[key].title || data[key].name,
         label: data[key].title,
         type: data[key]['x-component'],
         rules: [
@@ -76,6 +82,7 @@ const App = (props) => {
   const formInit = {};
   const searchFormInit = {};
   const objInit = (data, obj) => {
+    if (!data) return;
     // 遍历map生成对象
     const keyList = Object.keys(data);
     keyList.forEach((e) => {
@@ -195,6 +202,18 @@ const App = (props) => {
         return <InputNumber />;
       case 'DatePicker':
         return <DatePicker picker="date" />;
+      case 'Password':
+        return <Input.Password />;
+      case 'Slider':
+        return <Slider />;
+      case 'DatePicker.RangePicker':
+        return <RangePicker />;
+      case 'TimePicker':
+        return <TimePicker />;
+      case 'TimePicker.RangePicker':
+        return <TimePicker.RangePicker />;
+      case 'Switch':
+        return <Switch />;
       default:
         break;
     }
@@ -249,6 +268,7 @@ const App = (props) => {
         >
           {formItem.map((e) => (
             <Form.Item label={e.name} name={e.name} rules={e.rules} key={e.id}>
+              {/* TODO:delete */}
               {createElementList(e.type)}
             </Form.Item>
           ))}

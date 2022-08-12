@@ -13,8 +13,7 @@ import {
   Col,
   InputNumber,
   Slider,
-  TimePicker,
-  Switch,
+  Password,
 } from 'antd';
 import {
   PlusOutlined,
@@ -48,7 +47,6 @@ const App = (props) => {
   const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
   const formItemObj =
     formColumn[props.formCode]['formily-form-schema']?.schema?.properties;
-  console.log('formItemObj', formItemObj);
   const labelCol =
     formColumn[props.formCode]['formily-form-schema']['form']['labelCol'];
   const wrapperCol =
@@ -92,30 +90,36 @@ const App = (props) => {
   objInit(formItemObj, formInit);
   objInit(tableProp, searchFormInit);
   const FormattedDateTime = (dateString) => {
+    const year = dateString.getFullYear();
     const momth = (dateString.getMonth() + 1).toString().padStart(2, '0');
     const date = dateString.getDate().toString().padStart(2, '0');
-    return `${dateString.getFullYear()}-${momth}-${date}`;
+    return `${year}-${momth}-${date}`;
   };
   // 设置表格
   const columnsInit = formItem.map((e) => {
-    if (e.type === 'DatePicker') {
-      return {
-        title: e.label,
-        dataIndex: e.name,
-        key: e.id,
-        render: (time) => {
-          if (!time) return '';
-          if (typeof time === 'string')
-            return FormattedDateTime(new Date(time));
-          return time.format('YYYY-MM-DD');
-        },
-      };
+    switch (e.type) {
+      case 'DatePicker':
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+          render: (time) => {
+            if (time && moment(time)._isAMomentObject) {
+              return moment(time).format('YYYY-MM-DD');
+            } else if (typeof time === 'string') {
+              return FormattedDateTime(new Date(time));
+            }
+            return '';
+          },
+        };
+
+      default:
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+        };
     }
-    return {
-      title: e.label,
-      dataIndex: e.name,
-      key: e.id,
-    };
   });
   const columns = columnsInit.concat({
     title: 'operation',
@@ -157,6 +161,17 @@ const App = (props) => {
     setIndex(index);
     setEditFlag(true);
     setFormVisible(true);
+    for (let e in record) {
+      const reg = /^(\d{4})-(\d{2})-(\d{2})$/g;
+      console.log(record[e]);
+      if (
+        record[e] &&
+        record[e].length > 10 &&
+        reg.test(record[e]?.slice(0, 10))
+      ) {
+        record[e] = moment(record[e]);
+      }
+    }
     formRef.current.setFieldsValue(record);
   };
 
@@ -190,6 +205,7 @@ const App = (props) => {
     setFormVisible(false);
     setEditFlag(false);
   };
+
   const createElementList = (type) => {
     switch (type) {
       case 'Input':
@@ -202,18 +218,9 @@ const App = (props) => {
         return <InputNumber />;
       case 'DatePicker':
         return <DatePicker picker="date" />;
-      case 'Password':
-        return <Input.Password />;
       case 'Slider':
         return <Slider />;
-      case 'DatePicker.RangePicker':
-        return <RangePicker />;
-      case 'TimePicker':
-        return <TimePicker />;
-      case 'TimePicker.RangePicker':
-        return <TimePicker.RangePicker />;
-      case 'Switch':
-        return <Switch />;
+
       default:
         break;
     }

@@ -27,22 +27,18 @@ const renderNavBar = routes
         <div
           onClick={() => {
             if (item.name === '动态报表') {
-              window.location.href = ' http://localhost:9996/tool-datav/index';
+              window.location.href = 'http://localhost:9996/tool-datav/index';
             }
           }}
         >
           {item.name}
         </div>
       ),
+      meta: item.meta,
     };
   });
 
-const navBar = renderNavBar.filter(
-  (e) =>
-    e.key !== '/previewPage/menuPreview' &&
-    e.key !== '/previewPage/pagePreview' &&
-    e.key !== '/previewPage/layoutPreview',
-); // 过滤掉菜单预览
+const navBar = renderNavBar.filter((e) => !e.meta?.navHidden); // 过滤掉菜单预览
 
 const getMetaInfoByPath = (routesData, path, result = []) => {
   routesData.forEach((item) => {
@@ -99,7 +95,7 @@ const CommonLayout = (props) => {
     <Layout>
       <Header
         className={Styles.header}
-        style={{ display: meta && !meta.showMenu ? 'none' : 'block' }}
+        style={{ display: meta && !meta.showHeader ? 'none' : 'block' }}
       >
         <div className={Styles.logo}>
           <img src={logo} />

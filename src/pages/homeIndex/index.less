@@ -1,0 +1,113 @@
+.homepage {
+  width: 100vw;
+  height: calc(100vh - 64px);
+  background-image: url('../../assets//bg/u12.jpg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: flex;
+  // padding-top: 50px;
+  justify-content: center;
+
+  .homepage_container {
+    height: inherit;
+    // padding: 50px;
+
+    .welcomeWord {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+
+      h1 {
+        font-family: '新宋体 常规', '新宋体', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 72px;
+        line-height: 72px;
+        color: #81d3f8;
+        margin-top: 80px;
+      }
+
+      div {
+        font-size: 20px;
+        color: #fff;
+      }
+
+      span {
+        text-decoration: underline;
+        color: #65b7f3;
+        cursor: pointer;
+      }
+    }
+
+    .routerPanel {
+      display: flex;
+      // margin-top: 80px;
+      .panelItem {
+        width: 290px;
+        margin: 0 40px;
+        padding-top: 40px;
+        background-color: #fff;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-direction: column;
+        box-sizing: border-box;
+        // border-width: 1px;
+        border-style: solid;
+        border-color: rgba(101, 183, 243, 1);
+        border-radius: 10px;
+        -moz-box-shadow: 3px 3px 5px rgba(101, 183, 243, 1);
+        -webkit-box-shadow: 3px 3px 5px rgb(101 183 243);
+        box-shadow: 3px 3px 5px rgb(101 183 243);
+
+        img {
+          width: 40px;
+          height: 40px;
+        }
+
+        .enter {
+          cursor: pointer;
+          width: 100%;
+          height: 50px;
+          color: #fff;
+          font-style: normal;
+          font-size: 18px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-bottom-left-radius: 10px;
+          border-bottom-right-radius: 10px;
+          background-color: rgba(101, 183, 243, 1);
+        }
+
+        .description {
+          margin-bottom: 60px;
+          font-size: 14px;
+          color: #7f7f7f;
+          padding: 0 30px;
+          text-align: justify;
+        }
+
+        h1 {
+          margin: 20px 0 40px;
+          font-size: 20px;
+          color: #02a7f0;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1800px) {
+  .routerPanel {
+    margin-top: 50px;
+    transform: scale(0.8);
+  }
+}
+@media screen and (min-width: 1800px) {
+  .routerPanel {
+    margin-top: 150px;
+    transform: scale(1);
+  }
+}

@@ -16,7 +16,20 @@ import {
 export default [
   {
     path: '/',
-    redirect: '/userManage',
+    redirect: '/homeIndex',
+  },
+  {
+    name: '主页',
+    path: '/homeIndex',
+    component: '@/layouts/homeIndex/index',
+    meta: { showMenu: false, showHeader: true },
+    routes: [
+      {
+        name: '首页',
+        path: '/homeIndex',
+        component: '@/pages/homeIndex/index',
+      },
+    ],
   },
   {
     name: '用户管理',
@@ -65,7 +78,7 @@ export default [
     routes: [
       {
         path: '/menuManage',
-        redirect: '/menuManage/systemManage',
+        redirect: '/menuManage/menuList',
       },
       {
         name: '系统管理',
@@ -86,7 +99,7 @@ export default [
     routes: [
       {
         path: '/activityManage',
-        redirect: '/activityManage/activitConfig2',
+        redirect: '/activityManage/activityConfig',
       },
       {
         name: '流程管理',
@@ -130,13 +143,13 @@ export default [
         name: '动态表单',
         path: '/formManage/formList',
         component: '@/pages/formManage/formList',
-        meta: { showMenu: false },
+        meta: { showMenu: false, showHeader: false },
       },
       {
         name: '动态表单demo',
         path: '/formManage/formPreview',
         component: '@/pages/formManage/formPreview',
-        meta: { showMenu: false },
+        meta: { showMenu: false, showHeader: false },
       },
     ],
   },
@@ -154,11 +167,6 @@ export default [
         path: '/pageManage/homePage',
         component: '@/pages/pageManage/homePage/index',
       },
-      {
-        name: '自定义配置',
-        path: '/pageManage/pageBuild',
-        component: '@/pages/pageManage/pageBuild',
-      },
     ],
   },
   {
@@ -171,12 +179,6 @@ export default [
     name: '页面预览',
     path: '/previewPage/pagePreview',
     component: '@/pages/previewPage/pagePreview',
-    meta: { navHidden: true },
-  },
-  {
-    name: '布局预览',
-    path: '/previewPage/layoutPreview',
-    component: '@/pages/previewPage/layoutPreview',
     meta: { navHidden: true },
   },
   {

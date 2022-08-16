@@ -130,6 +130,7 @@ const configSider = (props) => {
   const [expandedKeys, setExpandedKeys] = useState(['standard']);
   const [searchValue, setSearchValue] = useState('');
   const [autoExpandParent, setAutoExpandParent] = useState(true);
+  const [selectedKeys, setSelectedKeys] = useState('');
 
   const operations = {
     template: (
@@ -207,7 +208,7 @@ const configSider = (props) => {
   const treeSelect = (key, type) => {
     // 选中树
     switch (type) {
-      case 'component': // 组件数组
+      case 'component': // 组件
         props.setComponent(key);
         break;
       case 'template': // 模板
@@ -253,6 +254,7 @@ const configSider = (props) => {
             onSelect={(e) => {
               treeSelect(e, 'component');
             }}
+            selectedKeys={selectedKeys}
           />
         </TabPane>
       </Tabs>

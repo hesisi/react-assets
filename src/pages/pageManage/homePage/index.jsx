@@ -1,4 +1,4 @@
-import { Layout, Row, Col, Button, Space, Select } from 'antd';
+import { Layout, Row, Col, Button, Space, Select, message } from 'antd';
 const { Header, Sider, Content } = Layout;
 const { Option } = Select;
 import Icon, {
@@ -15,101 +15,139 @@ import { useState, useEffect } from 'react';
 
 import { nanoid } from 'nanoid';
 
+import TodoList from '@/components/todoList';
+import LineChart from '@/components/lineChart';
+import GaugeChart from '@/components/gaugeChart';
+import ListCom from '@/components/listCom';
+
 const back = require('@/assets/icons/back.svg');
 const forward = require('@/assets/icons/forward.svg');
 const pic = require('@/assets/pic.jpg');
 const shrinks = ['100%', '80%', '60%', '40%', '20%'];
 
 const homePage = (props) => {
-  const [template, setTemplate] = useState(''); // 当前选中的模板类型
-  const [component, setComponent] = useState(''); // 当前选中的组件类型
+  const [template, setTemplate] = useState([]); // 当前选中的模板类型
+  const [component, setComponent] = useState([]); // 当前选中的组件类型
   const [dom, setDom] = useState([]);
   const [selectId, setSelectId] = useState('');
 
   useEffect(() => {
-    console.log('===treeSelect', template, component);
-    if (template.length > 0 && template[0].includes('default')) {
-      switch (template[0]) {
-        case 'default-single':
-          setDom([
-            {
-              id: nanoid(),
-              colSpan: 24,
-              className: 'default-col ',
-            },
-          ]);
-          break;
-        case 'default-header-three':
-          setDom([
-            {
-              id: nanoid(),
-              colSpan: 24,
-              className: 'default-col ',
-            },
-            {
-              id: nanoid(),
-              colSpan: 8,
-              className: 'default-col default-col __top default-col __right',
-            },
-            {
-              id: nanoid(),
-              colSpan: 8,
-              className: 'default-col default-col __top default-col __right',
-            },
-            {
-              id: nanoid(),
-              colSpan: 8,
-              className: 'default-col default-col __top',
-            },
-          ]);
-          break;
-        case 'default-two-three':
-          setDom([
-            {
-              id: nanoid(),
-              colSpan: 12,
-              className: 'default-col default-col __right',
-            },
-            {
-              id: nanoid(),
-              colSpan: 12,
-              className: 'default-col ',
-            },
-            {
-              id: nanoid(),
-              colSpan: 8,
-              className: 'default-col default-col __top default-col __right',
-            },
-            {
-              id: nanoid(),
-              colSpan: 8,
-              className: 'default-col default-col __top default-col __right',
-            },
-            {
-              id: nanoid(),
-              colSpan: 8,
-              className: 'default-col default-col __top',
-            },
-          ]);
-        default:
-          break;
-      }
+    // 设置固定模板
+    if (template.length < 0) return;
+    if (!template[0]?.includes('default')) return;
+    switch (template[0]) {
+      case 'default-single':
+        setDom([
+          {
+            id: nanoid(),
+            colSpan: 24,
+            className: 'default-col',
+            component: null,
+          },
+        ]);
+        break;
+      case 'default-header-three':
+        setDom([
+          {
+            id: nanoid(),
+            colSpan: 24,
+            className: 'default-col',
+            component: null,
+          },
+          {
+            id: nanoid(),
+            colSpan: 8,
+            className: 'default-col default-col __top default-col __right',
+            component: null,
+          },
+          {
+            id: nanoid(),
+            colSpan: 8,
+            className: 'default-col default-col __top default-col __right',
+            component: null,
+          },
+          {
+            id: nanoid(),
+            colSpan: 8,
+            className: 'default-col default-col __top',
+            component: null,
+          },
+        ]);
+        break;
+      case 'default-two-three':
+        setDom([
+          {
+            id: nanoid(),
+            colSpan: 12,
+            className: 'default-col default-col __right',
+            component: null,
+          },
+          {
+            id: nanoid(),
+            colSpan: 12,
+            className: 'default-col ',
+            component: null,
+          },
+          {
+            id: nanoid(),
+            colSpan: 8,
+            className: 'default-col default-col __top default-col __right',
+            component: null,
+          },
+          {
+            id: nanoid(),
+            colSpan: 8,
+            className: 'default-col default-col __top default-col __right',
+            component: null,
+          },
+          {
+            id: nanoid(),
+            colSpan: 8,
+            className: 'default-col default-col __top',
+            component: null,
+          },
+        ]);
+      default:
+        break;
     }
-  }, [template, component]);
-
-  const regionSelect = (id) => {
-    // 当前选中的块id
-    setSelectId(id);
-  };
+  }, [template]);
 
   const renderComponent = (com) => {
     switch (com[0]) {
       case 'standard-pic':
-        return <img src={pic} style={{ width: '100%', height: '100%' }}></img>;
-
+        return (
+          <img src={pic} className="dom-component dom-component__img"></img>
+        );
+      case 'standard-todo':
+        return <TodoList className="dom-component dom-component__todo" />;
+      case 'standard-charts':
+        return <LineChart id={selectId} />;
+      case 'standard-board':
+        return <GaugeChart id={selectId} />;
+      case 'standard-list':
+        return <ListCom className="dom-component dom-component__todo" />;
       default:
         return <></>;
     }
+  };
+
+  useEffect(() => {
+    if (!selectId && component[0]) {
+      message.warning('未选中操作区域');
+      return;
+    }
+    const domArr = dom.map((e) => {
+      if (e.id === selectId) {
+        e.component = renderComponent(component);
+      }
+      return e;
+    });
+    setDom(domArr);
+  }, [component]);
+
+  const regionSelect = (id) => {
+    // 当前选中的块id
+    setSelectId(id);
   };
 
   const renderDom = (dom) => {
@@ -120,21 +158,25 @@ const homePage = (props) => {
             <Col
               span={e.colSpan}
               key={e.id}
-              className={e.className}
+              className={
+                e.id === selectId ? `${e.className} active-col` : e.className
+              }
               onClick={() => {
                 regionSelect(e.id);
               }}
             >
-              {component ? (
-                <div>{renderComponent(component)}</div>
-              ) : (
-                <div className="default">
-                  <PlusOutlined
-                    style={{ color: '#1890ff', fontSize: '30px' }}
-                  />
-                  <p>请从组件库选择您想放置的组件</p>
-                </div>
-              )}
+              <div className={e.id === selectId ? 'active' : 'default'}>
+                {e.component ? (
+                  <>{e.component}</>
+                ) : (
+                  <>
+                    <PlusOutlined
+                      style={{ color: '#1890ff', fontSize: '30px' }}
+                    />
+                    <p className="dom-text">请从组件库选择您想放置的组件</p>
+                  </>
+                )}
+              </div>
             </Col>
           );
         })}

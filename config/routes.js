@@ -154,7 +154,7 @@ export default [
     ],
   },
   {
-    name: '页面管理',
+    name: '主页管理',
     path: '/pageManage',
     component: '@/layouts/pageManageLayout/index',
     routes: [
@@ -166,6 +166,7 @@ export default [
         name: '首页管理',
         path: '/pageManage/homePage',
         component: '@/pages/pageManage/homePage/index',
+        meta: { showMenu: false, showHeader: true },
       },
     ],
   },

@@ -32,7 +32,7 @@ const homePage = () => {
 
   const renderDom = (dom) => {
     return (
-      <Row wrap style={{ height: '100%', width: '100%', padding: '10px' }}>
+      <Row wrap style={{ height: '100%', width: '100%' }}>
         {dom.map((e) => {
           return (
             <Col span={e.colSpan} key={e.id} className={e.className}>
@@ -45,13 +45,33 @@ const homePage = () => {
   };
 
   useEffect(() => {
-    const homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
+    const homeDom = JSON.parse(window.localStorage.getItem('homeDom')); // DOM元素
     const domArr = homeDom.map((e) => {
       e.component = renderComponent(e.componentName, e.id);
       return e;
     });
     setDom(domArr);
   }, []);
+
+  useEffect(() => {
+    document.getElementsByClassName('default').forEach((e) => {
+      e.style.cursor = 'default';
+    });
+
+    const homeProperty = JSON.parse(
+      window.localStorage.getItem('homeProperty'),
+    );
+    if (Object.keys(homeProperty).length < 1) return;
+
+    document.getElementsByClassName('default-col').forEach((e) => {
+      e.style.borderWidth = homeProperty.colGap || '10px';
+      e.style.borderColor = homeProperty.colGapColor;
+      e.style.background = homeProperty.bg;
+    });
+    document.getElementsByClassName('default').forEach((e) => {
+      e.style.background = homeProperty.bg;
+    });
+  }, [dom]);
 
   return (
     <div style={{ height: '100vh', width: '100vw' }}>

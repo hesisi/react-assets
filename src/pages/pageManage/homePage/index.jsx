@@ -31,6 +31,8 @@ const homePage = (props) => {
   const [component, setComponent] = useState([]); // 当前选中的组件类型
   const [dom, setDom] = useState([]);
   const [selectId, setSelectId] = useState('');
+  const [property, setProperty] = useState({}); // 属性
+  const homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
 
   useEffect(() => {
     // 设置固定模板
@@ -58,19 +60,19 @@ const homePage = (props) => {
           {
             id: nanoid(),
             colSpan: 8,
-            className: 'default-col default-col __top default-col __right',
+            className: 'default-col default-col__top default-col__right',
             component: null,
           },
           {
             id: nanoid(),
             colSpan: 8,
-            className: 'default-col default-col __top default-col __right',
+            className: 'default-col default-col__top default-col__right',
             component: null,
           },
           {
             id: nanoid(),
             colSpan: 8,
-            className: 'default-col default-col __top',
+            className: 'default-col default-col__top',
             component: null,
           },
         ]);
@@ -80,7 +82,7 @@ const homePage = (props) => {
           {
             id: nanoid(),
             colSpan: 12,
-            className: 'default-col default-col __right',
+            className: 'default-col default-col__right',
             component: null,
           },
           {
@@ -92,28 +94,34 @@ const homePage = (props) => {
           {
             id: nanoid(),
             colSpan: 8,
-            className: 'default-col default-col __top default-col __right',
+            className: 'default-col default-col__top default-col__right',
             component: null,
           },
           {
             id: nanoid(),
             colSpan: 8,
-            className: 'default-col default-col __top default-col __right',
+            className: 'default-col default-col__top default-col__right',
             component: null,
           },
           {
             id: nanoid(),
             colSpan: 8,
-            className: 'default-col default-col __top',
+            className: 'default-col default-col__top',
             component: null,
           },
         ]);
       default:
         break;
     }
+    if (!homeDom) return;
+    const domArr = homeDom.map((e) => {
+      e.component = renderComponent([e.componentName], e.id);
+      return e;
+    });
+    setDom(domArr);
   }, [template]);
 
-  const renderComponent = (com) => {
+  const renderComponent = (com, id) => {
     switch (com[0]) {
       case 'standard-pic':
         return (
@@ -122,9 +130,13 @@ const homePage = (props) => {
       case 'standard-todo':
         return <TodoList className="dom-component dom-component__todo" />;
       case 'standard-charts':
-        return <LineChart id={selectId} className="dom-component" />;
+        return (
+          <LineChart id={selectId ? selectId : id} className="dom-component" />
+        );
       case 'standard-board':
-        return <GaugeChart id={selectId} className="dom-component" />;
+        return (
+          <GaugeChart id={selectId ? selectId : id} className="dom-component" />
+        );
       case 'standard-list':
         return <ListCom className="dom-component dom-component__todo" />;
       default:
@@ -139,13 +151,24 @@ const homePage = (props) => {
     }
     const domArr = dom.map((e) => {
       if (e.id === selectId) {
-        e.component = renderComponent(component);
+        e.component = renderComponent(component, e.id);
         e.componentName = component[0];
       }
       return e;
     });
     setDom(domArr);
   }, [component]);
+
+  useEffect(() => {
+    document.getElementsByClassName('default-col')?.forEach((e) => {
+      e.style.borderWidth = property.colGap;
+      e.style.borderColor = property.colGapColor;
+      e.style.background = property.bg;
+    });
+    document.getElementsByClassName('default')?.forEach((e) => {
+      e.style.background = property.bg;
+    });
+  }, [property]);
 
   const regionSelect = (id) => {
     // 当前选中的块id
@@ -191,9 +214,29 @@ const homePage = (props) => {
   };
 
   const previewHandler = () => {
-    console.log('====DOM', dom);
+    // console.log(dom);
     window.localStorage.setItem('homeDom', JSON.stringify(dom));
+    window.localStorage.setItem('homeProperty', JSON.stringify(property));
   };
+
+  useEffect(() => {
+    // 从内存中获取并回显
+    if (!homeDom) return;
+    // 默认模板
+    switch (homeDom.length) {
+      case 1:
+        setTemplate(['default-single']);
+        break;
+      case 4:
+        setTemplate(['default-header-three']);
+        break;
+      case 5:
+        setTemplate(['default-two-three']);
+        break;
+      default:
+        break;
+    }
+  }, []);
 
   return (
     <div className="home-page">
@@ -274,7 +317,11 @@ const homePage = (props) => {
                 )}
               </Col>
               <Col span={5}>
-                <ContentSetting selectId={selectId} />
+                <ContentSetting
+                  selectId={selectId}
+                  setProperty={setProperty}
+                  property={property}
+                />
               </Col>
             </Row>
           </Content>

@@ -183,6 +183,12 @@ export default [
     meta: { navHidden: true },
   },
   {
+    name: '首页预览',
+    path: '/previewPage/homePage',
+    component: '@/pages/previewPage/homePage',
+    meta: { navHidden: true },
+  },
+  {
     name: '动态报表',
     // path: 'http://www.baidu.com',
     // component: '@/layouts/formManageLayout',

@@ -119,15 +119,12 @@ const homePage = (props) => {
         return (
           <CarouselBanner className="dom-component dom-component__carousel" />
         );
-      // return (
-      //   <img src={pic} className="dom-component dom-component__img"></img>
-      // );
       case 'standard-todo':
         return <TodoList className="dom-component dom-component__todo" />;
       case 'standard-charts':
-        return <LineChart id={selectId} />;
+        return <LineChart id={selectId} className="dom-component" />;
       case 'standard-board':
-        return <GaugeChart id={selectId} />;
+        return <GaugeChart id={selectId} className="dom-component" />;
       case 'standard-list':
         return <ListCom className="dom-component dom-component__todo" />;
       default:
@@ -143,6 +140,7 @@ const homePage = (props) => {
     const domArr = dom.map((e) => {
       if (e.id === selectId) {
         e.component = renderComponent(component);
+        e.componentName = component[0];
       }
       return e;
     });
@@ -192,6 +190,11 @@ const homePage = (props) => {
     );
   };
 
+  const previewHandler = () => {
+    console.log('====DOM', dom);
+    window.localStorage.setItem('homeDom', JSON.stringify(dom));
+  };
+
   return (
     <div className="home-page">
       <Layout>
@@ -234,7 +237,9 @@ const homePage = (props) => {
             <Col span={5}>
               <Space>
                 <Button type="primary">返回</Button>
-                <Button type="primary">预览</Button>
+                <Button type="primary" onClick={previewHandler}>
+                  预览
+                </Button>
                 <Button type="primary">保存</Button>
                 <Button type="primary">启用</Button>
               </Space>

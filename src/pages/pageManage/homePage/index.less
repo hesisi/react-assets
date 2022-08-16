@@ -48,15 +48,6 @@
 
 .content-box__row {
   height: 100%;
-
-  // .ant-col:nth-child(1),
-  // .ant-col:nth-child(2) {
-  //   border-right: 20px solid @gray;
-  // //   box-sizing: border-box;
-  // }
-  // .ant-col:nth-child(3) {
-  //   border: none;
-  // }
 }
 
 .icon {
@@ -89,7 +80,9 @@
 .default-col {
   border: 10px solid white;
   background: @gray-2;
-  overflow: hidden;
+  overflow: auto;
+  scrollbar-width: none; /* firefox */
+  -ms-overflow-style: none; /* IE 10+ */
 }
 
 .default-col__top {
@@ -192,11 +185,15 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 
 .dom-component__img {
   &:extend(.dom-component);
-  object-fit: cover;
+  object-fit: contain;
 }
 .dom-component__todo {
   &:extend(.dom-component);

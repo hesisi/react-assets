@@ -14,6 +14,18 @@ const data = [
   {
     title: 'Ant Design Title 4',
   },
+  {
+    title: 'Ant Design Title 1',
+  },
+  {
+    title: 'Ant Design Title 2',
+  },
+  {
+    title: 'Ant Design Title 3',
+  },
+  {
+    title: 'Ant Design Title 4',
+  },
 ];
 
 const ListCom = (props) => (
@@ -25,7 +37,7 @@ const ListCom = (props) => (
       <List.Item>
         <List.Item.Meta
           avatar={<Avatar src={icon} />}
-          title={<a href="https://ant.design">{item.title}</a>}
+          title={<a href="#!">{item.title}</a>}
           description="Ant Design, a design language for background applications, is refined by Ant UED Team"
         />
       </List.Item>

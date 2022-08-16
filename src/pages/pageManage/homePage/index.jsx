@@ -19,6 +19,7 @@ import TodoList from '@/components/todoList';
 import LineChart from '@/components/lineChart';
 import GaugeChart from '@/components/gaugeChart';
 import ListCom from '@/components/listCom';
+import CarouselBanner from '@/components/carouselBanner';
 
 const back = require('@/assets/icons/back.svg');
 const forward = require('@/assets/icons/forward.svg');
@@ -116,8 +117,11 @@ const homePage = (props) => {
     switch (com[0]) {
       case 'standard-pic':
         return (
-          <img src={pic} className="dom-component dom-component__img"></img>
+          <CarouselBanner className="dom-component dom-component__carousel" />
         );
+      // return (
+      //   <img src={pic} className="dom-component dom-component__img"></img>
+      // );
       case 'standard-todo':
         return <TodoList className="dom-component dom-component__todo" />;
       case 'standard-charts':
@@ -147,6 +151,10 @@ const homePage = (props) => {
 
   const regionSelect = (id) => {
     // 当前选中的块id
+    if (selectId === id) {
+      setSelectId('');
+      return;
+    }
     setSelectId(id);
   };
 

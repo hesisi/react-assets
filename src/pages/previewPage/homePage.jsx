@@ -52,19 +52,29 @@ const homePage = () => {
   };
 
   useEffect(() => {
-    const homeDom =
-      JSON.parse(window.localStorage.getItem('homeDom')) ||
-      JSON.parse(window.localStorage.getItem('layoutTemplate')); // DOM元素
-    if (!homeDom) return;
+    let homeDom = [];
+    if (JSON.parse(window.localStorage.getItem('homeDom'))?.length > 0) {
+      homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
+    } else if (
+      JSON.parse(window.localStorage.getItem('layoutTemplate'))?.length > 0
+    ) {
+      homeDom = JSON.parse(window.localStorage.getItem('layoutTemplate'));
+    }
+    //   JSON.parse(window.localStorage.getItem('homeDom')) ||
+    //   JSON.parse(window.localStorage.getItem('layoutTemplate')); // DOM元素
+    // console.log(
+    //   homeDom,
+    //   JSON.parse(window.localStorage.getItem('layoutTemplate')),
+    // );
+    if (homeDom.length === 0) return;
     const domArr = homeDom.map((e) => {
       e.component = renderComponent(e.componentName, e.id);
       e.colSpan = e.col || e.colSpan;
-      e.className = e.className || 'default-col';
+      // e.className = e.className || 'default-col';
       return e;
     });
     setDom(domArr);
     setIds(domArr.map((e) => e.id));
-    console.log(domArr);
   }, []);
 
   useEffect(() => {
@@ -89,14 +99,14 @@ const homePage = () => {
     //   e.style.maxWidth = `${property.width}px`;
     //   e.style.height = `${property.height}px`;
     // });
-    // document.getElementsByClassName('default-col').forEach((e) => {
-    //   e.style.borderWidth = homeProperty.colGap || '10px';
-    //   e.style.borderColor = homeProperty.colGapColor;
-    //   e.style.background = homeProperty.bg;
-    // });
-    // document.getElementsByClassName('default').forEach((e) => {
-    //   e.style.background = homeProperty.bg;
-    // });
+    document.getElementsByClassName('default-col').forEach((e) => {
+      e.style.borderWidth = homeProperty.colGap || '10px';
+      e.style.borderColor = homeProperty.colGapColor;
+      e.style.background = homeProperty.bg;
+    });
+    document.getElementsByClassName('default').forEach((e) => {
+      e.style.background = homeProperty.bg;
+    });
   }, [dom]);
 
   return (

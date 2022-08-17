@@ -10,9 +10,9 @@ import Icon, {
 import './index.less';
 import ConfigSider from './configSider';
 import ContentSetting from './contentSetting';
-import PageBuid from '../pageBuild/index';
+import PageBuild from '../pageBuild/index';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { nanoid } from 'nanoid';
 
@@ -34,6 +34,7 @@ const homePage = (props) => {
   const [selectId, setSelectId] = useState('');
   const [property, setProperty] = useState({}); // 属性
   const homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
+  const pageBuildRef = useRef(null);
 
   useEffect(() => {
     // 设置固定模板
@@ -161,24 +162,24 @@ const homePage = (props) => {
     setDom(domArr);
   }, [component]);
 
-  // useEffect(() => {
-  //   const ele = document.getElementsByClassName(`${selectId}`);
-  //   if (ele.length < 1) return;
-  //   ele.forEach((e) => {
-  //     e.style.maxWidth = `${property.width}px`;
-  //     e.style.height = `${property.height}px`;
-  //   });
-  //   // ele.style.maxWidth = `${property.width}px`;
-  //   // ele.style.height = `${property.height}px`;
-  //   // document.getElementsByClassName('default-col')?.forEach((e) => {
-  //   //   e.style.borderWidth = property.colGap;
-  //   //   e.style.borderColor = property.colGapColor;
-  //   //   e.style.background = property.bg;
-  //   // });
-  //   // document.getElementsByClassName('default')?.forEach((e) => {
-  //   //   e.style.background = property.bg;
-  //   // });
-  // }, [property]);
+  useEffect(() => {
+    // const ele = document.getElementsByClassName(`${selectId}`);
+    // if (ele.length < 1) return;
+    // ele.forEach((e) => {
+    //   e.style.maxWidth = `${property.width}px`;
+    //   e.style.height = `${property.height}px`;
+    // });
+    // ele.style.maxWidth = `${property.width}px`;
+    // ele.style.height = `${property.height}px`;
+    document.getElementsByClassName('default-col')?.forEach((e) => {
+      e.style.borderWidth = property.colGap;
+      e.style.borderColor = property.colGapColor;
+      e.style.background = property.bg;
+    });
+    document.getElementsByClassName('default')?.forEach((e) => {
+      e.style.background = property.bg;
+    });
+  }, [property]);
 
   const regionSelect = (id) => {
     // 当前选中的块id
@@ -227,8 +228,15 @@ const homePage = (props) => {
 
   const previewHandler = () => {
     // console.log(dom);
-    window.localStorage.setItem('homeDom', JSON.stringify(dom));
-    window.localStorage.setItem('homeProperty', JSON.stringify(property));
+    if (template.length > 0 && template[0] === '1-0') {
+      pageBuildRef.current.preview();
+      window.localStorage.removeItem('homeDom');
+    } else {
+      window.localStorage.setItem('homeDom', JSON.stringify(dom));
+      window.localStorage.setItem('homeProperty', JSON.stringify(property));
+    }
+
+    window.open('/previewPage/homePage');
   };
 
   useEffect(() => {
@@ -317,7 +325,11 @@ const homePage = (props) => {
               </Col>
               {template.length > 0 && template[0] === '1-0' ? (
                 <Col span={20}>
-                  <PageBuid component={component} setSelectId={setSelectId} />
+                  <PageBuild
+                    component={component}
+                    setSelectId={setSelectId}
+                    ref={pageBuildRef}
+                  />
                 </Col>
               ) : (
                 <>

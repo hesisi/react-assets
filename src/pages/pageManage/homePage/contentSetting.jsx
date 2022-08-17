@@ -6,36 +6,36 @@ const contentSetting = (props) => {
   const [form] = Form.useForm();
   const onChange = (e, type) => {
     switch (type) {
-      // case 'colGap':
-      //   props.setProperty({
-      //     ...props.property,
-      //     colGap: `${e}px`,
-      //   });
-      //   break;
-      // case 'bg':
-      //   props.setProperty({
-      //     ...props.property,
-      //     bg: e.target.value,
-      //   });
-      //   break;
-      // case 'colGapColor':
-      //   props.setProperty({
-      //     ...props.property,
-      //     colGapColor: e.target.value,
-      //   });
-      //   break;
-      case 'height':
+      case 'colGap':
         props.setProperty({
           ...props.property,
-          height: e.target.value,
+          colGap: `${e}px`,
         });
         break;
-      case 'width':
+      case 'bg':
         props.setProperty({
           ...props.property,
-          width: e.target.value,
+          bg: e.target.value,
         });
         break;
+      case 'colGapColor':
+        props.setProperty({
+          ...props.property,
+          colGapColor: e.target.value,
+        });
+        break;
+      // case 'height':
+      //   props.setProperty({
+      //     ...props.property,
+      //     height: e.target.value,
+      //   });
+      //   break;
+      // case 'width':
+      //   props.setProperty({
+      //     ...props.property,
+      //     width: e.target.value,
+      //   });
+      //   break;
       default:
         break;
     }
@@ -61,17 +61,18 @@ const contentSetting = (props) => {
           <span>当前选中的：{props.selectId}</span>
         </TabPane>
         <TabPane tab="区域" key="region">
-          {/* <Form
+          <Form
             name="basic"
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 16 }}
             initialValues={{
-              width: '',
-              height: '',
+              colGap: '10',
+              colGapColor: '#ffffff',
+              bg: '#fafafa',
             }}
             form={form}
-          > */}
-          {/* <Form.Item label="间隙" name="colGap">
+          >
+            <Form.Item label="间隙" name="colGap">
               <InputNumber
                 onChange={(e) => {
                   onChange(e, 'colGap');
@@ -86,16 +87,16 @@ const contentSetting = (props) => {
 
             <Form.Item label="背景色" name="bg">
               <Input onChange={(e) => onChange(e, 'bg')} />
-            </Form.Item> */}
+            </Form.Item>
 
-          {/* <Form.Item label="宽度" name="width">
+            {/* <Form.Item label="宽度" name="width">
               <Input onChange={(e) => onChange(e, 'width')} addonAfter="px" />
             </Form.Item>
 
             <Form.Item label="高度" name="height">
               <Input onChange={(e) => onChange(e, 'height')} addonAfter="px" />
             </Form.Item> */}
-          {/* </Form> */}
+          </Form>
         </TabPane>
       </Tabs>
     </div>

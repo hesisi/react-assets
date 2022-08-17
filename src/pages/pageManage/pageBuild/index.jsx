@@ -14,7 +14,13 @@ import {
 import { nanoid } from 'nanoid';
 const { Option } = Select;
 import './index.less';
-import React, { useEffect, useState, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import image from './test.jpg';
 import { PlusOutlined } from '@ant-design/icons';
 
@@ -24,7 +30,7 @@ import GaugeChart from '@/components/gaugeChart';
 import ListCom from '@/components/listCom';
 import CarouselBanner from '@/components/carouselBanner';
 
-export default function pageBuid(props) {
+const pageBuild = forwardRef((props, ref) => {
   const [dom, setDom] = useState([]);
   const [targetDom, setTargetDom] = useState('');
   const [targetID, setTargetID] = useState('');
@@ -98,6 +104,10 @@ export default function pageBuid(props) {
   const preview = () => {
     window.localStorage.setItem('layoutTemplate', JSON.stringify(dom));
   };
+  useImperativeHandle(ref, () => ({
+    preview,
+  }));
+
   function renderChild(children) {
     return children.map((child) => (
       <Col
@@ -318,9 +328,9 @@ export default function pageBuid(props) {
               >
                 Add Col
               </Button>
-              <Button type="primary" id={'test1'} onClick={preview}>
+              {/* <Button type="primary" id={'test1'} onClick={preview}>
                 Save
-              </Button>
+              </Button> */}
             </div>
             <div className={'cont-panel'}>
               <h4>属性</h4>
@@ -376,4 +386,6 @@ export default function pageBuid(props) {
       </Row>
     </div>
   );
-}
+});
+
+export default pageBuild;

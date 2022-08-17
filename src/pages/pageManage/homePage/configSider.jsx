@@ -213,6 +213,9 @@ const configSider = (props) => {
         break;
       case 'template': // 模板
         props.setTemplate(key);
+        if (window.localStorage.getItem('homeDom')) {
+          window.localStorage.removeItem('homeDom');
+        }
         break;
       default:
         break;

@@ -10,6 +10,7 @@ import Icon, {
 import './index.less';
 import ConfigSider from './configSider';
 import ContentSetting from './contentSetting';
+import PageBuid from '../pageBuild/index';
 
 import { useState, useEffect } from 'react';
 
@@ -36,6 +37,7 @@ const homePage = (props) => {
 
   useEffect(() => {
     // 设置固定模板
+    console.log('template[0]', template[0]);
     if (template.length < 0) return;
     if (!template[0]?.includes('default')) return;
     switch (template[0]) {
@@ -159,16 +161,24 @@ const homePage = (props) => {
     setDom(domArr);
   }, [component]);
 
-  useEffect(() => {
-    document.getElementsByClassName('default-col')?.forEach((e) => {
-      e.style.borderWidth = property.colGap;
-      e.style.borderColor = property.colGapColor;
-      e.style.background = property.bg;
-    });
-    document.getElementsByClassName('default')?.forEach((e) => {
-      e.style.background = property.bg;
-    });
-  }, [property]);
+  // useEffect(() => {
+  //   const ele = document.getElementsByClassName(`${selectId}`);
+  //   if (ele.length < 1) return;
+  //   ele.forEach((e) => {
+  //     e.style.maxWidth = `${property.width}px`;
+  //     e.style.height = `${property.height}px`;
+  //   });
+  //   // ele.style.maxWidth = `${property.width}px`;
+  //   // ele.style.height = `${property.height}px`;
+  //   // document.getElementsByClassName('default-col')?.forEach((e) => {
+  //   //   e.style.borderWidth = property.colGap;
+  //   //   e.style.borderColor = property.colGapColor;
+  //   //   e.style.background = property.bg;
+  //   // });
+  //   // document.getElementsByClassName('default')?.forEach((e) => {
+  //   //   e.style.background = property.bg;
+  //   // });
+  // }, [property]);
 
   const regionSelect = (id) => {
     // 当前选中的块id
@@ -188,7 +198,9 @@ const homePage = (props) => {
               span={e.colSpan}
               key={e.id}
               className={
-                e.id === selectId ? `${e.className} active-col` : e.className
+                e.id === selectId
+                  ? `${e.className} active-col ${selectId}`
+                  : `${e.className} ${selectId}`
               }
               onClick={() => {
                 regionSelect(e.id);
@@ -303,26 +315,36 @@ const homePage = (props) => {
                   setComponent={setComponent}
                 />
               </Col>
-              <Col
-                span={15}
-                className={template.length === 0 ? 'content-box__panel' : ''}
-                style={{ padding: 0, borderRight: '20px solid #f0f2f5' }}
-              >
-                {template.length > 0 ? (
-                  renderDom(dom)
-                ) : (
-                  <span>
-                    请先选择您想要的模板，或是点击“+”，创建您的自定义模板吧...
-                  </span>
-                )}
-              </Col>
-              <Col span={5}>
-                <ContentSetting
-                  selectId={selectId}
-                  setProperty={setProperty}
-                  property={property}
-                />
-              </Col>
+              {template.length > 0 && template[0] === '1-0' ? (
+                <Col span={20}>
+                  <PageBuid component={component} setSelectId={setSelectId} />
+                </Col>
+              ) : (
+                <>
+                  <Col
+                    span={15}
+                    className={
+                      template.length === 0 ? 'content-box__panel' : ''
+                    }
+                    style={{ padding: 0, borderRight: '20px solid #f0f2f5' }}
+                  >
+                    {template.length > 0 ? (
+                      renderDom(dom)
+                    ) : (
+                      <span>
+                        请先选择您想要的模板，或是点击“+”，创建您的自定义模板吧...
+                      </span>
+                    )}
+                  </Col>
+                  <Col span={5}>
+                    <ContentSetting
+                      selectId={selectId}
+                      setProperty={setProperty}
+                      property={property}
+                    />
+                  </Col>
+                </>
+              )}
             </Row>
           </Content>
         </Layout>

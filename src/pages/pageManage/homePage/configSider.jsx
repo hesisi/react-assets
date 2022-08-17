@@ -75,11 +75,11 @@ const componentsTree = [
         key: 'standard-charts',
         icon: <BarChartOutlined />,
       },
-      {
-        title: '富文本',
-        key: 'standard-editor',
-        icon: <SnippetsOutlined />,
-      },
+      // {
+      //   title: '富文本',
+      //   key: 'standard-editor',
+      //   icon: <SnippetsOutlined />,
+      // },
     ],
   },
   {

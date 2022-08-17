@@ -16,8 +16,15 @@ const { Option } = Select;
 import './index.less';
 import React, { useEffect, useState, useRef } from 'react';
 import image from './test.jpg';
+import { PlusOutlined } from '@ant-design/icons';
 
-export default function pageBuid() {
+import TodoList from '@/components/todoList';
+import LineChart from '@/components/lineChart';
+import GaugeChart from '@/components/gaugeChart';
+import ListCom from '@/components/listCom';
+import CarouselBanner from '@/components/carouselBanner';
+
+export default function pageBuid(props) {
   const [dom, setDom] = useState([]);
   const [targetDom, setTargetDom] = useState('');
   const [targetID, setTargetID] = useState('');
@@ -26,9 +33,9 @@ export default function pageBuid() {
   const [form] = Form.useForm();
   const width = Form.useWatch('width', form);
 
-  const handleChange = (value) => {
-    console.log(`selected ${value}`);
-  };
+  // const handleChange = (value) => {
+  //   console.log(`selected ${value}`);
+  // };
 
   const addCol = () => {
     const doms = [...dom];
@@ -41,6 +48,8 @@ export default function pageBuid() {
       },
       col: 24,
       type: '',
+      component: null,
+      componentName: '',
     });
 
     setDom(doms);
@@ -49,6 +58,7 @@ export default function pageBuid() {
     formRef.current.submit();
   };
   const selectDom = (e, x) => {
+    props.setSelectId(x.id);
     e.stopPropagation();
     setTargetID(x.id);
     formRef.current.setFieldsValue({
@@ -57,10 +67,8 @@ export default function pageBuid() {
       height: x.style.height,
       type: x.type,
     });
-    console.log(form);
   };
   const setDomStyle = (form) => {
-    console.log(form);
     const doms = [...dom];
     doms.map((x) => {
       if (x.id == targetID) {
@@ -85,7 +93,6 @@ export default function pageBuid() {
     });
   };
   const onFinish = (values) => {
-    console.log('Success:', values);
     setDomStyle(values);
   };
   const preview = () => {
@@ -215,6 +222,42 @@ export default function pageBuid() {
       return <></>;
     }
   };
+
+  const renderComponent = (com, id) => {
+    console.log('renderComponent', com, targetID, id);
+    switch (com) {
+      case 'standard-pic':
+        return (
+          <CarouselBanner className="dom-component dom-component__carousel" />
+        );
+      case 'standard-todo':
+        return <TodoList className="dom-component dom-component__todo" />;
+      case 'standard-charts':
+        return (
+          <LineChart id={targetID ? targetID : id} className="dom-component" />
+        );
+      case 'standard-board':
+        return (
+          <GaugeChart id={targetID ? targetID : id} className="dom-component" />
+        );
+      case 'standard-list':
+        return <ListCom className="dom-component dom-component__todo" />;
+      default:
+        return <></>;
+    }
+  };
+
+  useEffect(() => {
+    const domArr = dom.map((e) => {
+      if (e.id === targetID) {
+        e.component = renderComponent(props.component[0], e.id);
+        e.componentName = props.component[0];
+      }
+      return e;
+    });
+    setDom(domArr);
+  }, [props.component]);
+
   const renderDoms = (arr) => {
     return (
       <Row>
@@ -228,11 +271,22 @@ export default function pageBuid() {
             }}
           >
             <div
-              className={x.id == targetID ? 'active addedItem' : 'addedItem'}
-              id={x.id}
+              className={
+                x.id == targetID ? 'active-build addedItem' : 'addedItem'
+              }
+              // id={x.id}
               style={{ ...x.style }}
             >
-              <Template type={x.type}></Template>
+              {x.component ? (
+                <>{x.component}</>
+              ) : (
+                <>
+                  <PlusOutlined
+                    style={{ color: '#1890ff', fontSize: '30px' }}
+                  />
+                  <p className="dom-text">请从组件库选择您想放置的组件</p>
+                </>
+              )}
             </div>
           </Col>
         ))}
@@ -241,9 +295,7 @@ export default function pageBuid() {
   };
   const handleDelete = () => {
     const doms = [...dom];
-    console.log(targetID);
     const newArr = doms.filter((x) => x.id != targetID);
-    console.log(newArr);
     setDom(newArr);
     clearPanel();
   };
@@ -279,6 +331,9 @@ export default function pageBuid() {
                 wrapperCol={{ span: 16 }}
                 autoComplete="off"
                 onFinish={onFinish}
+                initialValues={{
+                  target: '',
+                }}
               >
                 <Form.Item label="Target" name="target">
                   <Input disabled={true} value={targetID} />
@@ -295,7 +350,7 @@ export default function pageBuid() {
                 <Form.Item label="Height" name="height">
                   <Input />
                 </Form.Item>
-                <Form.Item label="Type" name="type">
+                {/* <Form.Item label="Type" name="type">
                   <Select
                     defaultValue=""
                     style={{ width: 120 }}
@@ -305,7 +360,7 @@ export default function pageBuid() {
                     <Option value="banner">Banner</Option>
                     <Option value="image">Image</Option>
                   </Select>
-                </Form.Item>
+                </Form.Item> */}
               </Form>
               <div style={{ padding: '10px' }}>
                 <Button onClick={save} style={{ marginRight: '10px' }}>

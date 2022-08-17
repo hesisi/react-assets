@@ -1,11 +1,17 @@
+@gray-5: #d9d9d9;
+@gray-2: #fafafa;
+
 .build-cont {
-  border: solid 1px #e2e2e2;
+  border: solid 1px @gray-5;
   border-radius: 4px;
   height: 100%;
   width: 100%;
+  .ant-col {
+    overflow: hidden;
+  }
 }
 .right-menu {
-  border: solid 1px #e2e2e2;
+  border: solid 1px @gray-5;
   border-radius: 4px;
   padding: 10px;
   height: 100%;
@@ -23,7 +29,7 @@
   align-items: start;
 }
 .cont-panel {
-  border: solid 1px #e2e2e2;
+  border: solid 1px @gray-5;
   border-radius: 4px;
   padding: 5px;
   margin-top: 10px;
@@ -32,12 +38,16 @@
 .addedItem {
   min-height: 20px;
   //width: 100%;
-  background: #e1e1e1;
+  background: @gray-2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   //margin: 5px;
-  &.active {
+  &.active-build {
     border: 1px solid #1890ff;
   }
 }
 .childItem {
-  background: #e2e2e2;
+  background: @gray-5;
 }

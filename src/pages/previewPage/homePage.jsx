@@ -7,9 +7,11 @@ import GaugeChart from '@/components/gaugeChart';
 import ListCom from '@/components/listCom';
 import CarouselBanner from '@/components/carouselBanner';
 import '../pageManage/homePage/index.less';
+import '../pageManage/pageBuild/index.less';
 
 const homePage = () => {
   const [dom, setDom] = useState([]);
+  const [ids, setIds] = useState([]);
 
   const renderComponent = (com, id) => {
     switch (com) {
@@ -35,7 +37,12 @@ const homePage = () => {
       <Row wrap style={{ height: '100%', width: '100%' }}>
         {dom.map((e) => {
           return (
-            <Col span={e.colSpan} key={e.id} className={e.className}>
+            <Col
+              span={e.colSpan}
+              key={e.id}
+              className={`${e.className} ${e.id}`}
+              style={e.style}
+            >
               <div className="default">{e.component}</div>
             </Col>
           );
@@ -45,12 +52,19 @@ const homePage = () => {
   };
 
   useEffect(() => {
-    const homeDom = JSON.parse(window.localStorage.getItem('homeDom')); // DOM元素
+    const homeDom =
+      JSON.parse(window.localStorage.getItem('homeDom')) ||
+      JSON.parse(window.localStorage.getItem('layoutTemplate')); // DOM元素
+    if (!homeDom) return;
     const domArr = homeDom.map((e) => {
       e.component = renderComponent(e.componentName, e.id);
+      e.colSpan = e.col || e.colSpan;
+      e.className = e.className || 'default-col';
       return e;
     });
     setDom(domArr);
+    setIds(domArr.map((e) => e.id));
+    console.log(domArr);
   }, []);
 
   useEffect(() => {
@@ -63,14 +77,26 @@ const homePage = () => {
     );
     if (Object.keys(homeProperty).length < 1) return;
 
-    document.getElementsByClassName('default-col').forEach((e) => {
-      e.style.borderWidth = homeProperty.colGap || '10px';
-      e.style.borderColor = homeProperty.colGapColor;
-      e.style.background = homeProperty.bg;
-    });
-    document.getElementsByClassName('default').forEach((e) => {
-      e.style.background = homeProperty.bg;
-    });
+    // ids.forEach((e) => {
+    //   const ele = document.getElementsByClassName(`${e}`)[0];
+    //   ele.style.maxWidth = `${homeProperty.width}px`;
+    //   ele.style.height = `${homeProperty.height}px`;
+    // });
+
+    // const ele = document.getElementsByClassName(`${selectId}`);
+    // if (ele.length < 1) return;
+    // ele.forEach((e) => {
+    //   e.style.maxWidth = `${property.width}px`;
+    //   e.style.height = `${property.height}px`;
+    // });
+    // document.getElementsByClassName('default-col').forEach((e) => {
+    //   e.style.borderWidth = homeProperty.colGap || '10px';
+    //   e.style.borderColor = homeProperty.colGapColor;
+    //   e.style.background = homeProperty.bg;
+    // });
+    // document.getElementsByClassName('default').forEach((e) => {
+    //   e.style.background = homeProperty.bg;
+    // });
   }, [dom]);
 
   return (

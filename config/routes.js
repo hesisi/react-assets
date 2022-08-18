@@ -143,7 +143,11 @@ export default [
         name: '动态表单',
         path: '/formManage/formList',
         component: '@/pages/formManage/formList',
-        meta: { showMenu: false, showHeader: false },
+        meta: {
+          showMenu: true,
+          showHeader: true,
+          breadcrumb: [{ label: '表单管理' }, { label: '列表表单' }],
+        },
       },
       {
         name: '动态表单demo',

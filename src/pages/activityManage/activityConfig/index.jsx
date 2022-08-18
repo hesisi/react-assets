@@ -15,7 +15,7 @@ import {
   BpmnPropertiesProviderModule,
 } from 'bpmn-js-properties-panel';
 
-import { xmlstr } from '../xml/testXml';
+import { xmlStr } from '../xml/Xml1';
 // import pizzaDiagram from './xml/pizza-collaboration.bpmn';
 import { useEffect, useRef } from 'react';
 import './index.less';
@@ -56,7 +56,7 @@ export default function IndexPage() {
       container: refPanel.current,
       modeler,
     });
-    modeler.importXML(xmlstr);
+    modeler.importXML(xmlStr);
   });
 
   return (

@@ -18,7 +18,9 @@ import {
   Select,
   Tag,
   Divider,
+  Layout,
 } from 'antd';
+const { Content } = Layout;
 import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'umi';
 // import { initFormListData } from './dataJson'
@@ -36,7 +38,9 @@ import {
   StopOutlined,
   FormOutlined,
   CloseOutlined,
+  SendOutlined,
 } from '@ant-design/icons';
+import '@/assets/style/layout.less';
 
 const { TextArea } = Input;
 
@@ -110,49 +114,73 @@ export default function FormList() {
       render: (_, record, index) => {
         return <span>{index + 1}</span>;
       },
+      width: 100,
+      fixed: 'left',
     },
     {
       title: '操作',
       key: 'action',
       render: (_, record) => (
         <Space split={<Divider type="vertical" />} size={0}>
-          <Button
-            type="link"
-            style={{ padding: 0 }}
-            icon={<CheckSquareOutlined />}
-            onClick={() => formStatusHandler(record, 'enable')}
-          >
-            启用
-          </Button>
-          <Button
-            type="link"
-            style={{ padding: 0 }}
-            icon={<StopOutlined />}
-            onClick={() => formStatusHandler(record, 'disabled')}
-          >
-            停用
-          </Button>
-          <Button
-            type="link"
-            onClick={() => handleShowDesigner(record)}
-            style={{ padding: 0 }}
-            icon={<FormOutlined />}
-          >
-            编辑
-          </Button>
-          <Button
-            type="link"
-            onClick={() => handleDelete(record)}
-            style={{ padding: 0 }}
-            icon={<CloseOutlined />}
-          >
-            删除
-          </Button>
-
-          {/* <a onClick={() => handlePreview(record)}>预览</a> */}
+          {record.formStatus === 'enable' ? (
+            <>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<SendOutlined />}
+              >
+                发布
+              </Button>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<StopOutlined />}
+                onClick={() => formStatusHandler(record, 'disabled')}
+              >
+                停用
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleShowDesigner(record)}
+                style={{ padding: 0 }}
+                icon={<FormOutlined />}
+              >
+                编辑
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<CheckSquareOutlined />}
+                onClick={() => formStatusHandler(record, 'enable')}
+              >
+                启用
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleShowDesigner(record)}
+                style={{ padding: 0 }}
+                icon={<FormOutlined />}
+              >
+                编辑
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleDelete(record)}
+                style={{ padding: 0 }}
+                icon={<CloseOutlined />}
+              >
+                删除
+              </Button>
+            </>
+          )}
         </Space>
       ),
       align: 'center',
+      width: 300,
+      fixed: 'left',
     },
 
     {
@@ -169,8 +197,8 @@ export default function FormList() {
     },
     {
       title: '表单状态',
-      key: 'tags',
-      dataIndex: 'tags',
+      key: 'formStatus',
+      dataIndex: 'formStatus',
       render: (_, { formStatus }, index) => {
         let color = formStatus === 'enable' ? 'blue' : 'default';
         return (
@@ -182,6 +210,7 @@ export default function FormList() {
         );
       },
       align: 'center',
+      width: 100,
     },
     {
       title: '创建时间',
@@ -301,6 +330,7 @@ export default function FormList() {
 
   // 清除表单检索
   const resetHandler = () => {
+    if (!formRef.current) return;
     formRef.current.resetFields();
     getFormList();
   };
@@ -324,75 +354,77 @@ export default function FormList() {
   };
 
   return (
-    <div style={{ padding: '50px 20px' }}>
-      {/* 筛选框 */}
-      <Row
-        justify="space-between"
-        style={{ paddingBottom: '15px', borderBottom: '2px solid #f0f0f0' }}
-      >
-        <Col>
-          <Form
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
-            layout="inline"
-            ref={formRef}
-          >
-            <Form.Item label="表单名称" name="formName">
-              <Input allowClear />
-            </Form.Item>
-
-            <Form.Item label="表单状态" name="formStatus">
-              <Select
-                style={{
-                  width: 180,
-                }}
-                allowClear
+    <div className="list">
+      <Layout className="list-layout">
+        <Content className="list-content">
+          {/* 筛选框 */}
+          <Row justify="space-between" className="list-row">
+            <Col>
+              <Form
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 16 }}
+                layout="inline"
+                ref={formRef}
               >
-                {selectList.map((e) => {
-                  return (
-                    <Select.Option value={e.value} key={e.value}>
-                      {e.label}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
-          </Form>
-        </Col>
+                <Form.Item label="表单名称" name="formName">
+                  <Input allowClear placeholder="请输入内容" />
+                </Form.Item>
 
-        <Col>
-          <Space size={10}>
-            <Button
-              type="primary"
-              icon={<SearchOutlined />}
-              onClick={searchHandler}
-            >
-              搜索
-            </Button>
-            <Button icon={<MinusCircleOutlined />} onClick={resetHandler}>
-              清除
-            </Button>
-          </Space>
-        </Col>
-      </Row>
+                <Form.Item label="表单状态" name="formStatus">
+                  <Select
+                    style={{
+                      width: 180,
+                    }}
+                    allowClear
+                    placeholder="请选择内容"
+                  >
+                    {selectList.map((e) => {
+                      return (
+                        <Select.Option value={e.value} key={e.value}>
+                          {e.label}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
+                </Form.Item>
+              </Form>
+            </Col>
 
-      <Row justify="end" style={{ padding: '20px 0' }}>
-        <Space size={10}>
-          <Button icon={<PlusCircleOutlined />} onClick={handleAdd}>
-            添加
-          </Button>
-          <Button icon={<CloseCircleOutlined />}>删除</Button>
-        </Space>
-      </Row>
+            <Col>
+              <Space size={10}>
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={searchHandler}
+                >
+                  搜索
+                </Button>
+                <Button icon={<MinusCircleOutlined />} onClick={resetHandler}>
+                  清除
+                </Button>
+              </Space>
+            </Col>
+          </Row>
 
-      {/* 列表部分 */}
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        rowKey={(record) => record.formCode}
-        rowSelection={rowSelection}
-        sticky={true}
-      />
+          <Row justify="end" style={{ padding: '20px 0' }}>
+            <Space size={10}>
+              <Button icon={<PlusCircleOutlined />} onClick={handleAdd}>
+                添加
+              </Button>
+              <Button icon={<CloseCircleOutlined />}>删除</Button>
+            </Space>
+          </Row>
+
+          {/* 列表部分 */}
+          <Table
+            columns={columns}
+            dataSource={dataSource}
+            rowKey={(record) => record.formCode}
+            rowSelection={rowSelection}
+            sticky={true}
+          />
+        </Content>
+      </Layout>
 
       {/* 弹框 */}
       <Modal

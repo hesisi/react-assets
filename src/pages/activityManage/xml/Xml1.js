@@ -11,6 +11,12 @@ export const xmlStr = `<?xml version="1.0" encoding="UTF-8"?>
 </process>
 <bpmndi:BPMNDiagram id="BpmnDiagram_1">
     <bpmndi:BPMNPlane id="BpmnPlane_1" bpmnElement="Process_1">
+    <bpmndi:BPMNShape id="StartEvent_1y45yut_di" bpmnElement="StartEvent_1y45yut">
+        <omgdc:Bounds x="152" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+        <omgdc:Bounds x="160" y="145" width="22" height="14" />
+        </bpmndi:BPMNLabel>
+    </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
 </bpmndi:BPMNDiagram>
 </definitions>`;

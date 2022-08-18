@@ -25,6 +25,7 @@ export default function Dialog(props: any) {
     // setIsModalVisible(false)
     // formRef.current?.resetFields()
     setIsModalVisible(false);
+    window.localStorage.setItem('flow', JSON.stringify(values));
     handleOk();
   };
   const confirm = () => {

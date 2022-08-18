@@ -16,9 +16,16 @@ export default class PropertiesView extends Component {
     };
   }
 
+  init = (modeler) => {
+    const bpmnFactory = modeler.get('bpmnFactory'),
+      elementFactory = modeler.get('elementFactory'),
+      elementRegistry = modeler.get('elementRegistry'),
+      modeling = modeler.get('modeling');
+    console.log(bpmnFactory);
+  };
   componentDidMount() {
     const { modeler } = this.props;
-
+    this.init(modeler);
     modeler.on('selection.changed', (e) => {
       const { element } = this.state;
 
@@ -47,23 +54,46 @@ export default class PropertiesView extends Component {
   }
 
   render() {
-    const { modeler } = this.props;
+    const { modeler, flow } = this.props;
 
     const { selectedElements, element } = this.state;
 
     return (
       <div>
-        {selectedElements.length === 1 && (
-          <ElementProperties modeler={modeler} element={element} />
-        )}
+        <div className="element-properties">
+          <h3 className={'panel-tittle'}>属性</h3>
+          <Collapse defaultActiveKey={['1']}>
+            <Panel header="常规" key="1">
+              {selectedElements.length === 1 && (
+                <ElementProperties modeler={modeler} element={element} />
+              )}
 
-        {/*{selectedElements.length === 0 && (*/}
-        {/*  <span>Please select an element.</span>*/}
-        {/*)}*/}
+              {/*{selectedElements.length === 0 && (*/}
+              {/*  <span>Please select an element.</span>*/}
+              {/*)}*/}
 
-        {selectedElements.length > 1 && (
-          <span>Please select a single element.</span>
-        )}
+              {selectedElements.length > 1 && (
+                <span>Please select a single element.</span>
+              )}
+            </Panel>
+            <Panel header="申请人" key="2">
+              <p>{'dddd'}</p>
+            </Panel>
+            {selectedElements.length === 1 ? (
+              <>
+                <Panel header="表单" key="3">
+                  <a
+                    onClick={() => {
+                      alert('创建表单');
+                    }}
+                  >
+                    create form
+                  </a>
+                </Panel>
+              </>
+            ) : null}
+          </Collapse>
+        </div>
       </div>
     );
   }
@@ -149,45 +179,33 @@ function ElementProperties(props) {
   }
 
   return (
-    <div className="element-properties" key={element.id}>
-      <h3 className={'panel-tittle'}>属性</h3>
-      <Collapse defaultActiveKey={['1']}>
-        <Panel header="常规" key="1">
-          <fieldset>
-            <label>id</label>
-            <span>{element.id}</span>
-          </fieldset>
+    <div key={element.id}>
+      <fieldset>
+        <label>id</label>
+        <span>{element.id}</span>
+      </fieldset>
 
-          <fieldset>
-            <label>名称</label>
-            <input
-              value={element.businessObject.name || ''}
-              onChange={(event) => {
-                updateName(event.target.value);
-              }}
-            />
-          </fieldset>
+      <fieldset>
+        <label>节点名称</label>
+        <input
+          value={element.businessObject.name || ''}
+          onChange={(event) => {
+            updateName(event.target.value);
+          }}
+        />
+      </fieldset>
 
-          <fieldset>
-            <label>表单</label>
-            <a
-              onClick={() => {
-                alert('创建表单');
-                console.log(getBusinessObject(element).$type);
-              }}
-            >
-              create form
-            </a>
-          </fieldset>
-        </Panel>
-        <Panel header="事件" key="2">
-          <p>{'dddd'}</p>
-        </Panel>
-        <Panel header="This is panel header 3" key="3">
-          <p>{'text'}</p>
-        </Panel>
-      </Collapse>
-
+      {/*<fieldset>*/}
+      {/*  <label>表单</label>*/}
+      {/*  <a*/}
+      {/*    onClick={() => {*/}
+      {/*      alert('创建表单');*/}
+      {/*      console.log(getBusinessObject(element).$type);*/}
+      {/*    }}*/}
+      {/*  >*/}
+      {/*    create form*/}
+      {/*  </a>*/}
+      {/*</fieldset>*/}
       {/*{is(element, 'custom:TopicHolder') && (*/}
       {/*  <fieldset>*/}
       {/*    <label>topic (custom)</label>*/}

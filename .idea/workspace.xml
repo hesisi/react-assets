@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="fix: formily">
+    <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="feat: flow list">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/Dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityList/Dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/xml/Xml1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/xml/Xml1.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,7 +105,7 @@
       <workItem from="1660008113614" duration="9562000" />
       <workItem from="1660094116096" duration="20162000" />
       <workItem from="1660181091122" duration="27593000" />
-      <workItem from="1660787361823" duration="11882000" />
+      <workItem from="1660787361823" duration="17566000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 创建自定义模板">
       <created>1660216714232</created>
@@ -135,7 +135,14 @@
       <option name="project" value="LOCAL" />
       <updated>1660791274137</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="feat: flow list">
+      <created>1660811919223</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1660811919223</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -161,6 +168,7 @@
     <MESSAGE value="feat: 创建自定义模板" />
     <MESSAGE value="feat: 自定义模板名义" />
     <MESSAGE value="fix: formily" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: formily" />
+    <MESSAGE value="feat: flow list" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: flow list" />
   </component>
 </project>

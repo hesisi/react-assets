@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, forwardRef } from 'react';
 import { Tabs, InputNumber, Input, Form } from 'antd';
 const { TabPane } = Tabs;
 
-const contentSetting = (props) => {
+const contentSetting = forwardRef((props, ref) => {
   const [form] = Form.useForm();
   const onChange = (e, type) => {
     switch (type) {
@@ -77,6 +77,7 @@ const contentSetting = (props) => {
               radius: '0',
             }}
             form={form}
+            ref={ref}
           >
             <Form.Item label="间隙" name="colGap">
               <InputNumber
@@ -117,6 +118,6 @@ const contentSetting = (props) => {
       </Tabs>
     </div>
   );
-};
+});
 
 export default contentSetting;

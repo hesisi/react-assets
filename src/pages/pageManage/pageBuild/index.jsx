@@ -51,6 +51,7 @@ const pageBuild = forwardRef((props, ref) => {
       children: [],
       style: {
         height: '160px',
+        borderRadius: '0px',
       },
       col: 24,
       type: '',
@@ -71,6 +72,7 @@ const pageBuild = forwardRef((props, ref) => {
       target: x.id,
       col: x.col,
       height: x.style.height,
+      radius: x.style.borderRadius,
       type: x.type,
     });
   };
@@ -82,6 +84,7 @@ const pageBuild = forwardRef((props, ref) => {
           width: form.width,
           height: form.type == 'table' ? '290px' : form.height,
           background: form.type == 'table' ? '#ffffff' : '',
+          borderRadius: form.type === 'table' ? '0px' : form.radius,
         };
         (x.col = form.col), (x.type = form.type);
       }
@@ -96,6 +99,7 @@ const pageBuild = forwardRef((props, ref) => {
       col: '',
       width: '',
       height: '',
+      radius: '',
     });
   };
   const onFinish = (values) => {
@@ -128,6 +132,7 @@ const pageBuild = forwardRef((props, ref) => {
   }
   const contentStyle = {
     height: '160px',
+    borderRadius: '0px',
     color: '#fff',
     lineHeight: '160px',
     textAlign: 'center',
@@ -358,6 +363,9 @@ const pageBuild = forwardRef((props, ref) => {
                   <Input />
                 </Form.Item>
                 <Form.Item label="Height" name="height">
+                  <Input />
+                </Form.Item>
+                <Form.Item label="Radius" name="radius">
                   <Input />
                 </Form.Item>
                 {/* <Form.Item label="Type" name="type">

@@ -40,10 +40,12 @@ const homePage = () => {
             <Col
               span={e.colSpan}
               key={e.id}
-              className={`${e.className} ${e.id}`}
+              className={e.className ? `${e.className} ${e.id}` : `${e.id}`}
               style={e.style}
             >
-              <div className="default">{e.component}</div>
+              <div className="default" style={e.style}>
+                {e.component}
+              </div>
             </Col>
           );
         })}

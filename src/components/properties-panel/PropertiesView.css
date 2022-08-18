@@ -1,0 +1,26 @@
+.element-properties label {
+  font-weight: bold;
+}
+.element-properties fieldset{
+  padding: 10px 10px 0;
+}
+.element-properties label:after {
+  content: ': ';
+}
+
+.element-properties button + button {
+  margin-left: 10px;
+}
+.element-properties .panel-tittle{
+  font-weight: bold;
+  font-size: 16px;
+  padding: 10px;
+  margin: 0;
+}
+.element-properties{
+  padding-bottom: 20px;
+  border-radius: 5px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 0 8px 4px rgba(0,0,0,0.2);
+}

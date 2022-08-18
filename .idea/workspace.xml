@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="feat: 自定义模板名义" />
+    <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="fix: formily">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/routes.js" beforeDir="false" afterPath="$PROJECT_DIR$/config/routes.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.less" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,15 +16,16 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="Less File" />
+        <option value="TypeScript JSX File" />
+        <option value="JavaScript File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="dev/jlf" />
+        <entry key="$PROJECT_DIR$" value="fix/formily" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -33,12 +40,12 @@
               <option name="branches">
                 <list>
                   <RecentBranch>
-                    <option name="branchName" value="master" />
-                    <option name="lastUsedInstant" value="1660219401" />
+                    <option name="branchName" value="dev/jlf" />
+                    <option name="lastUsedInstant" value="1660791604" />
                   </RecentBranch>
                   <RecentBranch>
-                    <option name="branchName" value="dev/jlf" />
-                    <option name="lastUsedInstant" value="1660014267" />
+                    <option name="branchName" value="master" />
+                    <option name="lastUsedInstant" value="1660219401" />
                   </RecentBranch>
                 </list>
               </option>
@@ -65,21 +72,23 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/pages/pageManage/homePage" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/pages/activityManage" />
     <property name="list.type.of.created.stylesheet" value="Less" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="prettierjs.PrettierConfiguration.Package" value="C:\project\ZC\react-assets\node_modules\prettier" />
-    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\WebStorm 2021.3.2\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
+    <property name="ts.external.directory.path" value="C:\project\ZC\react-assets\node_modules\typescript\lib" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\project\ZC\react-assets\src\pages\activityManage" />
+      <recent name="C:\project\ZC\react-assets\src\components" />
+      <recent name="C:\Users\lifjiang\AppData\Roaming\JetBrains\WebStorm2021.3\scratches" />
       <recent name="C:\project\ZC\react-assets\src\pages\pageManage\homePage" />
       <recent name="C:\project\ZC\react-assets\src\assets" />
-      <recent name="C:\project\ZC\react-assets\src\pages\pageManage\pageBuild" />
-      <recent name="C:\project\ZC\react-assets\src\pages\activityManage\activityConfig\xml" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\project\ZC\react-assets\src\components" />
       <recent name="C:\project\ZC\react-assets\src\pages\activityManage\activityList" />
       <recent name="C:\project\ZC\react-assets\src\pages\activityManage" />
     </key>
@@ -96,6 +105,7 @@
       <workItem from="1660008113614" duration="9562000" />
       <workItem from="1660094116096" duration="20162000" />
       <workItem from="1660181091122" duration="27593000" />
+      <workItem from="1660787361823" duration="11882000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 创建自定义模板">
       <created>1660216714232</created>
@@ -118,11 +128,23 @@
       <option name="project" value="LOCAL" />
       <updated>1660219309066</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="fix: formily">
+      <created>1660791274137</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1660791274137</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+    <option name="exactExcludedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.js" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -138,6 +160,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="feat: 创建自定义模板" />
     <MESSAGE value="feat: 自定义模板名义" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: 自定义模板名义" />
+    <MESSAGE value="fix: formily" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: formily" />
   </component>
 </project>

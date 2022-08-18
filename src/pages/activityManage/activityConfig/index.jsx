@@ -15,7 +15,7 @@ import {
   BpmnPropertiesProviderModule,
 } from 'bpmn-js-properties-panel';
 
-import { xmlstr } from '../xml/testXml';
+import { xmlStr } from '../xml/Xml1';
 // import pizzaDiagram from './xml/pizza-collaboration.bpmn';
 import { useEffect, useRef } from 'react';
 import './index.less';
@@ -27,12 +27,12 @@ import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
 import 'bpmn-js-properties-panel/dist/assets/properties-panel.css';
 import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 
-function Panel() {
-  const refPanel = useRef();
-  return <div ref={refPanel} id="panel" className={'panel'}></div>;
-}
+import PropertiesPanel from '../../../components/properties-panel';
+import customModdleExtension from '../../../components/properties-panel/custom.json';
+
 export default function IndexPage() {
   const refContainer = useRef();
+  const refPanel = useRef();
   useEffect(() => {
     const modeler = new Modeler({
       container: '#canvas',
@@ -41,18 +41,28 @@ export default function IndexPage() {
       propertiesPanel: {
         parent: '#panel',
       },
-      additionalModules: [
-        BpmnPropertiesPanelModule,
-        BpmnPropertiesProviderModule,
-      ],
+      // additionalModules: [
+      //   BpmnPropertiesPanelModule,
+      //   BpmnPropertiesProviderModule,
+      // ],
+      moddleExtensions: {
+        custom: customModdleExtension,
+      },
+      keyboard: {
+        bindTo: document.body,
+      },
     });
-    modeler.importXML(xmlstr);
+    const propertiesPanel = new PropertiesPanel({
+      container: refPanel.current,
+      modeler,
+    });
+    modeler.importXML(xmlStr);
   });
 
   return (
     <div className={'main-container'}>
       <div ref={refContainer} id="canvas" className="container" />
-      <Panel></Panel>
+      <div ref={refPanel} id="panel" className={'panel'}></div>
     </div>
   );
 }

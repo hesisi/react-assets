@@ -99,22 +99,19 @@ export default [
     routes: [
       {
         path: '/activityManage',
-        redirect: '/activityManage/activityConfig',
+        redirect: '/activityManage/activityList/',
       },
       {
-        name: '流程管理',
-        path: '/activityList/',
-        component: '@/pages/activityManage/activityList/activityList',
-      },
-      {
-        name: '流程配置2',
-        path: '/activityManage/activitConfig2',
-        component: '@/pages/activityManage/activitConfig2',
+        name: '流程列表',
+        path: '/activityManage/activityList/',
+        component: '@/pages/activityManage/activityList/activityList.tsx',
+        meta: { showMenu: false, showHeader: true },
       },
       {
         name: '流程配置',
         path: '/activityManage/activityConfig',
         component: '@/pages/activityManage/activityConfig',
+        meta: { showMenu: false, showHeader: true },
       },
     ],
   },

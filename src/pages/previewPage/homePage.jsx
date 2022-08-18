@@ -103,6 +103,7 @@ const homePage = () => {
       e.style.borderWidth = homeProperty.colGap || '10px';
       e.style.borderColor = homeProperty.colGapColor;
       e.style.background = homeProperty.bg;
+      e.style.borderRadius = homeProperty.radius || '0px';
     });
     document.getElementsByClassName('default').forEach((e) => {
       e.style.background = homeProperty.bg;

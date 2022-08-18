@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="feat: 自定义模板名义" />
+    <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="fix: formily">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_10_08_2022_11_02____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_10_08_2022_11_02_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.less" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -65,7 +71,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/pages/pageManage/homePage" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/components" />
     <property name="list.type.of.created.stylesheet" value="Less" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="prettierjs.PrettierConfiguration.Package" value="C:\project\ZC\react-assets\node_modules\prettier" />
@@ -74,12 +80,14 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\project\ZC\react-assets\src\components" />
+      <recent name="C:\Users\lifjiang\AppData\Roaming\JetBrains\WebStorm2021.3\scratches" />
       <recent name="C:\project\ZC\react-assets\src\pages\pageManage\homePage" />
       <recent name="C:\project\ZC\react-assets\src\assets" />
       <recent name="C:\project\ZC\react-assets\src\pages\pageManage\pageBuild" />
-      <recent name="C:\project\ZC\react-assets\src\pages\activityManage\activityConfig\xml" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\project\ZC\react-assets\src\components" />
       <recent name="C:\project\ZC\react-assets\src\pages\activityManage\activityList" />
       <recent name="C:\project\ZC\react-assets\src\pages\activityManage" />
     </key>
@@ -96,6 +104,7 @@
       <workItem from="1660008113614" duration="9562000" />
       <workItem from="1660094116096" duration="20162000" />
       <workItem from="1660181091122" duration="27593000" />
+      <workItem from="1660787361823" duration="1114000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 创建自定义模板">
       <created>1660216714232</created>

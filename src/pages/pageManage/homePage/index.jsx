@@ -35,10 +35,14 @@ const homePage = (props) => {
   const [property, setProperty] = useState({}); // 属性
   const homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
   const pageBuildRef = useRef(null);
+  const contentSettingRef = useRef(null);
 
   useEffect(() => {
     // 设置固定模板
-    console.log('template[0]', template[0]);
+    if (contentSettingRef.current) {
+      contentSettingRef.current.resetFields();
+    }
+
     if (template.length < 0) return;
     if (!template[0]?.includes('default')) return;
     switch (template[0]) {
@@ -175,6 +179,7 @@ const homePage = (props) => {
       e.style.borderWidth = property.colGap;
       e.style.borderColor = property.colGapColor;
       e.style.background = property.bg;
+      e.style.borderRadius = property.radius;
     });
     document.getElementsByClassName('default')?.forEach((e) => {
       e.style.background = property.bg;
@@ -353,6 +358,7 @@ const homePage = (props) => {
                       selectId={selectId}
                       setProperty={setProperty}
                       property={property}
+                      ref={contentSettingRef}
                     />
                   </Col>
                 </>

@@ -1,256 +1,464 @@
 /*
- * @Descripttion: 
- * @version: 
+ * @Descripttion:
+ * @version:
  * @Author: hesisi
  * @Date: 2022-06-13 16:09:41
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-03 14:59:15
  */
-import { Col, Row, Table, Form, Input, Button, Space, Modal } from 'antd';
-import { useEffect, useRef, useState } from 'react'
+import {
+  Col,
+  Row,
+  Table,
+  Form,
+  Input,
+  Button,
+  Space,
+  Modal,
+  Select,
+  Tag,
+  Divider,
+  Layout,
+} from 'antd';
+const { Content } = Layout;
+import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'umi';
 // import { initFormListData } from './dataJson'
-import { getUUID } from '@/utils/utils.js'
-import moment from 'moment'
-import { timeFormat } from '@/utils/constants.js'
-import { cloneDeep } from 'lodash'
-import Styles from './index.less'
+import { getUUID } from '@/utils/utils.js';
+import moment from 'moment';
+import { timeFormat } from '@/utils/constants.js';
+import { cloneDeep } from 'lodash';
+import Styles from './index.less';
+import {
+  SearchOutlined,
+  MinusCircleOutlined,
+  PlusCircleOutlined,
+  CloseCircleOutlined,
+  CheckSquareOutlined,
+  StopOutlined,
+  FormOutlined,
+  CloseOutlined,
+  SendOutlined,
+} from '@ant-design/icons';
+import '@/assets/style/layout.less';
 
 const { TextArea } = Input;
 
 const initFormInfo = {
-	formName: '',
-	formDesc: '',
-	formCode: '',
-	createName: '',
-	createCode: '',
-	createTime: '',
-	updateTime: ''
-}
+  formName: '',
+  formDesc: '',
+  formCode: '',
+  createTime: '',
+  updateTime: '',
+  formStatus: 'enable',
+};
+const selectList = [
+  { value: 'enable', label: '已启用' },
+  { value: 'edit', label: '编辑中' },
+  { value: 'disabled', label: '已停用' },
+];
+
 export default function FormList() {
-	const [dataSource, setDataSource] = useState([])
-	const [visible, setVisible] = useState(false)
-	const [operateType, setOperateType] = useState('add')  // 区分新建还是编辑表单
-	const [formInfo, setFormInfo] = useState(initFormInfo)
-	const history = useHistory()
+  const [dataSource, setDataSource] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const [operateType, setOperateType] = useState('add'); // 区分新建还是编辑表单
+  const [formInfo, setFormInfo] = useState(initFormInfo);
+  const history = useHistory();
+  const formRef = useRef(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
 
-	const columns = [
-		{
-			title: '表单名称',
-			dataIndex: 'formName',
-			key: 'formName',
-			render: (text, record) => <a onClick={() => handleShowDesigner(record)}>{text}</a>,
-		},
-		{
-			title: '描述',
-			dataIndex: 'formDesc',
-			key: 'formDesc',
-		},
-		{
-			title: '表单code',
-			dataIndex: 'formCode',
-			key: 'formCode',
-		},
-		{
-			title: '创建人名称',
-			dataIndex: 'createName',
-			key: 'createName',
-		},
-		{
-			title: '创建人code',
-			dataIndex: 'createCode',
-			key: 'createCode',
-		},
-		{
-			title: '创建时间',
-			dataIndex: 'createTime',
-			key: 'createTime',
-		},
-		{
-			title: '修改时间',
-			dataIndex: 'updateTime',
-			key: 'updateTime',
-		},
-		{
-			title: 'Action',
-			key: 'action',
-			render: (_, record) => (
-				<Space size="middle">
-					<a onClick={() => handleDelete(record)}>删除</a>
-					<a onClick={() => handleUpdate(record)}>修改</a>
-					<a onClick={() => handlePreview(record)}>预览</a>
-				</Space>
-			),
-		},
-	];
+  // 获取formList
+  const getFormList = () => {
+    const data =
+      (localStorage.getItem('formList') &&
+        JSON.parse(localStorage.getItem('formList'))) ||
+      [];
 
-	useEffect(() => {
-		// 初始化dataSource
-		getFormList()
-	}, [])
+    setDataSource(data);
+  };
 
-	// 获取formList
-	const getFormList = () => {
-		const data = localStorage.getItem("formList") && JSON.parse(localStorage.getItem("formList")) || []
-		setDataSource(data);
-	}
+  useEffect(() => {
+    getFormList(); // 初始化dataSource
+  }, []);
 
-	// 保存至缓存中
-	const saveFormList = (data) => {
-		data && localStorage.setItem("formList", JSON.stringify(data))
-	}
+  // 表格选择修改
+  const onSelectChange = (newSelectedRowKeys) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
 
-	// 删除
-	const handleDelete = (record) => {
-		Modal.confirm({
-			title: '确定要删除吗',
-			content: '该操作不可逆，请谨慎操作！',
-			onOk: () => {
-				const data = dataSource.filter(item => item.formCode !== record.formCode)
-				setDataSource(data)
-				saveFormList(data)
-			}
-		});
+  // 行选择
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
 
-	}
+  // 设置表单的状态
+  const formStatusHandler = (record, status) => {
+    const arr = dataSource.map((e) => {
+      if (e.formCode === record.formCode) {
+        e.formStatus = status;
+      }
+      return e;
+    });
+    setDataSource(arr);
+    saveFormList(arr);
+  };
 
-	// 修改
-	const handleUpdate = (record) => {
-		setOperateType("update")
-		setVisible(true)
-		setFormInfo(record)
-	}
+  // 表格配置项
+  const columns = [
+    {
+      title: '序号',
+      dataIndex: 'index',
+      key: 'index',
+      align: 'center',
+      render: (_, record, index) => {
+        return <span>{index + 1}</span>;
+      },
+      width: 100,
+      fixed: 'left',
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <Space split={<Divider type="vertical" />} size={0}>
+          {record.formStatus === 'enable' ? (
+            <>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<SendOutlined />}
+              >
+                发布
+              </Button>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<StopOutlined />}
+                onClick={() => formStatusHandler(record, 'disabled')}
+              >
+                停用
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleShowDesigner(record)}
+                style={{ padding: 0 }}
+                icon={<FormOutlined />}
+              >
+                编辑
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button
+                type="link"
+                style={{ padding: 0 }}
+                icon={<CheckSquareOutlined />}
+                onClick={() => formStatusHandler(record, 'enable')}
+              >
+                启用
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleShowDesigner(record)}
+                style={{ padding: 0 }}
+                icon={<FormOutlined />}
+              >
+                编辑
+              </Button>
+              <Button
+                type="link"
+                onClick={() => handleDelete(record)}
+                style={{ padding: 0 }}
+                icon={<CloseOutlined />}
+              >
+                删除
+              </Button>
+            </>
+          )}
+        </Space>
+      ),
+      align: 'center',
+      width: 300,
+      fixed: 'left',
+    },
 
-	// 预览
-	const handlePreview = (record) => {
-		// 页面跳转方法
-		history.push({pathname: '/formManage/formPreview', search: `formCode=${record.formCode}`})
-	}
+    {
+      title: '表单编号',
+      dataIndex: 'formCode',
+      key: 'formCode',
+      align: 'center',
+    },
+    {
+      title: '表单名称',
+      dataIndex: 'formName',
+      key: 'formName',
+      align: 'center',
+    },
+    {
+      title: '表单状态',
+      key: 'formStatus',
+      dataIndex: 'formStatus',
+      render: (_, { formStatus }, index) => {
+        let color = formStatus === 'enable' ? 'blue' : 'default';
+        return (
+          <Tag color={color} key={index}>
+            {formStatus
+              ? selectList.filter((e) => e.value === formStatus)[0]?.label
+              : '暂无状态'}
+          </Tag>
+        );
+      },
+      align: 'center',
+      width: 100,
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      align: 'center',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      key: 'updateTime',
+      align: 'center',
+    },
+  ];
 
-	const onChange = (value) => {
-		setFormInfo({
-			...formInfo,
-			...value
-		})
-	}
+  // 保存至缓存中
+  const saveFormList = (data) => {
+    data && localStorage.setItem('formList', JSON.stringify(data));
+  };
 
-	const handleOk = () => {
-		const currentTime = moment().format(timeFormat)
-		if (operateType === "add") {
-			const item = {
-				formName: formInfo.formName,
-				formDesc: formInfo.formDesc,
-				formCode: getUUID(),
-				createName: 'admin',
-				createCode: 'admin',
-				createTime: currentTime,
-				updateTime: currentTime
-			}
+  // 删除
+  const handleDelete = (record) => {
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        const data = dataSource.filter(
+          (item) => item.formCode !== record.formCode,
+        );
+        setDataSource(data);
+        saveFormList(data);
+      },
+    });
+  };
 
-			const data = cloneDeep(dataSource)
-			data.push(item)
-			setDataSource(data)
-			saveFormList(data)
-		} else {
-			const item = {
-				...formInfo,
-				createName: 'admin',
-				createCode: 'admin',
-				updateTime: currentTime
-			}
-			const data = dataSource && dataSource.map(i => {
-				if (i.formCode === formInfo.formCode) {
-					i = item
-				}
-				return i
-			})
-			setDataSource(data)
-			saveFormList(data)
-		}
+  // 修改
+  const handleUpdate = (record) => {
+    setOperateType('update');
+    setVisible(true);
+    setFormInfo(record);
+  };
 
-		setVisible(false)
-		// 清空
-		setFormInfo(initFormInfo)
-	}
+  // 预览
+  const handlePreview = (record) => {
+    history.push({
+      pathname: '/formManage/formPreview',
+      search: `formCode=${record.formCode}`,
+    });
+  };
 
-	const handleCancel = () => {
-		setVisible(false)
-		// 清空
-		setFormInfo(initFormInfo)
-	}
+  // 弹窗表单修改
+  const onChange = (value) => {
+    setFormInfo({
+      ...formInfo,
+      ...value,
+    });
+  };
 
-	const handleAdd = () => {
-		setVisible(true)
-		setOperateType("add")
-	}
+  const handleOk = () => {
+    const currentTime = moment().format(timeFormat);
+    if (operateType === 'add') {
+      const item = {
+        formName: formInfo.formName,
+        formDesc: formInfo.formDesc,
+        formCode: getUUID(),
+        createTime: currentTime,
+        updateTime: currentTime,
+        formStatus: 'enable',
+      };
 
-	// 点击跳转到设计器页面
-	const handleShowDesigner = (record) => {
-		// 页面跳转方法
-		history.push({pathname: '/formManage/formAndTable', search: `formCode=${record.formCode}`})
-	}
+      const data = cloneDeep(dataSource);
+      data.unshift(item);
+      setDataSource(data);
+      saveFormList(data);
+    } else {
+      const item = {
+        formStatus: 'enable',
+        ...formInfo,
+        updateTime: currentTime,
+      };
+      const data =
+        dataSource &&
+        dataSource.map((i) => {
+          if (i.formCode === formInfo.formCode) {
+            i = item;
+          }
+          return i;
+        });
+      setDataSource(data);
+      saveFormList(data);
+    }
 
-	return (
-		<div style={{ padding: '20px 10px' }}>
-			{/* 筛选框 */}
-			<div>
-				<Form
-					labelCol={{ span: 8 }}
-					wrapperCol={{ span: 16 }}
-				>
-					<Row>
-						<Col span={6}>
-							<Form.Item label="表单名称">
-								<Input />
-							</Form.Item>
-						</Col>
-						<Col span={6}>
-							<Form.Item label="表单code">
-								<Input />
-							</Form.Item>
-						</Col>
-						<Col span={6}>
-							<Form.Item label="创建人名称">
-								<Input />
-							</Form.Item>
-						</Col>
-						<Col span={6}>
-							<Form.Item label="创建人code">
-								<Input />
-							</Form.Item>
-						</Col>
-					</Row>
-				</Form>
-			</div>
+    setVisible(false);
+    setFormInfo(initFormInfo); // 清空
+  };
 
-			{/* 操作按钮 */}
-			<div className={Styles["operation-container"]}>
-				<Button onClick={handleAdd}>新增</Button>
-				{/* <Button>删除</Button> */}
-			</div>
+  // 取消表单
+  const handleCancel = () => {
+    setVisible(false);
+    setFormInfo(initFormInfo);
+  };
 
-			{/* 列表部分 */}
-			<Table columns={columns} dataSource={dataSource} />
+  // 新增表单
+  const handleAdd = () => {
+    setVisible(true);
+    setOperateType('add');
+  };
 
-			{/* 弹框 */}
-			<Modal title={`${operateType === "add" ? "新建" : "修改"}表单`} destroyOnClose visible={visible} onOk={handleOk} onCancel={handleCancel}>
-				<Form
-					labelCol={{ span: 4 }}
-					wrapperCol={{ span: 20 }}
-				>
-					<Form.Item label="表单名称">
-						<Input value={formInfo.formName} onChange={e => onChange({
-							formName: e.target.value
-						})} />
-					</Form.Item>
+  // 点击跳转到设计器页面
+  const handleShowDesigner = (record) => {
+    // 页面跳转方法
+    history.push({
+      pathname: '/formManage/formAndTable',
+      search: `formCode=${record.formCode}`,
+    });
+  };
 
-					<Form.Item label="描述">
-						<TextArea value={formInfo.formDesc} onChange={e => onChange({
-							formDesc: e.target.value
-						})} />
-					</Form.Item>
-				</Form>
-			</Modal>
-		</div>
-	);
+  // 清除表单检索
+  const resetHandler = () => {
+    if (!formRef.current) return;
+    formRef.current.resetFields();
+    getFormList();
+  };
+
+  // 检索
+  const searchHandler = () => {
+    // debugger;
+    const { formName, formStatus } = formRef.current.getFieldsValue();
+    if (!formName && !formStatus) {
+      getFormList();
+      return;
+    }
+    const data = dataSource.filter((e) => {
+      if (formName && formStatus) {
+        return (
+          e.formName.indexOf(formName) !== -1 && e.formStatus === formStatus
+        );
+      }
+      return e.formName.indexOf(formName) !== -1 || e.formStatus === formStatus;
+    });
+    setDataSource(data);
+  };
+
+  return (
+    <div className="list">
+      <Layout className="list-layout">
+        <Content className="list-content">
+          {/* 筛选框 */}
+          <Row justify="space-between" className="list-row">
+            <Col>
+              <Form
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 16 }}
+                layout="inline"
+                ref={formRef}
+              >
+                <Form.Item label="表单名称" name="formName">
+                  <Input allowClear placeholder="请输入内容" />
+                </Form.Item>
+
+                <Form.Item label="表单状态" name="formStatus">
+                  <Select
+                    style={{
+                      width: 180,
+                    }}
+                    allowClear
+                    placeholder="请选择内容"
+                  >
+                    {selectList.map((e) => {
+                      return (
+                        <Select.Option value={e.value} key={e.value}>
+                          {e.label}
+                        </Select.Option>
+                      );
+                    })}
+                  </Select>
+                </Form.Item>
+              </Form>
+            </Col>
+
+            <Col>
+              <Space size={10}>
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  onClick={searchHandler}
+                >
+                  搜索
+                </Button>
+                <Button icon={<MinusCircleOutlined />} onClick={resetHandler}>
+                  清除
+                </Button>
+              </Space>
+            </Col>
+          </Row>
+
+          <Row justify="end" style={{ padding: '20px 0' }}>
+            <Space size={10}>
+              <Button icon={<PlusCircleOutlined />} onClick={handleAdd}>
+                添加
+              </Button>
+              <Button icon={<CloseCircleOutlined />}>删除</Button>
+            </Space>
+          </Row>
+
+          {/* 列表部分 */}
+          <Table
+            columns={columns}
+            dataSource={dataSource}
+            rowKey={(record) => record.formCode}
+            rowSelection={rowSelection}
+            sticky={true}
+          />
+        </Content>
+      </Layout>
+
+      {/* 弹框 */}
+      <Modal
+        title={`${operateType === 'add' ? '新建' : '修改'}表单`}
+        destroyOnClose
+        visible={visible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <Form labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+          <Form.Item label="表单名称">
+            <Input
+              value={formInfo.formName}
+              onChange={(e) =>
+                onChange({
+                  formName: e.target.value,
+                })
+              }
+            />
+          </Form.Item>
+
+          <Form.Item label="描述">
+            <TextArea
+              value={formInfo.formDesc}
+              onChange={(e) =>
+                onChange({
+                  formDesc: e.target.value,
+                })
+              }
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </div>
+  );
 }

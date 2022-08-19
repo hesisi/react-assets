@@ -99,13 +99,17 @@ export default [
     routes: [
       {
         path: '/activityManage',
-        redirect: '/activityManage/activityList/',
+        redirect: '/activityManage/activityList',
       },
       {
         name: '流程列表',
-        path: '/activityManage/activityList/',
+        path: '/activityManage/activityList',
         component: '@/pages/activityManage/activityList/activityList.tsx',
-        meta: { showMenu: false, showHeader: true },
+        meta: {
+          showMenu: false,
+          showHeader: true,
+          breadcrumb: [{ label: '流程管理' }, { label: '流程列表' }],
+        },
       },
       {
         name: '流程配置',
@@ -122,7 +126,7 @@ export default [
     routes: [
       {
         path: '/formManage',
-        redirect: '/formManage/formAdd',
+        redirect: '/formManage/formList',
       },
       // {
       //   name: '新建表单',
@@ -140,7 +144,11 @@ export default [
         name: '动态表单',
         path: '/formManage/formList',
         component: '@/pages/formManage/formList',
-        meta: { showMenu: false, showHeader: false },
+        meta: {
+          showMenu: false,
+          showHeader: true,
+          breadcrumb: [{ label: '表单管理' }, { label: '表单列表' }],
+        },
       },
       {
         name: '动态表单demo',

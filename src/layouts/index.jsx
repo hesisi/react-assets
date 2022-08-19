@@ -91,6 +91,8 @@ const CommonLayout = (props) => {
     return metaInfo;
   });
 
+  console.log(meta);
+
   return (
     <Layout>
       <Header
@@ -142,6 +144,21 @@ const CommonLayout = (props) => {
               minHeight: 280,
             }}
           >
+            {meta && meta.breadcrumb ? (
+              <Breadcrumb
+                style={{
+                  background: 'white',
+                  padding: '20px',
+                  borderBottom: '4px solid #f0f0f0',
+                }}
+              >
+                {meta.breadcrumb.map((e, i) => {
+                  return <Breadcrumb.Item key={i}>{e.label}</Breadcrumb.Item>;
+                })}
+              </Breadcrumb>
+            ) : (
+              <></>
+            )}
             <div className={Styles.contentWrapper}>{props.children}</div>
           </Content>
         </Layout>

@@ -3,6 +3,7 @@ import { Input, Modal, Form } from 'antd';
 const { TextArea } = Input;
 import type { ColumnsType } from 'antd/es/table';
 import type { FormInstance } from 'antd/es/form';
+import { nanoid } from 'nanoid';
 
 export default function Dialog(props: any) {
   const formRef = React.createRef<FormInstance>();
@@ -15,18 +16,34 @@ export default function Dialog(props: any) {
 
   const onFinish = (values: any) => {
     const flowGroup = window.localStorage.getItem('flowGroup');
-    // if(flowGroup){
-    //   const temp = JSON.parse(flowGroup);
-    //   temp.push(values)
-    //   window.localStorage.setItem('flowGroup',JSON.stringify(temp))
-    // }else {
-    //   window.localStorage.setItem('flowGroup',JSON.stringify([values]))
-    // }
-    // setIsModalVisible(false)
-    // formRef.current?.resetFields()
+    if (flowGroup) {
+      const temp = JSON.parse(flowGroup);
+      temp.push({
+        ...values,
+        id: nanoid(),
+        status: 'enable',
+        creatTime: '2022-8-17',
+        updateTime: '2022-8-17',
+      }); //TODO:记得修改
+      window.localStorage.setItem('flowGroup', JSON.stringify(temp));
+    } else {
+      window.localStorage.setItem(
+        'flowGroup',
+        JSON.stringify([
+          {
+            ...values,
+            id: nanoid(),
+            status: 'enable',
+            creatTime: '2022-8-17',
+            updateTime: '2022-8-17',
+          },
+        ]), //TODO:记得修改
+      );
+    }
     setIsModalVisible(false);
-    window.localStorage.setItem('flow', JSON.stringify(values));
-    handleOk();
+    formRef.current?.resetFields();
+    setIsModalVisible(false);
+    // handleOk(); //TODO:记得修改
   };
   const confirm = () => {
     formRef.current

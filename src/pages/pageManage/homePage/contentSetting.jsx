@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, forwardRef } from 'react';
 import { Tabs, InputNumber, Input, Form } from 'antd';
 const { TabPane } = Tabs;
 
-const contentSetting = (props) => {
+const contentSetting = forwardRef((props, ref) => {
   const [form] = Form.useForm();
   const onChange = (e, type) => {
     switch (type) {
@@ -15,13 +15,19 @@ const contentSetting = (props) => {
       case 'bg':
         props.setProperty({
           ...props.property,
-          bg: e.target.value,
+          bg: `#${e.target.value}`,
         });
         break;
       case 'colGapColor':
         props.setProperty({
           ...props.property,
-          colGapColor: e.target.value,
+          colGapColor: `#${e.target.value}`,
+        });
+        break;
+      case 'radius':
+        props.setProperty({
+          ...props.property,
+          radius: `${e}px`,
         });
         break;
       // case 'height':
@@ -57,7 +63,6 @@ const contentSetting = (props) => {
     <div className="sider">
       <Tabs defaultActiveKey="region">
         <TabPane tab="组件" key="components">
-          {/* TODO:方便查看，记得删除 */}
           <span>当前选中的：{props.selectId}</span>
         </TabPane>
         <TabPane tab="区域" key="region">
@@ -67,10 +72,12 @@ const contentSetting = (props) => {
             wrapperCol={{ span: 16 }}
             initialValues={{
               colGap: '10',
-              colGapColor: '#ffffff',
-              bg: '#fafafa',
+              colGapColor: 'ffffff',
+              bg: 'fafafa',
+              radius: '0',
             }}
             form={form}
+            ref={ref}
           >
             <Form.Item label="间隙" name="colGap">
               <InputNumber
@@ -82,11 +89,21 @@ const contentSetting = (props) => {
             </Form.Item>
 
             <Form.Item label="间隙色" name="colGapColor">
-              <Input onChange={(e) => onChange(e, 'colGapColor')} />
+              <Input
+                onChange={(e) => onChange(e, 'colGapColor')}
+                addonBefore="#"
+              />
             </Form.Item>
 
             <Form.Item label="背景色" name="bg">
-              <Input onChange={(e) => onChange(e, 'bg')} />
+              <Input onChange={(e) => onChange(e, 'bg')} addonBefore="#" />
+            </Form.Item>
+
+            <Form.Item label="圆角" name="radius">
+              <InputNumber
+                onChange={(e) => onChange(e, 'radius')}
+                addonAfter="px"
+              />
             </Form.Item>
 
             {/* <Form.Item label="宽度" name="width">
@@ -101,6 +118,6 @@ const contentSetting = (props) => {
       </Tabs>
     </div>
   );
-};
+});
 
 export default contentSetting;

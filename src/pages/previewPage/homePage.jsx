@@ -40,10 +40,12 @@ const homePage = () => {
             <Col
               span={e.colSpan}
               key={e.id}
-              className={`${e.className} ${e.id}`}
+              className={e.className ? `${e.className} ${e.id}` : `${e.id}`}
               style={e.style}
             >
-              <div className="default">{e.component}</div>
+              <div className="default" style={e.style}>
+                {e.component}
+              </div>
             </Col>
           );
         })}
@@ -103,6 +105,7 @@ const homePage = () => {
       e.style.borderWidth = homeProperty.colGap || '10px';
       e.style.borderColor = homeProperty.colGapColor;
       e.style.background = homeProperty.bg;
+      e.style.borderRadius = homeProperty.radius || '0px';
     });
     document.getElementsByClassName('default').forEach((e) => {
       e.style.background = homeProperty.bg;

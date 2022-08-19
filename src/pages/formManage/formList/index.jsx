@@ -337,13 +337,17 @@ export default function FormList() {
 
   // 检索
   const searchHandler = () => {
-    // debugger;
     const { formName, formStatus } = formRef.current.getFieldsValue();
     if (!formName && !formStatus) {
       getFormList();
       return;
     }
-    const data = dataSource.filter((e) => {
+
+    const source =
+      dataSource.length > 0
+        ? dataSource
+        : JSON.parse(localStorage.getItem('formList'));
+    const data = source.filter((e) => {
       if (formName && formStatus) {
         return (
           e.formName.indexOf(formName) !== -1 && e.formStatus === formStatus

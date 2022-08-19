@@ -64,6 +64,10 @@ export default class PropertiesView extends Component {
           <h3 className={'panel-tittle'}>属性</h3>
           <Collapse defaultActiveKey={['1']}>
             <Panel header="常规" key="1">
+              <fieldset>
+                <label>id</label>
+                <span>{flow?.name}</span>
+              </fieldset>
               {selectedElements.length === 1 && (
                 <ElementProperties modeler={modeler} element={element} />
               )}

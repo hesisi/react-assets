@@ -55,8 +55,8 @@ export default function IndexPage() {
     }
   }
   useEffect(() => {
-    const flow = window.localStorage.getItem('flow');
-    setFlow(flow ? JSON.parse(flow) : null);
+    const _flow = window.localStorage.getItem('flow');
+    setFlow(_flow ? JSON.parse(_flow) : null);
     modeler = new Modeler({
       container: '#canvas',
       width: '100%', // 查看器宽度
@@ -78,7 +78,7 @@ export default function IndexPage() {
     const propertiesPanel = new PropertiesPanel({
       container: refPanel.current,
       modeler,
-      flow,
+      flow: JSON.parse(_flow),
     });
     modeler.importXML(xmlStr);
   }, []);

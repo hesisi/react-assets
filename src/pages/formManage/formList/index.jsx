@@ -358,6 +358,23 @@ export default function FormList() {
     setDataSource(data);
   };
 
+  // 批量删除
+  const deleteHandler = () => {
+    if (selectedRowKeys.length === 0) return;
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        let data = dataSource;
+        selectedRowKeys.forEach((item) => {
+          data = data.filter((e) => e.formCode !== item);
+        });
+        setDataSource(data);
+        saveFormList(data);
+      },
+    });
+  };
+
   return (
     <div className="list">
       <Layout className="list-layout">
@@ -416,7 +433,9 @@ export default function FormList() {
               <Button icon={<PlusCircleOutlined />} onClick={handleAdd}>
                 添加
               </Button>
-              <Button icon={<CloseCircleOutlined />}>删除</Button>
+              <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
+                删除
+              </Button>
             </Space>
           </Row>
 

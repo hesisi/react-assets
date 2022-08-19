@@ -337,6 +337,7 @@ export default function FormList() {
 
   // 检索
   const searchHandler = () => {
+    // debugger;
     const { formName, formStatus } = formRef.current.getFieldsValue();
     if (!formName && !formStatus) {
       getFormList();

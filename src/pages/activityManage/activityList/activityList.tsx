@@ -51,20 +51,6 @@ const selectList = [
   { value: 'disabled', label: '已停用' },
 ];
 
-const rowSelection = {
-  onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-    console.log(
-      `selectedRowKeys: ${selectedRowKeys}`,
-      'selectedRows: ',
-      selectedRows,
-    );
-  },
-  getCheckboxProps: (record: DataType) => ({
-    disabled: record.name === 'Disabled User', // Column configuration not to be checked
-    name: record.name,
-  }),
-};
-
 export default function Page() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [tableData, setTableData] = useState<DataType[]>([]);
@@ -194,6 +180,18 @@ export default function Page() {
       align: 'center',
     },
   ];
+  const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
+
+  // 表格选择修改
+  const onSelectChange = (newSelectedRowKeys: any) => {
+    setSelectedRowKeys(newSelectedRowKeys);
+  };
+
+  // 行选择
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
 
   // 删除
   const handleDelete = (record: any) => {
@@ -240,17 +238,69 @@ export default function Page() {
   const addProcess = () => {
     setIsModalVisible(true);
   };
-  const handleOk = (id: string) => {
+  const handleOk = (id: any) => {
     history.push(`/activityManage/activityConfig?activityId=${id}`);
   };
   // 清除表单检索
   const resetHandler = () => {
     if (!formRef.current) return;
     formRef.current.resetFields();
+    tableUpdate();
   };
 
   // 检索
-  const searchHandler = () => {};
+  const searchHandler = () => {
+    const { id, name, status } = formRef.current.getFieldsValue();
+    if (!id && !name && !status) {
+      tableUpdate();
+      return;
+    }
+
+    if (!flowData) return;
+    const arr = JSON.parse(flowData).filter((e: any) => {
+      if (id && name) {
+        return e.id.indexOf(id) !== -1 && e.name.indexOf(name) !== -1;
+      } else if (id && status) {
+        return e.id.indexOf(id) !== -1 && e.status === status;
+      } else if (name && status) {
+        return e.name.indexOf(name) !== -1 && e.status === status;
+      }
+      return (
+        e.id.indexOf(id) !== -1 ||
+        e.name.indexOf(name) !== -1 ||
+        e.status === status
+      );
+    });
+    setTableData(arr);
+  };
+
+  const tableUpdate = () => {
+    const flowData: any = window.localStorage.getItem('flowGroup');
+    setTableData(JSON.parse(flowData));
+  };
+
+  // 弹窗消失后更新列表
+  useEffect(() => {
+    tableUpdate();
+  }, [isModalVisible]);
+
+  // 批量删除
+  const deleteHandler = () => {
+    if (selectedRowKeys.length === 0) return;
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        if (!flowData) return;
+        let data = JSON.parse(flowData);
+        selectedRowKeys.forEach((item) => {
+          data = data.filter((e: any) => e.id !== item);
+        });
+        setTableData(data);
+        window.localStorage.setItem('flowGroup', JSON.stringify(data));
+      },
+    });
+  };
 
   return (
     <div className="list">
@@ -313,15 +363,14 @@ export default function Page() {
               <Button icon={<PlusCircleOutlined />} onClick={addProcess}>
                 添加
               </Button>
-              <Button icon={<CloseCircleOutlined />}>删除</Button>
+              <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
+                删除
+              </Button>
             </Space>
           </Row>
 
           <Table
-            rowSelection={{
-              type: 'checkbox',
-              ...rowSelection,
-            }}
+            rowSelection={rowSelection}
             columns={columns}
             dataSource={tableData}
             rowKey={(record: any) => record.id}

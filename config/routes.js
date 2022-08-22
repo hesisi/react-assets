@@ -139,6 +139,10 @@ export default [
         path: '/formManage/formAndTable',
         component: '@/pages/formAndTable',
         hidden: true,
+        meta: {
+          showMenu: false,
+          showHeader: true,
+        },
       },
       {
         name: '动态表单',

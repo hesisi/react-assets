@@ -337,13 +337,17 @@ export default function FormList() {
 
   // 检索
   const searchHandler = () => {
-    // debugger;
     const { formName, formStatus } = formRef.current.getFieldsValue();
     if (!formName && !formStatus) {
       getFormList();
       return;
     }
-    const data = dataSource.filter((e) => {
+
+    const source =
+      dataSource.length > 0
+        ? dataSource
+        : JSON.parse(localStorage.getItem('formList'));
+    const data = source.filter((e) => {
       if (formName && formStatus) {
         return (
           e.formName.indexOf(formName) !== -1 && e.formStatus === formStatus
@@ -352,6 +356,23 @@ export default function FormList() {
       return e.formName.indexOf(formName) !== -1 || e.formStatus === formStatus;
     });
     setDataSource(data);
+  };
+
+  // 批量删除
+  const deleteHandler = () => {
+    if (selectedRowKeys.length === 0) return;
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        let data = dataSource;
+        selectedRowKeys.forEach((item) => {
+          data = data.filter((e) => e.formCode !== item);
+        });
+        setDataSource(data);
+        saveFormList(data);
+      },
+    });
   };
 
   return (
@@ -412,7 +433,9 @@ export default function FormList() {
               <Button icon={<PlusCircleOutlined />} onClick={handleAdd}>
                 添加
               </Button>
-              <Button icon={<CloseCircleOutlined />}>删除</Button>
+              <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
+                删除
+              </Button>
             </Space>
           </Row>
 

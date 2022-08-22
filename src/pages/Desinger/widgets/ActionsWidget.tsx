@@ -6,7 +6,7 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-04 16:16:14
  */
-import React, { useEffect,useImperativeHandle, forwardRef } from 'react';
+import React, { useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Space, Button, Radio } from 'antd';
 import { useDesigner, TextWidget } from '@designable/react';
 import { GlobalRegistry } from '@designable/core';
@@ -18,20 +18,21 @@ import {
   transformToTreeNode,
 } from '@designable/formily-transformer';
 import { onFormSubmitValidateEnd } from '@formily/core';
+import { history } from 'umi';
 
 interface ActionsWidgetProps {
   type: 'form' | 'table';
-  getDesigner: (e:any) => {},
-  onSave: () => {}
+  getDesigner: (e: any) => {};
+  onSave: () => {};
 }
 
 export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
-  const { type, getDesigner,onSave } = props;
+  const { type, getDesigner, onSave } = props;
   const designer = useDesigner() || Engine;
 
   useEffect(() => {
-    getDesigner(designer)
-  }, []) 
+    getDesigner(designer);
+  }, []);
 
   const supportLocales = ['zh-cn', 'en-us', 'ko-kr'];
 
@@ -56,11 +57,21 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
       <Button
         type="primary"
         onClick={() => {
-          onSave()
+          onSave();
         }}
       >
-        <TextWidget>Save</TextWidget>
+        <TextWidget>保存</TextWidget>
+      </Button>
+
+      <Button
+        type="primary"
+        onClick={() => {
+          history.push('/formManage/formList');
+        }}
+        ghost
+      >
+        <TextWidget>返回</TextWidget>
       </Button>
     </Space>
   );
-})
+});

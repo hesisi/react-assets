@@ -19,6 +19,7 @@ import {
   Tag,
   Divider,
   Layout,
+  Radio,
 } from 'antd';
 const { Content } = Layout;
 import { useEffect, useRef, useState } from 'react';
@@ -468,6 +469,14 @@ export default function FormList() {
                 })
               }
             />
+          </Form.Item>
+
+          <Form.Item label="创建方式">
+            <Radio.Group defaultValue="canvas">
+              <Radio.Button value="canvas">画布创建</Radio.Button>
+              <Radio.Button value="template">模板创建</Radio.Button>
+              <Radio.Button value="data">数据创建</Radio.Button>
+            </Radio.Group>
           </Form.Item>
 
           <Form.Item label="描述">

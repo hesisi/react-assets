@@ -58,3 +58,8 @@ export const selectList = {
     { label: '不显示', value: false },
   ],
 };
+
+export const options = [
+  { label: '启用', value: 'active' },
+  { label: '另存为模板', value: 'saveAsTemplate' },
+];

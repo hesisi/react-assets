@@ -14,10 +14,12 @@ import {
   Table,
   Popover,
   Tree,
+  Checkbox,
+  Modal,
 } from 'antd';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
-const { Search } = Input;
+const { Search, TextArea } = Input;
 
 import './tableSetting.less';
 import { nanoid } from 'nanoid';
@@ -36,6 +38,7 @@ const tableSetting = (props) => {
   const [dataSource, setDataSource] = useState([]); // 表格的数据来源
   const [btnPopoverVisible, setBtnPopoverVisible] = useState(false); // 按钮图标popover可见性
   const [treeData, setTreeData] = useState([]); // 大纲树
+  const [saveVisible, setSaveVisible] = useState(false);
 
   // 从内存获取表格
   useEffect(async () => {
@@ -208,11 +211,18 @@ const tableSetting = (props) => {
   };
 
   // 列表配置保存
-  const tableConfigSave = () => {
+  const handleOk = (status) => {
     window.localStorage.setItem('tableConfig', {
       tableConfig: table,
       buttonConfig: buttons,
+      status: status,
     });
+    setSaveVisible(false);
+  };
+
+  // 取消列表配置保存
+  const handleCancel = () => {
+    setSaveVisible(false);
   };
 
   return (
@@ -222,7 +232,9 @@ const tableSetting = (props) => {
           <Button
             icon={<Icon icon="SaveOutlined" />}
             type="primary"
-            onClick={tableConfigSave}
+            onClick={() => {
+              setSaveVisible(true);
+            }}
           >
             保存
           </Button>
@@ -230,10 +242,16 @@ const tableSetting = (props) => {
             icon={<Icon icon="CheckSquareOutlined" />}
             type="primary"
             ghost
+            onClick={() => handleOk('enable')}
           >
             启用
           </Button>
-          <Button icon={<Icon icon="StopOutlined" />} type="primary" ghost>
+          <Button
+            icon={<Icon icon="StopOutlined" />}
+            type="primary"
+            ghost
+            onClick={() => handleOk('disabled')}
+          >
             停用
           </Button>
           <Button icon={<Icon icon="CloseOutlined" />} type="primary" ghost>
@@ -458,6 +476,7 @@ const tableSetting = (props) => {
                 <Form.Item label="按钮文本" name="label">
                   <Input />
                 </Form.Item>
+
                 <Form.Item label="按钮图标" name="icon">
                   <Space>
                     <Popover
@@ -489,8 +508,9 @@ const tableSetting = (props) => {
                   ) : (
                   )} */}
                 </Form.Item>
+
                 <Form.Item label="按钮事件" name="method">
-                  <Input />
+                  <TextArea />
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 5, span: 16 }}>
@@ -511,6 +531,19 @@ const tableSetting = (props) => {
           </Tabs>
         </Col>
       </Row>
+
+      <Modal
+        title="确认保存"
+        visible={saveVisible}
+        onOk={() => handleOk('save')}
+        onCancel={handleCancel}
+      >
+        <p>是否保存当前表单？</p>
+        <Checkbox.Group
+          options={config.options}
+          defaultValue={['active', 'saveAsTemplate']}
+        />
+      </Modal>
     </>
   );
 };

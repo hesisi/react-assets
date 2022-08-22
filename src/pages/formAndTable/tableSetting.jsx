@@ -26,6 +26,8 @@ import { nanoid } from 'nanoid';
 import Icon from '@/utils/icon';
 import * as config from './settingConfig';
 
+import { history } from 'umi';
+
 const tableSetting = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
   const [columnCount, setColumnCount] = useState(5); // 表格的列数计算
@@ -265,6 +267,16 @@ const tableSetting = (props) => {
           </Button>
           <Button icon={<Icon icon="CloseOutlined" />} type="primary" ghost>
             删除
+          </Button>
+          <Button
+            icon={<Icon icon="ArrowLeftOutlined" />}
+            type="primary"
+            ghost
+            onClick={() => {
+              history.push('/formManage/formList');
+            }}
+          >
+            返回
           </Button>
         </Space>
       </Row>

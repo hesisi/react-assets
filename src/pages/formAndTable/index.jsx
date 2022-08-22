@@ -20,7 +20,7 @@ import TableSetting from './tableSetting';
 const { Group, Button } = Radio;
 
 export default function (props) {
-  const [desingerType, setDesingerType] = useState('table');
+  const [desingerType, setDesingerType] = useState('form');
   const [designer, setDesigner] = useState();
 
   // 保存当前设计器的form schema

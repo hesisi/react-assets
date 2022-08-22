@@ -209,8 +209,6 @@ const tableSetting = (props) => {
 
   // 列表配置保存
   const tableConfigSave = () => {
-    console.log('====table', table);
-    console.log('====Buttons', buttons);
     window.localStorage.setItem('tableConfig', {
       tableConfig: table,
       buttonConfig: buttons,

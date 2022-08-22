@@ -1,10 +1,18 @@
 import { is, getBusinessObject, getDi } from 'bpmn-js/lib/util/ModelUtil';
-import { Collapse } from 'antd';
-import { Form, Input } from 'antd';
+import { Collapse, Select } from 'antd';
+import { Form, Input, Button } from 'antd';
 const { Panel } = Collapse;
 import React, { Component } from 'react';
 
+const { Option } = Select;
+
 import './PropertiesView.css';
+import Leave from './Leave';
+import FieldTable from './FieldTable';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import ElementProperties from './ElementProperties';
+import Approver from './Approver';
+import Ruler from './Ruler';
 
 export default class PropertiesView extends Component {
   constructor(props) {
@@ -13,19 +21,19 @@ export default class PropertiesView extends Component {
     this.state = {
       selectedElements: [],
       element: null,
+      flow: null,
     };
   }
 
-  init = (modeler) => {
-    const bpmnFactory = modeler.get('bpmnFactory'),
-      elementFactory = modeler.get('elementFactory'),
-      elementRegistry = modeler.get('elementRegistry'),
-      modeling = modeler.get('modeling');
-    console.log(bpmnFactory);
+  init = () => {
+    const _flow = window.localStorage.getItem('flow');
+    this.setState({
+      flow: JSON.parse(_flow),
+    });
   };
   componentDidMount() {
     const { modeler } = this.props;
-    this.init(modeler);
+    this.init();
     modeler.on('selection.changed', (e) => {
       const { element } = this.state;
 
@@ -52,194 +60,86 @@ export default class PropertiesView extends Component {
       }
     });
   }
-
+  creatForm = () => {
+    alert('跳转到动态表单');
+  };
   render() {
-    const { modeler, flow } = this.props;
+    const { modeler } = this.props;
 
-    const { selectedElements, element } = this.state;
-
+    const { selectedElements, element, flow } = this.state;
+    console.log(element);
     return (
-      <div>
+      <div className={'panel-content'}>
         <div className="element-properties">
           <h3 className={'panel-tittle'}>属性</h3>
-          <Collapse defaultActiveKey={['1']}>
-            <Panel header="常规" key="1">
-              <fieldset>
-                <label>id</label>
-                <span>{flow?.name}</span>
-              </fieldset>
-              {selectedElements.length === 1 && (
-                <ElementProperties modeler={modeler} element={element} />
-              )}
+          <Form>
+            <Collapse defaultActiveKey={['1']}>
+              <Panel header="常规" key="1">
+                {selectedElements.length > 0 ? null : (
+                  <fieldset>
+                    <label>流程名称</label>
+                    <span>{flow?.name}</span>
+                  </fieldset>
+                )}
 
-              {/*{selectedElements.length === 0 && (*/}
-              {/*  <span>Please select an element.</span>*/}
-              {/*)}*/}
+                {selectedElements.length === 1 && (
+                  <ElementProperties modeler={modeler} element={element} />
+                )}
 
-              {selectedElements.length > 1 && (
-                <span>Please select a single element.</span>
-              )}
-            </Panel>
-            <Panel header="申请人" key="2">
-              <p>{'dddd'}</p>
-            </Panel>
-            {selectedElements.length === 1 ? (
-              <>
-                <Panel header="表单" key="3">
-                  <a
-                    onClick={() => {
-                      alert('创建表单');
-                    }}
-                  >
-                    create form
-                  </a>
+                {/*{selectedElements.length === 0 && (*/}
+                {/*  <span>Please select an element.</span>*/}
+                {/*)}*/}
+
+                {selectedElements.length > 1 && (
+                  <span>Please select a single element.</span>
+                )}
+              </Panel>
+              {element?.type === 'bpmn:StartEvent' && (
+                <Panel header={'申请人'} key="2">
+                  <Form.Item label="申请人" name="applyPerson">
+                    <Select style={{ width: 120 }}>
+                      <Option value="anyone">任何人可填</Option>
+                      <Option value="role">指定角色可填</Option>
+                      <Option value="person">指定人可填</Option>
+                    </Select>
+                  </Form.Item>
                 </Panel>
-              </>
-            ) : null}
-          </Collapse>
+              )}
+              {element?.type === 'bpmn:UserTask' && (
+                <Panel header={'审批人'} key="3">
+                  <Approver></Approver>
+                </Panel>
+              )}
+              <Panel header="规则" key="4">
+                <Ruler></Ruler>
+              </Panel>
+              <Panel header="表单" key="5">
+                <Form.Item label="目标表单">
+                  <Form.Item name="targetForm" noStyle>
+                    <Select style={{ width: 120 }}>
+                      <Option value="form1">表单一</Option>
+                      <Option value="form2">表单二</Option>
+                    </Select>
+                  </Form.Item>
+                  <Button
+                    type={'primary'}
+                    icon={<PlusCircleOutlined />}
+                    onClick={this.creatForm}
+                  >
+                    创建
+                  </Button>
+                </Form.Item>
+                <div>
+                  <label>字段权限</label>
+                  <FieldTable></FieldTable>
+                </div>
+              </Panel>
+            </Collapse>
+          </Form>
         </div>
       </div>
     );
   }
-}
-
-function ElementProperties(props) {
-  let { element, modeler } = props;
-
-  if (element.labelTarget) {
-    element = element.labelTarget;
-  }
-
-  function updateName(name) {
-    const modeling = modeler.get('modeling');
-
-    modeling.updateLabel(element, name);
-  }
-
-  function updateTopic(topic) {
-    const modeling = modeler.get('modeling');
-
-    modeling.updateProperties(element, {
-      'custom:topic': topic,
-    });
-  }
-
-  function makeMessageEvent() {
-    const bpmnReplace = modeler.get('bpmnReplace');
-
-    bpmnReplace.replaceElement(element, {
-      type: element.businessObject.$type,
-      eventDefinitionType: 'bpmn:MessageEventDefinition',
-    });
-  }
-
-  function makeServiceTask(name) {
-    const bpmnReplace = modeler.get('bpmnReplace');
-
-    bpmnReplace.replaceElement(element, {
-      type: 'bpmn:ServiceTask',
-    });
-  }
-
-  function attachTimeout() {
-    const modeling = modeler.get('modeling');
-    const autoPlace = modeler.get('autoPlace');
-    const selection = modeler.get('selection');
-
-    const attrs = {
-      type: 'bpmn:BoundaryEvent',
-      eventDefinitionType: 'bpmn:TimerEventDefinition',
-    };
-
-    const position = {
-      x: element.x + element.width,
-      y: element.y + element.height,
-    };
-
-    const boundaryEvent = modeling.createShape(attrs, position, element, {
-      attach: true,
-    });
-
-    const taskShape = append(boundaryEvent, {
-      type: 'bpmn:Task',
-    });
-
-    selection.select(taskShape);
-  }
-
-  function isTimeoutConfigured(element) {
-    const attachers = element.attachers || [];
-
-    return attachers.some((e) => hasDefinition(e, 'bpmn:TimerEventDefinition'));
-  }
-
-  function append(element, attrs) {
-    const autoPlace = modeler.get('autoPlace');
-    const elementFactory = modeler.get('elementFactory');
-
-    var shape = elementFactory.createShape(attrs);
-
-    return autoPlace.append(element, shape);
-  }
-
-  return (
-    <div key={element.id}>
-      <fieldset>
-        <label>id</label>
-        <span>{element.id}</span>
-      </fieldset>
-
-      <fieldset>
-        <label>节点名称</label>
-        <input
-          value={element.businessObject.name || ''}
-          onChange={(event) => {
-            updateName(event.target.value);
-          }}
-        />
-      </fieldset>
-
-      {/*<fieldset>*/}
-      {/*  <label>表单</label>*/}
-      {/*  <a*/}
-      {/*    onClick={() => {*/}
-      {/*      alert('创建表单');*/}
-      {/*      console.log(getBusinessObject(element).$type);*/}
-      {/*    }}*/}
-      {/*  >*/}
-      {/*    create form*/}
-      {/*  </a>*/}
-      {/*</fieldset>*/}
-      {/*{is(element, 'custom:TopicHolder') && (*/}
-      {/*  <fieldset>*/}
-      {/*    <label>topic (custom)</label>*/}
-      {/*    <input*/}
-      {/*      value={element.businessObject.get('custom:topic')}*/}
-      {/*      onChange={(event) => {*/}
-      {/*        updateTopic(event.target.value);*/}
-      {/*      }}*/}
-      {/*    />*/}
-      {/*  </fieldset>*/}
-      {/*)}*/}
-
-      {/*<fieldset>*/}
-      {/*  <label>actions</label>*/}
-
-      {/*  {is(element, 'bpmn:Task') && !is(element, 'bpmn:ServiceTask') && (*/}
-      {/*    <button onClick={makeServiceTask}>Make Service Task</button>*/}
-      {/*  )}*/}
-
-      {/*  {is(element, 'bpmn:Event') &&*/}
-      {/*    !hasDefinition(element, 'bpmn:MessageEventDefinition') && (*/}
-      {/*      <button onClick={makeMessageEvent}>Make Message Event</button>*/}
-      {/*    )}*/}
-
-      {/*  {is(element, 'bpmn:Task') && !isTimeoutConfigured(element) && (*/}
-      {/*    <button onClick={attachTimeout}>Attach Timeout</button>*/}
-      {/*  )}*/}
-      {/*</fieldset>*/}
-    </div>
-  );
 }
 
 // helpers ///////////////////

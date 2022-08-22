@@ -78,7 +78,6 @@ export default function IndexPage() {
     const propertiesPanel = new PropertiesPanel({
       container: refPanel.current,
       modeler,
-      flow: JSON.parse(_flow),
     });
     modeler.importXML(xmlStr);
   }, []);

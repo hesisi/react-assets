@@ -212,7 +212,7 @@ const homePage = (props) => {
                 regionSelect(e.id);
               }}
             >
-              <div className={e.id === selectId ? 'active' : 'default'}>
+              <div className={e.id === selectId ? 'active-box' : 'default'}>
                 {e.component ? (
                   <>{e.component}</>
                 ) : (

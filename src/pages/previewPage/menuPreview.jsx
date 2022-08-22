@@ -20,7 +20,7 @@ eventBus.addListener('setTree', (tree, menuConfig) => {
   const temp = (data) => {
     data.forEach((item) => {
       treeObj[item.key] = item.address;
-      if (item.children) {
+      if (item.children && item.children.length) {
         temp(item.children);
       }
     });

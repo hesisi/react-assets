@@ -91,8 +91,6 @@ const CommonLayout = (props) => {
     return metaInfo;
   });
 
-  console.log(meta);
-
   return (
     <Layout>
       <Header

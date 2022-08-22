@@ -15,11 +15,12 @@ import {
 } from '@designable/formily-transformer';
 import FormDesigner from '../Desinger';
 import { tableConfig } from './designerConfig';
+import TableSetting from './tableSetting';
 
 const { Group, Button } = Radio;
 
 export default function (props) {
-  const [desingerType, setDesingerType] = useState('form');
+  const [desingerType, setDesingerType] = useState('table');
   const [designer, setDesigner] = useState();
 
   // 保存当前设计器的form schema
@@ -179,16 +180,21 @@ export default function (props) {
         onChange={(e) => {
           setDesingerType(e?.target?.value || 'form');
         }}
+        style={{ padding: '20px' }}
       >
-        <Button value="form">表单设计</Button>
-        <Button value="table">列表设计</Button>
+        <Button value="form">表单字段</Button>
+        <Button value="table">列表配置</Button>
       </Group>
 
-      <FormDesigner
-        type={desingerType}
-        getDesigner={getDesigner}
-        onSave={onSave}
-      />
+      {desingerType === 'form' ? (
+        <FormDesigner
+          type={desingerType}
+          getDesigner={getDesigner}
+          onSave={onSave}
+        />
+      ) : (
+        <TableSetting formCode={formCode} />
+      )}
     </>
   );
 }

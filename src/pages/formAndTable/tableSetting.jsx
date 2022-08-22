@@ -13,58 +13,16 @@ import {
   Tag,
   Table,
   Popover,
+  Tree,
 } from 'antd';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
 const { Search } = Input;
-import {
-  SaveOutlined,
-  CheckSquareOutlined,
-  StopOutlined,
-  CloseOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-  CopyOutlined,
-} from '@ant-design/icons';
+
 import './tableSetting.less';
 import { nanoid } from 'nanoid';
 import Icon from '@/utils/icon';
-
-const selectList = {
-  isShow: [
-    { label: '是', value: true },
-    { label: '否', value: false },
-  ],
-  sortEnable: [
-    { label: '不可排序', value: false },
-    { label: '可排序', value: true },
-  ],
-  searchEnable: [
-    { label: '可搜索', value: true },
-    { label: '不可搜索', value: false },
-  ],
-  filterEnable: [
-    { label: '显示', value: true },
-    { label: '不显示', value: false },
-  ],
-};
-
-// 列表配置初始化
-const columnInit = {
-  isShow: true,
-  sortEnable: false,
-  searchEnable: true,
-  filterEnable: true,
-};
-
-// 按钮配置初始化
-const buttonInit = {
-  id: null,
-  label: '',
-  icon: null,
-  method: '',
-  iconName: '',
-};
+import * as config from './settingConfig';
 
 const tableSetting = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
@@ -77,10 +35,52 @@ const tableSetting = (props) => {
   const [column, setColumn] = useState([]); // 表格的数据项
   const [dataSource, setDataSource] = useState([]); // 表格的数据来源
   const [btnPopoverVisible, setBtnPopoverVisible] = useState(false); // 按钮图标popover可见性
+  const [treeData, setTreeData] = useState([]); // 大纲树
 
-  useEffect(() => {
-    tableDataFetch(); // 从内存获取表格
+  // 从内存获取表格
+  useEffect(async () => {
+    tableDataFetch();
   }, []);
+
+  // 监听修改，重新渲染表格
+  useEffect(() => {
+    const indexCol = [
+      {
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        align: 'center',
+        render: (_, record, index) => {
+          return <span>{index + 1}</span>;
+        },
+      },
+    ];
+    const operationCol = [
+      {
+        title: '操作',
+        dataIndex: 'operation',
+        render: (_, record, index) => {
+          return (
+            <>
+              <Button type="link">Delete</Button>
+              <Button type="link">Edit</Button>
+            </>
+          );
+        },
+      },
+    ];
+    const tableShow = table.filter((e) => e.isShow);
+    const col = tableShow.map((e) => {
+      return {
+        title: e.label,
+        dataIndex: e.name,
+        key: e.id,
+        sorter: e.sorter || false,
+      };
+    });
+    // 设置表格
+    setColumn(indexCol.concat(col).concat(operationCol));
+  }, [table]);
 
   // 根据formCode获取存在localStorage的table
   const tableDataFetch = () => {
@@ -103,39 +103,30 @@ const tableSetting = (props) => {
             },
           ],
           id: data[key]['x-designable-id'],
-          ...columnInit,
+          ...config.columnInit,
         });
       }
     };
     objSetFunc(properties, formItem);
     setTable(formItem);
     setColumnCount(formItem.length);
-    const indexCol = [
+
+    const formList = JSON.parse(window.localStorage.getItem('formList'));
+    const formTree = formList.filter((e) => e.formCode === props.formCode)[0];
+    const children = formItem.map((e) => {
+      return {
+        title: e.title,
+        key: e.id,
+      };
+    });
+    const tree = [
       {
-        title: '序号',
-        dataIndex: 'index',
-        key: 'index',
-        align: 'center',
-        render: (_, record, index) => {
-          return <span>{index + 1}</span>;
-        },
+        title: `${formTree.formName}    （${children.length}）`,
+        key: formTree.formCode,
+        children: children,
       },
     ];
-    const col = formItem.map((e) => {
-      switch (e.type) {
-        default:
-          return {
-            title: e.label,
-            dataIndex: e.name,
-            key: e.id,
-            sorter: (a, b) => {},
-          };
-      }
-    });
-    console.log('===formItem', formItem);
-
-    // 设置表格
-    setColumn(indexCol.concat(col));
+    setTreeData(tree);
   };
 
   // 添加操作按钮
@@ -182,22 +173,9 @@ const tableSetting = (props) => {
   };
 
   // 气泡内容
-  const iconList = [
-    'EditOutlined',
-    'FormOutlined',
-    'CopyOutlined',
-    'ScissorOutlined',
-    'DeleteOutlined',
-    'SnippetsOutlined',
-    'QuestionOutlined',
-    'QuestionCircleOutlined',
-    'PlusOutlined',
-    'PlusCircleOutlined',
-    'PauseOutlined',
-  ];
   const content = (
-    <Space className="button-icon">
-      {iconList.map((e, i) => {
+    <Space className="button-icon" size={10} wrap>
+      {config.iconList.map((e, i) => {
         return (
           <div
             onClick={() => {
@@ -218,6 +196,7 @@ const tableSetting = (props) => {
     setBtnPopoverVisible(false);
   };
 
+  // 列表配置的下拉框改变的时候
   const selectChange = (ele, e, property) => {
     const tables = table.map((item) => {
       if (ele.id === item.id) {
@@ -226,33 +205,69 @@ const tableSetting = (props) => {
       return item;
     });
     setTable(tables);
-    console.log(tables.map((e) => e.filterEnable));
+  };
+
+  // 列表配置保存
+  const tableConfigSave = () => {
+    console.log('====table', table);
+    console.log('====Buttons', buttons);
+    window.localStorage.setItem('tableConfig', {
+      tableConfig: table,
+      buttonConfig: buttons,
+    });
   };
 
   return (
     <>
       <Row justify="end" style={{ padding: '10px 15px 10px' }}>
         <Space size={10}>
-          <Button icon={<SaveOutlined />} type="primary">
+          <Button
+            icon={<Icon icon="SaveOutlined" />}
+            type="primary"
+            onClick={tableConfigSave}
+          >
             保存
           </Button>
-          <Button icon={<CheckSquareOutlined />} type="primary" ghost>
+          <Button
+            icon={<Icon icon="CheckSquareOutlined" />}
+            type="primary"
+            ghost
+          >
             启用
           </Button>
-          <Button icon={<StopOutlined />} type="primary" ghost>
+          <Button icon={<Icon icon="StopOutlined" />} type="primary" ghost>
             停用
           </Button>
-          <Button icon={<CloseOutlined />} type="primary" ghost>
+          <Button icon={<Icon icon="CloseOutlined" />} type="primary" ghost>
             删除
           </Button>
         </Space>
       </Row>
 
       <Row style={{ height: '100%' }}>
+        {/* 大纲部分 */}
         <Col
           span={4}
-          style={{ border: '1px solid #d9d9d9', borderRight: 0 }}
-        ></Col>
+          style={{
+            border: '1px solid #d9d9d9',
+            borderRight: 0,
+            padding: '10px',
+          }}
+        >
+          <p className="table-col__title">大纲</p>
+          {treeData.length > 0 ? (
+            <Tree
+              defaultExpandedKeys={[`${props.formCode}`]}
+              defaultExpandAll={true}
+              defaultExpandParent
+              treeData={treeData}
+            />
+          ) : (
+            <></>
+          )}
+        </Col>
+
+        {/* 表格部分 */}
         <Col
           span={16}
           style={{
@@ -261,7 +276,11 @@ const tableSetting = (props) => {
             padding: '20px',
           }}
         >
-          <Button icon={<SaveOutlined />} type="primary" onClick={buttonAdd}>
+          <Button
+            icon={<Icon icon="SaveOutlined" />}
+            type="primary"
+            onClick={buttonAdd}
+          >
             添加按钮
           </Button>
 
@@ -271,10 +290,10 @@ const tableSetting = (props) => {
           <Row justify="space-between">
             <Col span={19}>
               <Space size={10} wrap>
-                <Button icon={<PlusOutlined />} type="primary">
+                <Button icon={<Icon icon="PlusOutlined" />} type="primary">
                   新建
                 </Button>
-                <Button icon={<DeleteOutlined />} type="primary">
+                <Button icon={<Icon icon="DeleteOutlined" />} type="primary">
                   删除
                 </Button>
                 {buttons &&
@@ -324,6 +343,7 @@ const tableSetting = (props) => {
 
           <Divider />
 
+          {/* 检索条件 */}
           <Form form={searchForm} layout="inline">
             {table.map((e) => {
               if (e.filterEnable) {
@@ -345,6 +365,8 @@ const tableSetting = (props) => {
             style={{ marginTop: '20px' }}
           />
         </Col>
+
+        {/* 配置项部分 */}
         <Col span={4} style={{ border: '1px solid #d9d9d9', padding: '10px' }}>
           <Tabs
             tabPosition="top"
@@ -357,16 +379,18 @@ const tableSetting = (props) => {
                 列表显示的字段建议不超过7个，当前已显示{columnCount}个。
               </span>
               {/* 字段折叠面板 */}
-
               <Collapse accordion style={{ background: '#fafafa' }}>
                 {table &&
                   table.map((e) => {
                     return (
                       <Panel header={e.name} key={e.id}>
-                        <Form initialValues={columnInit}>
+                        <Form initialValues={config.columnInit}>
                           <Form.Item label="在列表显示" name="isShow">
-                            <Select>
-                              {selectList.isShow.map((e) => {
+                            <Select
+                              onChange={(ele) => selectChange(e, ele, 'isShow')}
+                              value={e.isShow}
+                            >
+                              {config.selectList.isShow.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>
                                     {e.label}
@@ -376,14 +400,12 @@ const tableSetting = (props) => {
                             </Select>
                           </Form.Item>
 
-                          <Form.Item label="是否可排序" name="sortEnable">
+                          <Form.Item label="是否可排序" name="sorter">
                             <Select
-                              onChange={(ele) =>
-                                selectChange(e, ele, 'sortEnable')
-                              }
-                              value={e.sortEnable}
+                              onChange={(ele) => selectChange(e, ele, 'sorter')}
+                              value={e.sorter}
                             >
-                              {selectList.sortEnable.map((e) => {
+                              {config.selectList.sortEnable.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>
                                     {e.label}
@@ -395,7 +417,7 @@ const tableSetting = (props) => {
 
                           <Form.Item label="是否可搜索" name="searchEnable">
                             <Select>
-                              {selectList.searchEnable.map((e) => {
+                              {config.selectList.searchEnable.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>
                                     {e.label}
@@ -412,7 +434,7 @@ const tableSetting = (props) => {
                               }
                               value={e.filterEnable}
                             >
-                              {selectList.filterEnable.map((e) => {
+                              {config.selectList.filterEnable.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>
                                     {e.label}
@@ -427,10 +449,11 @@ const tableSetting = (props) => {
                   })}
               </Collapse>
             </TabPane>
+
             {/* 按钮属性 */}
             <TabPane tab="按钮属性" key="button" forceRender={true}>
               <Form
-                initialValues={buttonInit}
+                initialValues={config.buttonInit}
                 form={btnForm}
                 onFinish={(e) => onFinish(e, 'btn')}
               >
@@ -444,6 +467,7 @@ const tableSetting = (props) => {
                       title="icon"
                       visible={btnPopoverVisible}
                       placement="bottom"
+                      overlayStyle={{ width: '360px' }}
                     >
                       <Button
                         type="link"

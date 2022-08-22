@@ -11,6 +11,8 @@ import {
   Input,
   Divider,
   Tag,
+  Table,
+  Popover,
 } from 'antd';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
@@ -65,16 +67,19 @@ const buttonInit = {
 };
 
 const tableSetting = (props) => {
-  const [table, setTable] = useState([]);
-  const [columnCount, setColumnCount] = useState(5);
-  const [buttons, setButtons] = useState([]);
-  const btnFormRef = useRef(null);
-  const [tabsActiveKey, setTabsActiveKey] = useState('table');
-  const [btnForm] = Form.useForm();
-  const [selectBtnId, setSelectBtnId] = useState(null);
+  const [table, setTable] = useState([]); // 从内存获取的表格
+  const [columnCount, setColumnCount] = useState(5); // 表格的列数计算
+  const [buttons, setButtons] = useState([]); // 操作按钮数组
+  const [tabsActiveKey, setTabsActiveKey] = useState('table'); // tabs激活key
+  const [btnForm] = Form.useForm(); // 按钮属性表单
+  const [searchForm] = Form.useForm(); // 检索条件表单
+  const [selectBtnId, setSelectBtnId] = useState(null); // 当前选中的操作按钮
+  const [column, setColumn] = useState([]); // 表格的数据项
+  const [dataSource, setDataSource] = useState([]); // 表格的数据来源
+  const [btnPopoverVisible, setBtnPopoverVisible] = useState(false); // 按钮图标popover可见性
 
   useEffect(() => {
-    tableDataFetch();
+    tableDataFetch(); // 从内存获取表格
   }, []);
 
   // 根据formCode获取存在localStorage的table
@@ -98,12 +103,39 @@ const tableSetting = (props) => {
             },
           ],
           id: data[key]['x-designable-id'],
+          ...columnInit,
         });
       }
     };
     objSetFunc(properties, formItem);
     setTable(formItem);
+    setColumnCount(formItem.length);
+    const indexCol = [
+      {
+        title: '序号',
+        dataIndex: 'index',
+        key: 'index',
+        align: 'center',
+        render: (_, record, index) => {
+          return <span>{index + 1}</span>;
+        },
+      },
+    ];
+    const col = formItem.map((e) => {
+      switch (e.type) {
+        default:
+          return {
+            title: e.label,
+            dataIndex: e.name,
+            key: e.id,
+            sorter: (a, b) => {},
+          };
+      }
+    });
     console.log('===formItem', formItem);
+
+    // 设置表格
+    setColumn(indexCol.concat(col));
   };
 
   // 添加操作按钮
@@ -111,8 +143,7 @@ const tableSetting = (props) => {
     const btn = {
       id: nanoid(),
       label: '按钮',
-      icon: <CopyOutlined />,
-      iconName: 'CopyOutlined',
+      icon: '',
       method: '',
     };
     setButtons([...buttons, btn]);
@@ -122,6 +153,7 @@ const tableSetting = (props) => {
   const buttonsDelete = (id) => {
     const btn = buttons.filter((e) => e.id !== id);
     setButtons(btn);
+    btnForm.resetFields();
   };
 
   // 选择操作按钮
@@ -149,6 +181,54 @@ const tableSetting = (props) => {
     }
   };
 
+  // 气泡内容
+  const iconList = [
+    'EditOutlined',
+    'FormOutlined',
+    'CopyOutlined',
+    'ScissorOutlined',
+    'DeleteOutlined',
+    'SnippetsOutlined',
+    'QuestionOutlined',
+    'QuestionCircleOutlined',
+    'PlusOutlined',
+    'PlusCircleOutlined',
+    'PauseOutlined',
+  ];
+  const content = (
+    <Space className="button-icon">
+      {iconList.map((e, i) => {
+        return (
+          <div
+            onClick={() => {
+              selectIcon(e);
+            }}
+            key={i}
+          >
+            <Icon icon={e} />
+          </div>
+        );
+      })}
+    </Space>
+  );
+
+  // 按钮图标选择
+  const selectIcon = (icon) => {
+    btnForm.setFieldValue('icon', icon);
+    setBtnPopoverVisible(false);
+  };
+
+  const selectChange = (ele, e, property) => {
+    const tables = table.map((item) => {
+      if (ele.id === item.id) {
+        item[property] = e;
+      }
+      return item;
+    });
+    setTable(tables);
+    console.log(tables.map((e) => e.filterEnable));
+  };
+
   return (
     <>
       <Row justify="end" style={{ padding: '10px 15px 10px' }}>
@@ -167,6 +247,7 @@ const tableSetting = (props) => {
           </Button>
         </Space>
       </Row>
+
       <Row style={{ height: '100%' }}>
         <Col
           span={4}
@@ -186,6 +267,7 @@ const tableSetting = (props) => {
 
           <Divider />
 
+          {/* button和搜索 */}
           <Row justify="space-between">
             <Col span={19}>
               <Space size={10} wrap>
@@ -206,14 +288,24 @@ const tableSetting = (props) => {
                           buttonsDelete(e.id);
                         }}
                       >
-                        <Button
-                          icon={e.icon}
-                          type="primary"
-                          ghost
-                          onClick={() => buttonSelect(e)}
-                        >
-                          {e.label}
-                        </Button>
+                        {e.icon ? (
+                          <Button
+                            icon={<Icon icon={e.icon} />}
+                            type="primary"
+                            ghost
+                            onClick={() => buttonSelect(e)}
+                          >
+                            {e.label}
+                          </Button>
+                        ) : (
+                          <Button
+                            type="primary"
+                            ghost
+                            onClick={() => buttonSelect(e)}
+                          >
+                            {e.label}
+                          </Button>
+                        )}
                       </Tag>
                     );
                   })}
@@ -229,6 +321,29 @@ const tableSetting = (props) => {
               />
             </Col>
           </Row>
+
+          <Divider />
+
+          <Form form={searchForm} layout="inline">
+            {table.map((e) => {
+              if (e.filterEnable) {
+                return (
+                  <Form.Item label={e.label} name={e.name} key={e.id}>
+                    <Input />
+                  </Form.Item>
+                );
+              }
+              return <div key={e.id}></div>;
+            })}
+          </Form>
+
+          {/* 表格部分 */}
+          <Table
+            columns={column}
+            dataSource={dataSource}
+            pagination={{ position: ['none', 'none'] }}
+            style={{ marginTop: '20px' }}
+          />
         </Col>
         <Col span={4} style={{ border: '1px solid #d9d9d9', padding: '10px' }}>
           <Tabs
@@ -236,12 +351,13 @@ const tableSetting = (props) => {
             activeKey={tabsActiveKey}
             onTabClick={onTabClick}
           >
+            {/* 列表配置 */}
             <TabPane tab="列表配置" key="table">
               <span className="tab__text">
                 列表显示的字段建议不超过7个，当前已显示{columnCount}个。
               </span>
-
               {/* 字段折叠面板 */}
+
               <Collapse accordion style={{ background: '#fafafa' }}>
                 {table &&
                   table.map((e) => {
@@ -261,7 +377,12 @@ const tableSetting = (props) => {
                           </Form.Item>
 
                           <Form.Item label="是否可排序" name="sortEnable">
-                            <Select>
+                            <Select
+                              onChange={(ele) =>
+                                selectChange(e, ele, 'sortEnable')
+                              }
+                              value={e.sortEnable}
+                            >
                               {selectList.sortEnable.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>
@@ -285,7 +406,12 @@ const tableSetting = (props) => {
                           </Form.Item>
 
                           <Form.Item label="在筛选栏显示" name="filterEnable">
-                            <Select>
+                            <Select
+                              onChange={(ele) =>
+                                selectChange(e, ele, 'filterEnable')
+                              }
+                              value={e.filterEnable}
+                            >
                               {selectList.filterEnable.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>
@@ -301,7 +427,8 @@ const tableSetting = (props) => {
                   })}
               </Collapse>
             </TabPane>
-            <TabPane tab="按钮属性" key="button">
+            {/* 按钮属性 */}
+            <TabPane tab="按钮属性" key="button" forceRender={true}>
               <Form
                 initialValues={buttonInit}
                 form={btnForm}
@@ -311,8 +438,34 @@ const tableSetting = (props) => {
                   <Input />
                 </Form.Item>
                 <Form.Item label="按钮图标" name="icon">
-                  <Icon icon="CopyOutlined" />
-                  {/* <Button icon={React.createElement(btnForm.iconName)}></Button> */}
+                  <Space>
+                    <Popover
+                      content={content}
+                      title="icon"
+                      visible={btnPopoverVisible}
+                      placement="bottom"
+                    >
+                      <Button
+                        type="link"
+                        style={{ paddingLeft: 0 }}
+                        onClick={() => {
+                          setBtnPopoverVisible(true);
+                        }}
+                      >
+                        选择图标
+                      </Button>
+                    </Popover>
+                    {btnForm && btnForm.getFieldValue('icon') ? (
+                      <Icon icon={btnForm.getFieldValue('icon')} />
+                    ) : (
+                      <></>
+                    )}
+                  </Space>
+
+                  {/* {btnForm && btnForm.getFieldValue('icon') ? (
+                    <Icon icon={btnForm.getFieldValue('icon')} />
+                  ) : (
+                  )} */}
                 </Form.Item>
                 <Form.Item label="按钮事件" name="method">
                   <Input />

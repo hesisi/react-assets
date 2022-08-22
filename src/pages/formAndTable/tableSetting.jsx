@@ -91,7 +91,7 @@ const tableSetting = (props) => {
     if (!formColumn) return;
     const formItemObj = formColumn[props.formCode]['formily-form-schema'];
     const properties = formItemObj?.schema?.properties;
-    const formItem = [];
+    let formItem = [];
     const objSetFunc = (data, arr) => {
       for (let key in data) {
         arr.push({
@@ -111,6 +111,12 @@ const tableSetting = (props) => {
       }
     };
     objSetFunc(properties, formItem);
+
+    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
+    if (tableConfig) {
+      formItem = tableConfig.tableConfig;
+      setButtons(tableConfig.buttonConfig);
+    }
     setTable(formItem);
     setColumnCount(formItem.length);
 
@@ -212,11 +218,14 @@ const tableSetting = (props) => {
 
   // 列表配置保存
   const handleOk = (status) => {
-    window.localStorage.setItem('tableConfig', {
-      tableConfig: table,
-      buttonConfig: buttons,
-      status: status,
-    });
+    window.localStorage.setItem(
+      'tableConfig',
+      JSON.stringify({
+        tableConfig: table,
+        buttonConfig: buttons,
+        status: status,
+      }),
+    );
     setSaveVisible(false);
   };
 
@@ -378,7 +387,7 @@ const tableSetting = (props) => {
             columns={column}
             dataSource={dataSource}
             pagination={{ position: ['none', 'none'] }}
-            style={{ marginTop: '20px' }}
+            style={{ marginTop: '30px' }}
           />
         </Col>
 

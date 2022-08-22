@@ -109,7 +109,7 @@ export default function Page() {
                 type="link"
                 style={{ padding: 0 }}
                 icon={<FormOutlined />}
-                onClick={() => handleOk(record.id)}
+                onClick={() => handleOk(record?.id)}
               >
                 编辑
               </Button>
@@ -240,7 +240,7 @@ export default function Page() {
   const addProcess = () => {
     setIsModalVisible(true);
   };
-  const handleOk = (id: string) => {
+  const handleOk = (id?: string | number) => {
     history.push(`/activityManage/activityConfig?activityId=${id}`);
   };
   // 清除表单检索

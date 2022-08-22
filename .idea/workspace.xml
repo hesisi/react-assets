@@ -2,11 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="feat: flow list">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_11_08_2022_13_52____.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_11_08_2022_13_52_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/properties-panel/Approver.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/properties-panel/FieldTable.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/components/properties-panel/Leave.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.less" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/Dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityList/Dialog.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,15 +22,15 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Less File" />
-        <option value="TypeScript JSX File" />
         <option value="JavaScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="fix/formily" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -41,7 +46,7 @@
                 <list>
                   <RecentBranch>
                     <option name="branchName" value="dev/jlf" />
-                    <option name="lastUsedInstant" value="1660791604" />
+                    <option name="lastUsedInstant" value="1660878111" />
                   </RecentBranch>
                   <RecentBranch>
                     <option name="branchName" value="master" />
@@ -107,6 +112,10 @@
       <workItem from="1660181091122" duration="27593000" />
       <workItem from="1660787361823" duration="17837000" />
       <workItem from="1660871658003" duration="2573000" />
+      <workItem from="1660890621713" duration="5721000" />
+      <workItem from="1660901192908" duration="4149000" />
+      <workItem from="1661131424385" duration="181000" />
+      <workItem from="1661132442977" duration="1063000" />
     </task>
     <task id="LOCAL-00001" summary="feat: 创建自定义模板">
       <created>1660216714232</created>
@@ -166,7 +175,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/dev/jlf" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>

@@ -527,7 +527,7 @@ const tableSetting = (props) => {
                 {table &&
                   table.map((e) => {
                     return (
-                      <Panel header={e.name} key={e.id}>
+                      <Panel header={e.label} key={e.id}>
                         <Form initialValues={config.columnInit}>
                           <Form.Item label="在列表显示" name="isShow">
                             <Select

@@ -40,7 +40,10 @@ export default function Dialog(props: any) {
     //     ]), //TODO:记得修改
     //   );
     // }
-    window.localStorage.setItem('flow', JSON.stringify(values));
+    const temp = { ...values };
+    temp.id = nanoid();
+    console.log(temp);
+    window.localStorage.setItem('flow', JSON.stringify(temp));
     setIsModalVisible(false);
     handleOk(); //TODO:记得修改
   };

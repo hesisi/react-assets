@@ -1,216 +1,361 @@
-import { Tree, Button } from 'antd';
-import { nanoid } from 'nanoid';
-import { UploadOutlined, CloseOutlined } from '@ant-design/icons';
-import React, { useState, useEffect } from 'react';
-import eventBus from '../../../utils/eventBus';
+import React, { memo, useState, useRef, useEffect } from 'react';
+import { Tree, Tooltip, Input } from 'antd';
+import { Scrollbars } from 'react-custom-scrollbars';
+import { list } from './iconBox';
+import { cloneDeep } from 'lodash';
+import {
+  PlusCircleOutlined,
+  EditOutlined,
+  MinusCircleOutlined,
+} from '@ant-design/icons';
 
-let arr = []; // 存在内存，不受react组件影响
-let deleteFlag = false;
-function uniqueFunc(arr, uniId) {
-  // 过滤掉数组重复的项
-  const res = new Map();
-  return arr.filter((item) => !res.has(item[uniId]) && res.set(item[uniId], 1));
-}
+import { getUUID } from '@/utils/utils';
+import localForage from 'localforage';
 
-export default function menuTree(props) {
-  const [gData, setGData] = useState();
-  // const [deleteFlag, setDeleteFlag] = useState(false);
+const { TreeNode } = Tree;
+const { Search } = Input;
 
-  const setTreeNode = () => {
-    const treeData = uniqueFunc(arr, 'key') || [];
-    if (
-      props.config &&
-      treeData.length >= 0 &&
-      !props.config.formValue.isEdit
-    ) {
-      // 新增一个结点
-      treeData.push({
-        title: props.config.formValue.menuname,
-        key: nanoid(),
-        ...props.config.formValue,
-        icon: props.config.comIcons,
-        iconIndex: props.config.iconIndex,
-      });
-      arr = [...treeData];
-      setGData(arr);
-      props.setTree(arr); // 返回给父组件
-      deleteFlag = false;
-    } else if (props.config?.formValue?.isEdit) {
-      // 修改一个结点，找到对应结点进行修改
-      const form = props.config?.formValue;
+const defaultTreeParaent = [
+  {
+    title: '菜单管理',
+    key: '00-top',
+    children: [],
+    isTop: true,
+  },
+];
+let curerntTree = defaultTreeParaent;
+let defaultTrreData = {
+  current: defaultTreeParaent,
+};
+
+function menuTree(props) {
+  const formRef = useRef();
+  const [treeData, setTreeData] = useState(defaultTreeParaent);
+  const [autoParentExpand, setAutoParentExpand] = useState(true); //是否展示删除按钮
+  const [operType, setOperType] = useState(''); //区别Modal弹出框的类型，(添加，修改，删除用的是一个Modal)
+  const [searchValue, setSearchValue] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [expandedKeys, setExpandedKeys] = useState([]);
+
+  const getTreeNode = async () => {
+    // todo: 后续接接口保存的tree data
+    setIsLoading(false);
+    // 获取保存treeData 初始化
+    const treeSaveData = await localForage.getItem('menuTree');
+    console.log(treeSaveData, '44-------');
+    if (treeSaveData?.[0]?.children && treeSaveData?.[0].children.length) {
+      defaultTrreData.current = [];
       const temp = (data) => {
         data.forEach((item) => {
-          if (item.key === form.key) {
-            item = Object.assign(item, {
-              ...form,
-              key: nanoid(),
-              title: form.menuname,
-              icon: props.config.comIcons,
-              iconIndex: props.config.iconIndex,
-            });
-          } else if (item.children) {
+          item['icon'] =
+            item.iconIndex >= 0
+              ? React.createElement(list[item.iconIndex])
+              : null;
+          defaultTrreData.current.push(item);
+          if (item?.children?.length) {
             temp(item.children);
           }
         });
-        return data;
       };
-      arr = temp(arr);
-      setGData([...arr]); // 这样才可以动态更新掉视图上的数据
-      props.setTree(arr);
-    } else {
-      // 预览返回的时候，从内存取
-      setGData([...arr]);
-      props.setTree(arr);
+      temp(treeSaveData);
+      setTreeData([...treeSaveData]); // 这样才可以动态更新掉视图上的数据
+      curerntTree = [...treeSaveData];
+      props.setTree(treeSaveData);
     }
   };
 
-  useEffect(() => {
-    setTreeNode();
-  }, [props.submitFlag]);
+  const editTreeNodeConfig = () => {
+    const form = props.config?.formValue;
 
-  useEffect(() => {
-    // 清空树的所有结点
-    eventBus.addListener('nodeClear', (node) => {
-      arr = node;
-      setGData(node); // 这样才可以动态更新掉视图上的数据
-      props.setTree(node);
-    });
-  }, []);
-
-  const onDrop = (info) => {
-    // 拖拽函数
-    const dropKey = info.node.key;
-    const dragKey = info.dragNode.key;
-    const dropPos = info.node.pos.split('-');
-    const dropPosition =
-      info.dropPosition - Number(dropPos[dropPos.length - 1]);
-
-    const loop = (data, key, callback) => {
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].key === key) {
-          return callback(data[i], i, data);
-        }
-
-        if (data[i].children) {
-          loop(data[i].children, key, callback);
-        }
-      }
-    };
-
-    const data = [...gData]; // Find dragObject
-
-    let dragObj;
-    loop(data, dragKey, (item, index, arr) => {
-      arr.splice(index, 1);
-      dragObj = item;
-    });
-
-    if (!info.dropToGap) {
-      // Drop on the content
-      loop(data, dropKey, (item) => {
-        item.children = item.children || []; // where to insert 示例添加到头部，可以是随意位置
-
-        item.children.unshift(dragObj);
-      });
-    } else if (
-      (info.node.props.children || []).length > 0 && // Has children
-      info.node.props.expanded && // Is expanded
-      dropPosition === 1 // On the bottom gap
-    ) {
-      loop(data, dropKey, (item) => {
-        item.children = item.children || []; // where to insert 示例添加到头部，可以是随意位置
-
-        item.children.unshift(dragObj); // in previous version, we use item.children.push(dragObj) to insert the
-        // item to the tail of the children
-      });
-    } else {
-      let ar = [];
-      let i;
-      loop(data, dropKey, (_item, index, arr) => {
-        ar = arr;
-        i = index;
-      });
-
-      if (dropPosition === -1) {
-        ar.splice(i, 0, dragObj);
-      } else {
-        ar.splice(i + 1, 0, dragObj);
-      }
+    /* 页面初始化回填curerntTree */
+    if (!form) {
+      setTreeData([...curerntTree]);
+      props.setTree(curerntTree);
+      return;
     }
+    console.log(props.config.iconIndex, '72----');
+    defaultTrreData.current = defaultTrreData.current.map((item) => {
+      if (item.key === form.key) {
+        return {
+          ...item,
+          ...form,
+          title: form.menuname,
+          icon:
+            props.config.iconIndex >= 0
+              ? React.createElement(list[props.config.iconIndex])
+              : null,
+          iconIndex: props.config.iconIndex,
+        };
+      }
+      return item;
+    });
 
-    arr = [...data];
-    setGData(data);
-    props.setTree(arr);
-  };
-
-  const nodeDelete = (v) => {
-    // 结点删除
     const temp = (data) => {
-      data.forEach((item, index) => {
-        if (item.key === v.key) {
-          data.splice(index, 1);
+      data.forEach((item) => {
+        if (item.key === form.key) {
+          item = Object.assign(item, {
+            ...form,
+            title: form.menuname,
+            icon:
+              props.config.iconIndex >= 0
+                ? React.createElement(list[props.config.iconIndex])
+                : null,
+            iconIndex: props.config.iconIndex,
+          });
         } else if (item.children) {
           temp(item.children);
         }
       });
       return data;
     };
-    arr = temp(arr);
-    setGData([...arr]); // 这样才可以动态更新掉视图上的数据
+    const arr = temp(treeData);
+    setTreeData([...arr]); // 这样才可以动态更新掉视图上的数据
+    curerntTree = [...arr];
     props.setTree(arr);
-    deleteFlag = true; // 删除标识
+  };
+
+  useEffect(() => {
+    getTreeNode();
+  }, []);
+
+  useEffect(() => {
+    editTreeNodeConfig();
+  }, [props.submitFlag]);
+
+  const onSelect = async (selectedKeys, info) => {
+    const { selectedNodes } = info;
+    console.log(selectedNodes, '115------');
+    if (!selectedNodes.length) {
+      props.setForm({
+        formValue: {},
+      });
+      return;
+    }
+    const selectNodeInfo = defaultTrreData.current.filter(
+      (item) => item.key === selectedNodes[0].key,
+    );
+    console.log(selectNodeInfo, '125----');
+    //这里写点击tree节点的事件逻辑 选中展示节点配置信息
     props.setForm({
-      formValue: {},
-      comIcons: {},
-      isEdit: false,
+      formValue: {
+        ...selectNodeInfo[0],
+        menuname: selectNodeInfo[0]?.title || '',
+      },
+      comIcons: selectNodeInfo[0]?.icon || null,
+      isEdit: true,
     });
   };
 
-  const onSelect = (selectedKeys, { selected, selectedNodes, node, event }) => {
-    if (deleteFlag) {
-      props.setForm({
-        // 回显后点击删除需要清空表单
-        formValue: null,
-        comIcons: null,
-      });
-      return;
-    } // 删除也会触发onSelect但是无需回显
-    props.setForm({
-      formValue: {
-        ...selectedNodes[0],
-        menuname: selectedNodes[0]?.title || selectedNodes[0]?.menuname || '',
-      },
-      comIcons: selectedNodes[0]?.icon || null,
-      isEdit: true,
+  const operateTrreNode = (tree, oper, operNode, nodeKey) => {
+    tree.forEach((item, index) => {
+      if (item.key === nodeKey) {
+        /* 添加操作 */
+        if (oper === 'add') {
+          item.children.push(operNode);
+        }
+        /* 删除 */
+        if (oper === 'delete') {
+          tree.splice(index, 1);
+        }
+        /* 编辑 */
+        if (oper === 'update') {
+          onSelect([], { selectedNodes: [{ key: item.key }] });
+        }
+      }
+      if (item.children && item.children.length) {
+        item.children = operateTrreNode(item.children, oper, operNode, nodeKey);
+      }
     });
+    return tree;
+  };
 
-    deleteFlag = false;
+  //添加按钮弹出添加Modal
+  const handleOperateSub = (e, node, operateIdenty) => {
+    e && e.stopPropagation();
+    if (!node) {
+      return;
+    }
+
+    const newNode =
+      operateIdenty === 'add'
+        ? {
+            title:
+              node.title === '菜单管理'
+                ? `Parent-${node.children.length + 1}`
+                : `${node.title}-${node.children.length + 1}`,
+            key: getUUID(),
+            children: [],
+          }
+        : {};
+
+    const newTreeDataOper = operateTrreNode(
+      cloneDeep(treeData),
+      operateIdenty,
+      newNode,
+      node.key,
+    );
+    if (operateIdenty === 'add') {
+      defaultTrreData.current.push(newNode);
+    }
+    if (operateIdenty === 'delete') {
+      defaultTrreData.current = defaultTrreData.current.filter(
+        (item) => item.key !== node.key,
+      );
+    }
+    curerntTree = newTreeDataOper;
+    setTreeData(newTreeDataOper);
+    props.setTree(newTreeDataOper);
+    setOperType(operateIdenty);
+  };
+
+  const getParentKey = (key, tree) => {
+    let parentKey;
+    for (let i = 0; i < tree.length; i++) {
+      const node = tree[i];
+      if (node.children) {
+        if (node.children.some((item) => item.key === key)) {
+          parentKey = node.key;
+        } else if (getParentKey(key, node.children)) {
+          parentKey = getParentKey(key, node.children);
+        }
+      }
+    }
+    return parentKey;
+  };
+
+  /* tree 前端搜索 */
+  const handleTreeChange = (e) => {
+    const { value } = e.target;
+    const newExpandedKeys = defaultTrreData.current
+      .map((item) => {
+        if (item.title.indexOf(value) > -1) {
+          return getParentKey(item.key, treeData);
+        }
+        return null;
+      })
+      .filter((item, i, self) => item && self.indexOf(item) === i);
+    setExpandedKeys(newExpandedKeys);
+    setSearchValue(value);
+    setAutoParentExpand(true);
+  };
+
+  //增删改组件
+  const getNodeTree = (data) => {
+    if (!(data && data.length)) {
+      return [];
+    }
+
+    const menu = (node) => {
+      const strTitle = node.title;
+      const index = strTitle.indexOf(searchValue);
+      const beforeStr = strTitle.substring(0, index);
+      const afterStr = strTitle.slice(index + searchValue.length);
+      const title =
+        index > -1 ? (
+          <span>
+            {beforeStr}
+            <span className="site-tree-search-value">{searchValue}</span>
+            {afterStr}
+          </span>
+        ) : (
+          <span>{strTitle}</span>
+        );
+
+      return (
+        <div className="tree-node-wrapper">
+          <span className="tree-node-title">{title}</span>
+          <span className="icon-wrapper">
+            <span
+              className="icon-add"
+              onClick={(e) => handleOperateSub(e, node, 'add')}
+            >
+              <Tooltip placement="bottom" title="添加子节点">
+                <PlusCircleOutlined />
+              </Tooltip>
+            </span>
+            {!node.isTop ? (
+              <>
+                <span
+                  className="icon-edit"
+                  onClick={(e) => handleOperateSub(e, node, 'update')}
+                >
+                  <Tooltip placement="bottom" title="修改节点">
+                    <EditOutlined />
+                  </Tooltip>
+                </span>
+                <span
+                  className="icon-remove"
+                  onClick={(e) => handleOperateSub(e, node, 'delete')}
+                >
+                  <Tooltip placement="bottom" title="删除该节点">
+                    <MinusCircleOutlined />
+                  </Tooltip>
+                </span>
+              </>
+            ) : null}
+          </span>
+        </div>
+      );
+    };
+    return data.map((item) => {
+      if (item.children && item.children.length) {
+        return (
+          <TreeNode key={item.key} title={<>{menu(item)}</>} icon={item?.icon}>
+            {getNodeTree(item.children)}
+          </TreeNode>
+        );
+      }
+      return (
+        <TreeNode key={item.key} title={<>{menu(item)}</>} icon={item?.icon} />
+      );
+    });
+  };
+
+  const onExpand = (newExpandedKeys) => {
+    setExpandedKeys(newExpandedKeys);
+    setAutoParentExpand(false);
   };
 
   return (
-    <Tree
-      defaultExpandAll
-      treeData={gData}
-      showIcon
-      draggable
-      blockNode
-      onDrop={onDrop}
-      onSelect={onSelect}
-      titleRender={(v) => {
-        return (
-          <span>
-            {v.title}
-            <Button
-              type="link"
-              className="tree-btn__delete"
-              size="small"
-              onClick={() => nodeDelete(v)}
-            >
-              <CloseOutlined />
-            </Button>
-          </span>
-        );
-      }}
-    />
+    <>
+      {isLoading === true ? null : (
+        <div className="menu-tree-wrapper">
+          <div className="menu-tree-wrapper-top">
+            <div>
+              <Search
+                placeholder="请输入菜单名字"
+                onChange={handleTreeChange}
+                style={{ width: 300, marginBottom: '10px' }}
+              />
+            </div>
+          </div>
+
+          <div
+            className="menu-tree-wrapper-content"
+            style={{ display: 'flex', marginRight: '20px' }}
+          >
+            <Scrollbars>
+              <Tree
+                showIcon
+                blockNode
+                // multiple
+                defaultExpandAll
+                // defaultExpandedKeys={}
+                onExpand={onExpand}
+                expandedKeys={expandedKeys}
+                autoExpandParent={autoParentExpand}
+                onSelect={onSelect}
+                // treeData={treeDataShow}
+                style={{ width: '250px' }}
+              >
+                {getNodeTree(treeData)}
+              </Tree>
+            </Scrollbars>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
+
+export default memo(menuTree);

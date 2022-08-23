@@ -159,7 +159,7 @@ const homePage = (props) => {
 
   useEffect(() => {
     if (!selectId && component[0]) {
-      message.warning('未选中操作区域');
+      message.warning('未选中操作区域哦');
       return;
     }
     const domArr = dom.map((e) => {

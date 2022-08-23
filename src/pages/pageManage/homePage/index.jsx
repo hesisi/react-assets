@@ -37,6 +37,12 @@ const homePage = (props) => {
   const pageBuildRef = useRef(null);
   const contentSettingRef = useRef(null);
 
+  // 获取传过来的值 contentsetting
+  const [echartsProps, setEchartsProps] = useState({});
+  const getDataFromContentSetting = (data) => {
+    console.log('从组件获得到的数据', data);
+  };
+
   useEffect(() => {
     // 设置固定模板
     if (contentSettingRef.current) {
@@ -358,6 +364,8 @@ const homePage = (props) => {
                       selectId={selectId}
                       setProperty={setProperty}
                       property={property}
+                      getDataFrom={getDataFromContentSetting}
+                      componentData={component}
                       ref={contentSettingRef}
                     />
                   </Col>

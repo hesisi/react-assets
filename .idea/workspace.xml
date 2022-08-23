@@ -3,16 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="b54a368b-5d36-479f-8f0f-824259ed7f78" name="变更" comment="feat: flow list">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/Approver.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/Approver.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/FieldTable.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/FieldTable.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/PropertiesView.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/Ruler.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/Ruler.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/components/properties-panel/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/properties-panel/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityConfig/index.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/Dialog.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityList/Dialog.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/activityList/activityList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pages/activityManage/xml/Xml1.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/pages/activityManage/xml/Xml1.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +21,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="dev/jlf" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -211,6 +201,7 @@
     <MESSAGE value="feat: 自定义模板名义" />
     <MESSAGE value="fix: formily" />
     <MESSAGE value="feat: flow list" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: flow list" />
+    <MESSAGE value="feat: flow config" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: flow config" />
   </component>
 </project>

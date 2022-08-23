@@ -30,7 +30,6 @@ export default function (props) {
 
   const getDesigner = (designer) => {
     setDesigner(designer);
-
     getSchemaData(designer);
   };
 
@@ -75,21 +74,20 @@ export default function (props) {
     const schemaJson = transformToSchema(designer.getCurrentTree());
     if (desingerType === 'form') {
       // 保存table schema并将设计器初始化成 form schema
-      setFormilyTableSchema(schemaJson);
+      // setFormilyTableSchema(schemaJson);
       designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
-    }
-    //  else {
-    //   // 保存form schema并将设计器初始化成 table schema
-    //   setFormilyFormSchema(schemaJson);
+    } else {
+      // 保存form schema并将设计器初始化成 table schema
+      setFormilyFormSchema(schemaJson);
 
-    //   if (!formilyTableSchema) {
-    //     const initTableSchema = transformFormToTable(schemaJson);
-    //     setFormilyTableSchema(initTableSchema);
-    //     designer.setCurrentTree(transformToTreeNode(initTableSchema));
-    //   } else {
-    //     designer.setCurrentTree(transformToTreeNode(formilyTableSchema));
-    //   }
-    // }
+      // if (!formilyTableSchema) {
+      //   const initTableSchema = transformFormToTable(schemaJson);
+      //   setFormilyTableSchema(initTableSchema);
+      //   designer.setCurrentTree(transformToTreeNode(initTableSchema));
+      // } else {
+      //   designer.setCurrentTree(transformToTreeNode(formilyTableSchema));
+      // }
+    }
   };
 
   // transformFormToTable: 如果table schema为空则，讲form的字段转成table的列

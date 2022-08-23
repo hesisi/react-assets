@@ -67,7 +67,7 @@ export default function Approver(props: any) {
             <Option value="approver2">审批人二</Option>
           </Select>
         </Form.Item>
-        <Button type={'primary'} icon={<PlusCircleOutlined />}>
+        <Button style={{ marginLeft: 10 }} icon={<PlusCircleOutlined />}>
           创建
         </Button>
       </Form.Item>
@@ -90,13 +90,18 @@ export default function Approver(props: any) {
             <Option value="form2">表单二</Option>
           </Select>
         </Form.Item>
-        <Button type={'primary'} icon={<PlusCircleOutlined />}>
+        <Button style={{ marginLeft: 10 }} icon={<PlusCircleOutlined />}>
           创建
         </Button>
       </Form.Item>
       <div>
         <label>字段权限</label>
-        <Table pagination={false} dataSource={dataSource} columns={columns} />
+        <Table
+          pagination={false}
+          dataSource={dataSource}
+          columns={columns}
+          style={{ marginTop: 10 }}
+        />
       </div>
     </>
   );

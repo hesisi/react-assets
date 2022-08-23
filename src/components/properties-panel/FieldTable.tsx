@@ -66,7 +66,12 @@ export default function FieldTable(props: any) {
 
   return (
     <>
-      <Table pagination={false} dataSource={dataSource} columns={columns} />
+      <Table
+        pagination={false}
+        dataSource={dataSource}
+        columns={columns}
+        style={{ marginTop: 10 }}
+      />
     </>
   );
 }

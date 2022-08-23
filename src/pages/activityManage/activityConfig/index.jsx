@@ -13,7 +13,7 @@ import Modeler from 'bpmn-js/lib/Modeler';
 
 import { xmlStr } from '../xml/Xml1';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import './index.less';
 import 'bpmn-js/dist/assets/diagram-js.css';
 import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
@@ -26,7 +26,12 @@ import 'bpmn-js-properties-panel/dist/assets/element-templates.css';
 import PropertiesPanel from '../../../components/properties-panel';
 import customModdleExtension from '../../../components/properties-panel/custom.json';
 
-import { Link } from 'umi';
+/**汉化*/
+import customTranslate from './translate/customTranslate';
+const customTranslateModule = {
+  translate: ['value', customTranslate],
+};
+import { Link, history, useLocation } from 'umi';
 import {
   LeftOutlined,
   MinusOutlined,
@@ -36,38 +41,49 @@ import {
   CheckSquareOutlined,
   CloseOutlined,
 } from '@ant-design/icons';
+import { nanoid } from 'nanoid';
+import moment from 'moment';
 
 export default function IndexPage() {
-  const [flow, setFlow] = useState(null);
+  const location = useLocation();
   const refContainer = useRef();
   const refPanel = useRef();
-  let modeler;
-  /**
-   * Save diagram contents and print them to the console.
-   */
-  async function exportDiagram() {
-    try {
-      var result = await modeler.saveXML({ format: true });
-      alert('Diagram exported. Check the developer tools!');
-      console.log('DIAGRAM', result.xml);
-    } catch (err) {
-      console.error('could not save BPMN 2.0 diagram', err);
+  const [modeler, setModeler] = useState(null);
+  const [group, setGroup] = useState([]);
+  const [flowMsg, setFlowMsg] = useState(null);
+
+  let flow = useMemo(() => {
+    return null;
+  }, []);
+  const getFlow = (group) => {
+    let _flow = {};
+    if (group) {
+      _flow = group.find((x) => x.id === location.query.flowID);
+    } else {
+      _flow = null;
     }
-  }
+    // console.log(_flow)
+    flow = _flow;
+    setFlowMsg(_flow);
+  };
   useEffect(() => {
-    const _flow = window.localStorage.getItem('flow');
-    setFlow(_flow ? JSON.parse(_flow) : null);
-    modeler = new Modeler({
+    const _flowGroup = window.localStorage.getItem('flowGroup');
+    const group = _flowGroup ? JSON.parse(_flowGroup) : [];
+    setGroup(group);
+    getFlow(group);
+    // setFlow(_flow ? JSON.parse(_flow) : null);
+    const modeler = new Modeler({
       container: '#canvas',
       width: '100%', // 查看器宽度
       height: '100%', // 查看器高度
       propertiesPanel: {
         parent: '#panel',
       },
-      // additionalModules: [
-      //   BpmnPropertiesPanelModule,
-      //   BpmnPropertiesProviderModule,
-      // ],
+      additionalModules: [
+        // BpmnPropertiesPanelModule,
+        // BpmnPropertiesProviderModule,
+        customTranslateModule,
+      ],
       moddleExtensions: {
         custom: customModdleExtension,
       },
@@ -75,13 +91,45 @@ export default function IndexPage() {
         bindTo: document.body,
       },
     });
+    console.log(flow);
     const propertiesPanel = new PropertiesPanel({
       container: refPanel.current,
       modeler,
+      flowMsg: flow,
     });
-    modeler.importXML(xmlStr);
-  }, []);
+    // console.log(flow?.xml)
+    modeler.importXML(flow?.xml || xmlStr);
+    setModeler(modeler);
+  }, [flow]);
 
+  /**
+   * Save diagram contents and print them to the console.
+   */
+  async function exportDiagram() {
+    try {
+      var result = await modeler.saveXML({ format: true });
+      console.log('DIAGRAM', result.xml);
+      const _flow = { ...flow };
+      _flow.xml = result.xml;
+      _flow.creatTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      _flow.status = 'status';
+      _flow.creatTime = _flow.creatTime
+        ? moment().format('YYYY-MM-DD HH:mm:ss')
+        : '';
+      // window.localStorage.setItem('flow',JSON.stringify(_flow));
+
+      const tempGroup = group.map((x) => {
+        if (x.id === _flow.id) {
+          x = { ..._flow };
+        }
+        return x;
+      });
+      window.localStorage.setItem('flowGroup', JSON.stringify(tempGroup));
+      history.push('/activityManage');
+    } catch (err) {
+      console.error('could not save BPMN 2.0 diagram', err);
+    }
+  }
   return (
     <Layout
       style={{ padding: '10px', backgroundColor: '#f2f2f2', height: '100%' }}
@@ -94,12 +142,13 @@ export default function IndexPage() {
               返回
             </Link>
           </Col>
-          <Col span={8}>{flow?.name}</Col>
+          <Col span={8}>{flowMsg?.name}</Col>
           <Col span={8} style={{ textAlign: 'right' }}>
             <Button
               icon={<SaveOutlined />}
               type="primary"
               style={{ marginRight: '10px' }}
+              onClick={exportDiagram}
             >
               保存
             </Button>
@@ -152,12 +201,6 @@ export default function IndexPage() {
           <div className={'main-container'}>
             <div ref={refContainer} id="canvas" className="container" />
             <div ref={refPanel} id="panel" className={'panel'}></div>
-            <div
-              className={'action-cont'}
-              style={{ position: 'absolute', bottom: '20px', left: '20px' }}
-            >
-              <a onClick={exportDiagram}>下载</a>
-            </div>
           </div>
         </Content>
       </Layout>

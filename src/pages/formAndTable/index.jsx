@@ -77,18 +77,19 @@ export default function (props) {
       // 保存table schema并将设计器初始化成 form schema
       setFormilyTableSchema(schemaJson);
       designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
-    } else {
-      // 保存form schema并将设计器初始化成 table schema
-      setFormilyFormSchema(schemaJson);
-
-      if (!formilyTableSchema) {
-        const initTableSchema = transformFormToTable(schemaJson);
-        setFormilyTableSchema(initTableSchema);
-        designer.setCurrentTree(transformToTreeNode(initTableSchema));
-      } else {
-        designer.setCurrentTree(transformToTreeNode(formilyTableSchema));
-      }
     }
+    //  else {
+    //   // 保存form schema并将设计器初始化成 table schema
+    //   setFormilyFormSchema(schemaJson);
+
+    //   if (!formilyTableSchema) {
+    //     const initTableSchema = transformFormToTable(schemaJson);
+    //     setFormilyTableSchema(initTableSchema);
+    //     designer.setCurrentTree(transformToTreeNode(initTableSchema));
+    //   } else {
+    //     designer.setCurrentTree(transformToTreeNode(formilyTableSchema));
+    //   }
+    // }
   };
 
   // transformFormToTable: 如果table schema为空则，讲form的字段转成table的列
@@ -139,6 +140,7 @@ export default function (props) {
   // 保存，暂时保存至localStorage中
   const onSave = () => {
     const schemaJsonStr = transformToSchema(designer.getCurrentTree());
+    console.log('---desingerType', desingerType, schemaJsonStr);
 
     // 修改
     let formList =
@@ -179,6 +181,7 @@ export default function (props) {
         buttonStyle="solid"
         onChange={(e) => {
           setDesingerType(e?.target?.value || 'form');
+          onSave();
         }}
         style={{ padding: '20px' }}
       >

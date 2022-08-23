@@ -80,15 +80,16 @@ export default [
         path: '/menuManage',
         redirect: '/menuManage/menuList',
       },
-      {
-        name: '系统管理',
-        path: '/menuManage/systemManage',
-        component: '@/pages/menuManage/systemManage',
-      },
+      // {
+      //   name: '系统管理',
+      //   path: '/menuManage/systemManage',
+      //   component: '@/pages/menuManage/systemManage',
+      // },
       {
         name: '菜单管理',
         path: '/menuManage/menuList',
         component: '@/pages/menuManage/menuList',
+        meta: { showMenu: false, showHeader: true },
       },
     ],
   },

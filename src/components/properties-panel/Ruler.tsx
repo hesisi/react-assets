@@ -35,6 +35,12 @@ export default function Ruler() {
     });
     setRuleList(temp);
   };
+  const removeLine = (index: any) => {
+    const temp = [...ruleList];
+    temp.splice(index, 1);
+    setRuleList(temp);
+  };
+
   return (
     <>
       {ruleList.map((x, index) => (
@@ -78,6 +84,7 @@ export default function Ruler() {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
+              onClick={() => removeLine(index)}
             >
               <DeleteOutlined />
             </a>

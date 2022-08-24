@@ -198,6 +198,12 @@ export default [
     meta: { navHidden: true },
   },
   {
+    name: '登录页',
+    path: '/login',
+    component: '@/pages/login/login',
+    meta: { navHidden: true },
+  },
+  {
     name: '动态报表',
     // path: 'http://www.baidu.com',
     // component: '@/layouts/formManageLayout',

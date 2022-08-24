@@ -16,6 +16,7 @@ import {
   Tree,
   Checkbox,
   Modal,
+  Radio,
 } from 'antd';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
@@ -49,6 +50,8 @@ const tableSetting = (props) => {
   const formRef = useRef(null);
   const [index, setIndex] = useState(-1);
   const [icon, setIcon] = useState('');
+  const [iconPosition, setIconPosition] = useState('front');
+  const [iconList, setIconList] = useState(config.iconList);
 
   // 从内存获取表格
   useEffect(async () => {
@@ -198,6 +201,7 @@ const tableSetting = (props) => {
     setTabsActiveKey('button');
     btnForm.setFieldsValue({ ...e });
     setSelectBtnId(e.id);
+    setIcon(btnForm.getFieldValue('icon'));
   };
 
   // tabs点击时
@@ -215,25 +219,51 @@ const tableSetting = (props) => {
         return e;
       });
       setButtons(btns);
+      setIconPosition(ele.position);
+      btnFormReset();
     }
+  };
+
+  // icon检索
+  const onSearch = (str) => {
+    if (!str) {
+      setIconList(config.iconList);
+      return;
+    }
+    const list = iconList.filter(
+      (item) => item.toLowerCase().indexOf(str.toLowerCase()) !== -1,
+    );
+    setIconList(list);
   };
 
   // 气泡内容
   const content = (
-    <Space className="button-icon" size={10} wrap>
-      {config.iconList.map((e, i) => {
-        return (
-          <div
-            onClick={() => {
-              selectIcon(e);
-            }}
-            key={i}
-          >
-            <Icon icon={e} />
-          </div>
-        );
-      })}
-    </Space>
+    <>
+      {' '}
+      <Search
+        placeholder="input iconName"
+        onSearch={onSearch}
+        style={{
+          width: 300,
+        }}
+        allowClear
+      />
+      <Divider />
+      <Space className="button-icon" size={10} wrap>
+        {iconList.map((e, i) => {
+          return (
+            <div
+              onClick={() => {
+                selectIcon(e);
+              }}
+              key={i}
+            >
+              <Icon icon={e} />
+            </div>
+          );
+        })}
+      </Space>
+    </>
   );
 
   // 按钮图标选择
@@ -283,7 +313,6 @@ const tableSetting = (props) => {
   const formCancel = () => {
     setFormVisible(false);
     formRef.current.form.reset();
-    console.log(formRef.current.form);
   };
 
   // 确认添加
@@ -454,14 +483,25 @@ const tableSetting = (props) => {
                         }}
                       >
                         {e.icon ? (
-                          <Button
-                            icon={<Icon icon={e.icon} />}
-                            type="primary"
-                            ghost
-                            onClick={() => buttonSelect(e)}
-                          >
-                            {e.label}
-                          </Button>
+                          iconPosition === 'front' ? (
+                            <Button
+                              type="primary"
+                              ghost
+                              onClick={() => buttonSelect(e)}
+                            >
+                              <Icon icon={e.icon} />
+                              {e.label}
+                            </Button>
+                          ) : (
+                            <Button
+                              type="primary"
+                              ghost
+                              onClick={() => buttonSelect(e)}
+                            >
+                              {e.label}
+                              <Icon icon={e.icon} />
+                            </Button>
+                          )
                         ) : (
                           <Button
                             type="primary"
@@ -611,6 +651,13 @@ const tableSetting = (props) => {
               >
                 <Form.Item label="按钮文本" name="label">
                   <Input />
+                </Form.Item>
+
+                <Form.Item label="按钮位置" name="position">
+                  <Radio.Group>
+                    <Radio value="front">前</Radio>
+                    <Radio value="end">后</Radio>
+                  </Radio.Group>
                 </Form.Item>
 
                 <Form.Item label="按钮图标" name="icon">

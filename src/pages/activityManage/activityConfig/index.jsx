@@ -69,6 +69,7 @@ export default function IndexPage() {
   useEffect(() => {
     const _flowGroup = window.localStorage.getItem('flowGroup');
     const group = _flowGroup ? JSON.parse(_flowGroup) : [];
+    // console.log(group)
     setGroup(group);
     getFlow(group);
     // setFlow(_flow ? JSON.parse(_flow) : null);
@@ -91,7 +92,7 @@ export default function IndexPage() {
         bindTo: document.body,
       },
     });
-    console.log(flow);
+    // console.log(flow);
     const propertiesPanel = new PropertiesPanel({
       container: refPanel.current,
       modeler,
@@ -108,12 +109,12 @@ export default function IndexPage() {
   async function exportDiagram() {
     try {
       var result = await modeler.saveXML({ format: true });
-      console.log('DIAGRAM', result.xml);
+      // console.log('DIAGRAM', result.xml);
       const _flow = { ...flow };
       _flow.xml = result.xml;
       _flow.creatTime = moment().format('YYYY-MM-DD HH:mm:ss');
       _flow.status = 'status';
-      _flow.creatTime = _flow.creatTime
+      _flow.updateTime = _flow.creatTime
         ? moment().format('YYYY-MM-DD HH:mm:ss')
         : '';
       // window.localStorage.setItem('flow',JSON.stringify(_flow));
@@ -124,6 +125,7 @@ export default function IndexPage() {
         }
         return x;
       });
+      // console.log(tempGroup)
       window.localStorage.setItem('flowGroup', JSON.stringify(tempGroup));
       history.push('/activityManage');
     } catch (err) {

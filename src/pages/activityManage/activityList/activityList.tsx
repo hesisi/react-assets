@@ -243,8 +243,8 @@ export default function Page() {
   const addProcess = () => {
     setIsModalVisible(true);
   };
-  const handleOk = (id: any) => {
-    history.push(`/activityManage/activityConfig?activityId=${id}`);
+  const handleOk = (id?: any) => {
+    history.push(`/activityManage/activityConfig?flowID=${id}`);
   };
   // 清除表单检索
   const resetHandler = () => {

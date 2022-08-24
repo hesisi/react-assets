@@ -48,7 +48,6 @@ const getMetaInfoByPath = (routesData, path, result = []) => {
       getMetaInfoByPath(item.routes, path, result);
     }
   });
-
   return result;
 };
 
@@ -87,7 +86,6 @@ const CommonLayout = (props) => {
     const metaInfo =
       getMetaInfoByPath(routes, path, []) &&
       getMetaInfoByPath(routes, path, [])[0];
-
     return metaInfo;
   });
 

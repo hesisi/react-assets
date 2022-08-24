@@ -48,6 +48,7 @@ const tableSetting = (props) => {
   const [formTree, setFormTree] = useState(null);
   const formRef = useRef(null);
   const [index, setIndex] = useState(-1);
+  const [icon, setIcon] = useState('');
 
   // 从内存获取表格
   useEffect(async () => {
@@ -238,6 +239,7 @@ const tableSetting = (props) => {
   // 按钮图标选择
   const selectIcon = (icon) => {
     btnForm.setFieldValue('icon', icon);
+    setIcon(icon);
     setBtnPopoverVisible(false);
   };
 
@@ -332,6 +334,12 @@ const tableSetting = (props) => {
     setIndex(index);
     const form = formRef.current.form;
     form.setValues(record);
+  };
+
+  // 按钮属性表单清空
+  const btnFormReset = () => {
+    btnForm?.resetFields();
+    setIcon(btnForm.getFieldValue('icon'));
   };
   return (
     <>
@@ -527,7 +535,7 @@ const tableSetting = (props) => {
                 {table &&
                   table.map((e) => {
                     return (
-                      <Panel header={e.name} key={e.id}>
+                      <Panel header={e.label} key={e.id}>
                         <Form initialValues={config.columnInit}>
                           <Form.Item label="在列表显示" name="isShow">
                             <Select
@@ -624,11 +632,7 @@ const tableSetting = (props) => {
                         选择图标
                       </Button>
                     </Popover>
-                    {btnForm && btnForm.getFieldValue('icon') ? (
-                      <Icon icon={btnForm.getFieldValue('icon')} />
-                    ) : (
-                      <></>
-                    )}
+                    {icon ? <Icon icon={icon} /> : <></>}
                   </Space>
 
                   {/* {btnForm && btnForm.getFieldValue('icon') ? (
@@ -646,10 +650,7 @@ const tableSetting = (props) => {
                     <Button type="primary" htmlType="submit">
                       Submit
                     </Button>
-                    <Button
-                      htmlType="button"
-                      onClick={() => btnForm.current.resetFields()}
-                    >
+                    <Button htmlType="button" onClick={btnFormReset}>
                       Reset
                     </Button>
                   </Space>

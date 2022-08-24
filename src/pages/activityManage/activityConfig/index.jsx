@@ -62,7 +62,6 @@ export default function IndexPage() {
     } else {
       _flow = null;
     }
-    // console.log(_flow)
     flow = _flow;
     setFlowMsg(_flow);
   };
@@ -110,7 +109,7 @@ export default function IndexPage() {
     try {
       var result = await modeler.saveXML({ format: true });
       // console.log('DIAGRAM', result.xml);
-      const _flow = { ...flow };
+      const _flow = { ...flowMsg };
       _flow.xml = result.xml;
       _flow.creatTime = moment().format('YYYY-MM-DD HH:mm:ss');
       _flow.status = 'status';
@@ -118,14 +117,12 @@ export default function IndexPage() {
         ? moment().format('YYYY-MM-DD HH:mm:ss')
         : '';
       // window.localStorage.setItem('flow',JSON.stringify(_flow));
-
       const tempGroup = group.map((x) => {
         if (x.id === _flow.id) {
           x = { ..._flow };
         }
         return x;
       });
-      // console.log(tempGroup)
       window.localStorage.setItem('flowGroup', JSON.stringify(tempGroup));
       history.push('/activityManage');
     } catch (err) {

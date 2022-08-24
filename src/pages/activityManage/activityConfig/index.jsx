@@ -113,7 +113,7 @@ export default function IndexPage() {
       _flow.xml = result.xml;
       _flow.creatTime = moment().format('YYYY-MM-DD HH:mm:ss');
       _flow.status = 'status';
-      _flow.creatTime = _flow.creatTime
+      _flow.updateTime = _flow.creatTime
         ? moment().format('YYYY-MM-DD HH:mm:ss')
         : '';
       // window.localStorage.setItem('flow',JSON.stringify(_flow));

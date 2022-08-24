@@ -114,6 +114,7 @@ export default function Page() {
                 type="link"
                 style={{ padding: 0 }}
                 icon={<FormOutlined />}
+                onClick={() => handleEdit(record)}
               >
                 编辑
               </Button>
@@ -193,6 +194,10 @@ export default function Page() {
     onChange: onSelectChange,
   };
 
+  /**编辑*/
+  const handleEdit = (record: any) => {
+    history.push(`/activityManage/activityConfig?flowID=${record.id}`);
+  };
   // 删除
   const handleDelete = (record: any) => {
     Modal.confirm({
@@ -238,8 +243,8 @@ export default function Page() {
   const addProcess = () => {
     setIsModalVisible(true);
   };
-  const handleOk = (id: any) => {
-    history.push(`/activityManage/activityConfig?activityId=${id}`);
+  const handleOk = (id?: any) => {
+    history.push(`/activityManage/activityConfig?flowID=${id}`);
   };
   // 清除表单检索
   const resetHandler = () => {

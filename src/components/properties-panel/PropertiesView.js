@@ -13,27 +13,21 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 import ElementProperties from './ElementProperties';
 import Approver from './Approver';
 import Ruler from './Ruler';
+import { history } from 'umi';
 
 export default class PropertiesView extends Component {
   constructor(props) {
     super(props);
-
+    // console.log(props);
     this.state = {
       selectedElements: [],
       element: null,
-      flow: null,
     };
   }
 
-  init = () => {
-    const _flow = window.localStorage.getItem('flow');
-    this.setState({
-      flow: JSON.parse(_flow),
-    });
-  };
   componentDidMount() {
     const { modeler } = this.props;
-    this.init();
+
     modeler.on('selection.changed', (e) => {
       const { element } = this.state;
 
@@ -61,13 +55,13 @@ export default class PropertiesView extends Component {
     });
   }
   creatForm = () => {
-    alert('跳转到动态表单');
+    history.push('/formManage/formList');
   };
   render() {
-    const { modeler } = this.props;
+    const { modeler, flowMsg } = this.props;
 
-    const { selectedElements, element, flow } = this.state;
-    console.log(element);
+    const { selectedElements, element } = this.state;
+
     return (
       <div className={'panel-content'}>
         <div className="element-properties">
@@ -78,7 +72,7 @@ export default class PropertiesView extends Component {
                 {selectedElements.length > 0 ? null : (
                   <fieldset>
                     <label>流程名称</label>
-                    <span>{flow?.name}</span>
+                    <span>{flowMsg?.name}</span>
                   </fieldset>
                 )}
 
@@ -110,30 +104,35 @@ export default class PropertiesView extends Component {
                   <Approver></Approver>
                 </Panel>
               )}
-              <Panel header="规则" key="4">
-                <Ruler></Ruler>
-              </Panel>
-              <Panel header="表单" key="5">
-                <Form.Item label="目标表单">
-                  <Form.Item name="targetForm" noStyle>
-                    <Select style={{ width: 120 }}>
-                      <Option value="form1">表单一</Option>
-                      <Option value="form2">表单二</Option>
-                    </Select>
+              {element?.type === 'bpmn:ExclusiveGateway' && (
+                <Panel header="规则" key="4">
+                  <Ruler></Ruler>
+                </Panel>
+              )}
+              {(element?.type === 'bpmn:StartEvent' ||
+                element?.type === 'bpmn:UserTask') && (
+                <Panel header="表单" key="5">
+                  <Form.Item label="目标表单">
+                    <Form.Item name="targetForm" noStyle>
+                      <Select style={{ width: 120 }}>
+                        <Option value="form1">表单一</Option>
+                        <Option value="form2">表单二</Option>
+                      </Select>
+                    </Form.Item>
+                    <Button
+                      icon={<PlusCircleOutlined />}
+                      onClick={this.creatForm}
+                      style={{ marginLeft: 10 }}
+                    >
+                      创建
+                    </Button>
                   </Form.Item>
-                  <Button
-                    type={'primary'}
-                    icon={<PlusCircleOutlined />}
-                    onClick={this.creatForm}
-                  >
-                    创建
-                  </Button>
-                </Form.Item>
-                <div>
-                  <label>字段权限</label>
-                  <FieldTable></FieldTable>
-                </div>
-              </Panel>
+                  <div>
+                    <label>字段权限</label>
+                    <FieldTable></FieldTable>
+                  </div>
+                </Panel>
+              )}
             </Collapse>
           </Form>
         </div>

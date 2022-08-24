@@ -9,7 +9,7 @@
 import React, { useMemo, useImperativeHandle, forwardRef } from 'react';
 import { createForm } from '@formily/core';
 import { createSchemaField } from '@formily/react';
-import { Button } from 'antd'
+import { Button } from 'antd';
 import {
   Form,
   FormItem,
@@ -97,6 +97,8 @@ export const PreviewWidget: React.FC<IPreviewWidgetProps> = forwardRef(
   (props, ref) => {
     const form = useMemo(() => createForm(), []);
     const { form: formProps, schema } = transformToSchema(props.tree); // treeNode模式 json -> treeNode -> schema
+
+    console.log('IPreviewWidgetProps', form);
 
     useImperativeHandle(ref, () => {
       return {

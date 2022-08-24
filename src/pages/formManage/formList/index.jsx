@@ -271,9 +271,10 @@ export default function FormList() {
   };
 
   const handleOk = () => {
+    let item = null;
     const currentTime = moment().format(timeFormat);
     if (operateType === 'add') {
-      const item = {
+      item = {
         formName: formInfo.formName,
         formDesc: formInfo.formDesc,
         formCode: getUUID(),
@@ -287,7 +288,7 @@ export default function FormList() {
       setDataSource(data);
       saveFormList(data);
     } else {
-      const item = {
+      item = {
         formStatus: 'enable',
         ...formInfo,
         updateTime: currentTime,
@@ -306,6 +307,9 @@ export default function FormList() {
 
     setVisible(false);
     setFormInfo(initFormInfo); // 清空
+
+    history.push(`/formManage/formAndTable?formCode=${item.formCode}`);
+    console.log(item);
   };
 
   // 取消表单

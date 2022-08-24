@@ -38,6 +38,7 @@ export const buttonInit = {
   icon: null,
   method: '',
   iconName: '',
+  position: 'front',
 };
 
 export const selectList = {

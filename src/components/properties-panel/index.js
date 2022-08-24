@@ -5,8 +5,11 @@ import PropertiesView from './PropertiesView';
 
 export default class PropertiesPanel {
   constructor(options) {
-    const { modeler, container } = options;
+    const { modeler, container, flowMsg } = options;
 
-    ReactDOM.render(<PropertiesView modeler={modeler} />, container);
+    ReactDOM.render(
+      <PropertiesView modeler={modeler} flowMsg={flowMsg} />,
+      container,
+    );
   }
 }

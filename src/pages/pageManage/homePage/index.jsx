@@ -37,6 +37,16 @@ const homePage = (props) => {
   const pageBuildRef = useRef(null);
   const contentSettingRef = useRef(null);
 
+  // 获取传过来的值 contentsetting
+  const [echartsProps, setEchartsProps] = useState({});
+  const getDataFromContentSetting = (data) => {
+    console.log('从组件获得到的数据', data);
+    setEchartsProps(data);
+  };
+  useEffect(() => {
+    console.log('kankan', echartsProps);
+    renderComponent(['standard-charts'], selectId);
+  }, [echartsProps]);
   useEffect(() => {
     // 设置固定模板
     if (contentSettingRef.current) {
@@ -138,7 +148,11 @@ const homePage = (props) => {
         return <TodoList className="dom-component dom-component__todo" />;
       case 'standard-charts':
         return (
-          <LineChart id={selectId ? selectId : id} className="dom-component" />
+          <LineChart
+            id={selectId ? selectId : id}
+            echartsProps={echartsProps}
+            className="dom-component"
+          />
         );
       case 'standard-board':
         return (
@@ -358,6 +372,8 @@ const homePage = (props) => {
                       selectId={selectId}
                       setProperty={setProperty}
                       property={property}
+                      getDataFrom={getDataFromContentSetting}
+                      componentData={component}
                       ref={contentSettingRef}
                     />
                   </Col>

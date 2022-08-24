@@ -1,6 +1,15 @@
 import { useEffect, useRef, forwardRef, useState } from 'react';
 import { SwapOutlined } from '@ant-design/icons';
-import { Tabs, InputNumber, Input, Form, Collapse, Switch, Button } from 'antd';
+import {
+  Tabs,
+  InputNumber,
+  Input,
+  Form,
+  Collapse,
+  Switch,
+  Button,
+  Modal,
+} from 'antd';
 const { Panel } = Collapse;
 const { TabPane } = Tabs;
 import './contentSetting.less';
@@ -65,6 +74,10 @@ const contentSetting = forwardRef((props, ref) => {
   const [dealMethodActive, setDealMethodActive] = useState('first');
 
   const [getMethodActive, setGetMethodActive] = useState('first');
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [xAxisProps, setXAxisProp] = useState({
+    xFontSize: 0,
+  });
   // 此处是eCHARTS图表配置的方法
   const changeSwitch = (e, type) => {
     switch (type) {
@@ -141,6 +154,10 @@ const contentSetting = forwardRef((props, ref) => {
       ? setGetMethodActive('first')
       : setGetMethodActive('second');
   };
+  const changeFontSize = (e) => {
+    setXAxisProp({ xFontSize: e });
+    props.getDataFrom({ value: xAxisProps });
+  };
   // useEffect(() => {
   //   form.resetFields();
   //   const ele = document.getElementById(`${props.selectId}`);
@@ -152,9 +169,24 @@ const contentSetting = forwardRef((props, ref) => {
   //     form.setFieldValue('height', ele.style.height.slice(0, -2));
   //   }
   // }, [props.selectId]);
+  const handleCancel = (data) => {
+    setIsModalVisible(data);
+  };
 
   return (
     <div className="sider">
+      <Modal
+        title="自定义方法转换数据"
+        centered
+        footer={null}
+        visible={isModalVisible}
+        onCancel={() => handleCancel(false)}
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+
+        <p>Some contents...</p>
+      </Modal>
       <Tabs defaultActiveKey="region">
         <TabPane tab="组件" key="components">
           {props.componentData[0] === 'standard-charts' && props.selectId ? (
@@ -264,7 +296,10 @@ const contentSetting = forwardRef((props, ref) => {
                       </div>
                       <div className="formInput">
                         <span className="spanName">字体大小</span>
-                        <InputNumber addonAfter="px" />
+                        <InputNumber
+                          addonAfter="px"
+                          onChange={(e) => changeFontSize(e)}
+                        />
                       </div>
                     </div>
                   ) : null}
@@ -738,7 +773,11 @@ const contentSetting = forwardRef((props, ref) => {
                     <div>
                       <div className="formInput">
                         <span className="spanName">处理方法</span>
-                        <Button type="primary" icon={<SwapOutlined />}>
+                        <Button
+                          type="primary"
+                          onClick={() => handleCancel(true)}
+                          icon={<SwapOutlined />}
+                        >
                           编辑转换方法
                         </Button>
                       </div>

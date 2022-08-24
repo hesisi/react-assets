@@ -35,10 +35,12 @@ export default [
     name: '用户管理',
     path: '/userManage',
     component: '@/layouts/userManageLoyout/index',
+    meta: { showMenu: false, showHeader: true },
     routes: [
       {
         path: '/userManage',
         redirect: '/userManage/authManage',
+        meta: { showMenu: false, showHeader: true },
       },
       {
         name: '权限管理',
@@ -53,7 +55,7 @@ export default [
           {
             name: '账号管理',
             path: '/userManage/authManage/account',
-            component: '@/pages/userManage/authManage/account',
+            component: '@/pages/userManage/authManage/account/index.tsx',
             exact: true,
           },
           {
@@ -68,6 +70,7 @@ export default [
         icon: React.createElement(NotificationOutlined),
         path: '/userManage/orginationManage',
         component: '@/pages/userManage/orginationManage/index',
+        meta: { showMenu: false, showHeader: true },
       },
     ],
   },

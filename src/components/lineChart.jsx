@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as echarts from 'echarts';
 
 const LineChart = (props) => {
@@ -34,8 +34,9 @@ const LineChart = (props) => {
   };
 
   useEffect(() => {
+    console.log('传过来的数据', props);
     initChart();
-  }, []);
+  }, [props]);
 
   return (
     <div

@@ -32,6 +32,24 @@ export default [
     ],
   },
   {
+    name: '消息中心',
+    path: '/notificationCenter',
+    component: '@/layouts/homeIndex/index',
+    meta: { showMenu: false, showHeader: true },
+    routes: [
+      {
+        path: '/notificationCenter',
+        redirect: '/notificationCenter/notificationList',
+      },
+      {
+        name: '消息列表',
+        path: '/notificationCenter/notificationList',
+        component: '@/pages/notificationCenter/index',
+        meta: { showMenu: false, showHeader: true },
+      },
+    ],
+  },
+  {
     name: '用户管理',
     path: '/userManage',
     component: '@/layouts/userManageLoyout/index',
@@ -200,7 +218,20 @@ export default [
   },
   {
     name: '动态报表',
-    // path: 'http://www.baidu.com',
-    // component: '@/layouts/formManageLayout',
+    path: '/dyformManage',
+    component: '@/layouts/homeIndex/index',
+    meta: { showMenu: false, showHeader: true },
+    routes: [
+      {
+        path: '/dyformManage',
+        redirect: '/dyformManage/formCreate',
+      },
+      {
+        name: '首页',
+        path: '/dyformManage/formCreate',
+        component: '@/pages/dyFormCreate/index',
+        meta: { showMenu: false, showHeader: true },
+      },
+    ],
   },
 ];

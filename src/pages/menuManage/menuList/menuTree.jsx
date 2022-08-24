@@ -124,7 +124,6 @@ function menuTree(props) {
 
   const onSelect = async (selectedKeys, info) => {
     const { selectedNodes } = info;
-    console.log(selectedNodes, '115------');
     if (!selectedNodes.length) {
       props.setForm({
         formValue: {},
@@ -134,7 +133,6 @@ function menuTree(props) {
     const selectNodeInfo = defaultTrreData.current.filter(
       (item) => item.key === selectedNodes[0].key,
     );
-    console.log(selectNodeInfo, '125----');
     //这里写点击tree节点的事件逻辑 选中展示节点配置信息
     props.setForm({
       formValue: {
@@ -202,10 +200,19 @@ function menuTree(props) {
         (item) => item.key !== node.key,
       );
     }
+
     curerntTree = newTreeDataOper;
     setTreeData(newTreeDataOper);
     props.setTree(newTreeDataOper);
     setOperType(operateIdenty);
+    if (operateIdenty === 'add') {
+      const oldExpandKeys = cloneDeep(expandedKeys);
+      if (oldExpandKeys.includes(node.key)) {
+        return;
+      }
+      oldExpandKeys.push(node.key);
+      setExpandedKeys(oldExpandKeys);
+    }
   };
 
   const getParentKey = (key, tree) => {

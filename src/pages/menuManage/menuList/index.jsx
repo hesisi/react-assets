@@ -53,7 +53,10 @@ export default function IndexPage() {
       // 回调处理menu所需参数label
       data.forEach((item) => {
         item.label = item.title;
-        item['icon'] = React.createElement(list[item.iconIndex]);
+        item['icon'] =
+          item.iconIndex >= 0
+            ? React.createElement(list[item.iconIndex])
+            : null;
         delete item.iconIndex;
         delete item.isEdit;
         delete item.formValue;

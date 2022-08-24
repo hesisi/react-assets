@@ -13,11 +13,12 @@ import { PlusCircleOutlined } from '@ant-design/icons';
 import ElementProperties from './ElementProperties';
 import Approver from './Approver';
 import Ruler from './Ruler';
+import { history } from 'umi';
 
 export default class PropertiesView extends Component {
   constructor(props) {
     super(props);
-    console.log(props);
+    // console.log(props);
     this.state = {
       selectedElements: [],
       element: null,
@@ -54,7 +55,7 @@ export default class PropertiesView extends Component {
     });
   }
   creatForm = () => {
-    alert('跳转到动态表单');
+    history.push('/formManage/formList');
   };
   render() {
     const { modeler, flowMsg } = this.props;

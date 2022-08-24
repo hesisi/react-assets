@@ -1,128 +1,163 @@
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, Select, message } from 'antd';
 import './index.less';
 import IconBox from './iconBox';
 import { UploadOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import React, { useState, createRef, useEffect } from 'react';
 import { Space } from '@formily/antd';
+import { list } from './iconBox';
 
 export default function configPanel(props) {
+  const [visible, setVisible] = useState(false);
+
   const [iconSelect, setIconSelect] = useState(null);
   const [iconIndex, setIconIndex] = useState(-1);
   const [isEdit, setIsEdit] = useState(false);
   const [isShowEdit, setIsShowEdit] = useState(false);
   const [form] = Form.useForm();
+  const [selectList, setSelectList] = useState([
+    { value: 'a', label: '角色A' },
+    { value: 'b', label: '角色B' },
+    { value: 'c', label: '角色C' },
+  ]);
 
   useEffect(() => {
-    // debugger;
-    // if (!props.formData || !props.formData.formValue) return;
     const value = props?.formData?.formValue || {};
-    form.setFieldsValue({
-      menuname: value?.menuname || '',
-      address: value?.address || '',
-      icon: value?.icon || null,
-    });
-    if (value) {
-      setIconSelect(value.icon);
-      setIconIndex(value.iconIndex);
+    if (value && value.key && !value.isTop) {
+      setVisible(true);
+      form.setFieldsValue({
+        menuname: value?.menuname || '',
+        address: value?.address || '',
+        authority: value?.authority || '',
+        icon: value?.icon || null,
+      });
+
+      if (value) {
+        // setIconSelect(value.icon);
+        setIconIndex(value.iconIndex);
+      }
+      const isEdit = props.formData?.isEdit || false;
+      setIsEdit(isEdit); // 是否是编辑
+      setIsShowEdit(isEdit);
+      return;
     }
-    const isEdit = props.formData?.isEdit || false;
-    setIsEdit(isEdit); // 是否是编辑
-    // if (isEdit) {
-    setIsShowEdit(isEdit);
-    // }
+    setVisible(false);
   }, [props.formData]);
 
   const onFinish = (values) => {
     // 表单提交
-    if (props.formData?.isEdit) {
-      // 编辑的时候会有其他属性一并返回
-      props.configSubmit(
-        { ...props.formData.formValue, ...values, isEdit },
-        iconSelect,
-        iconIndex,
-      );
-    } else {
-      props.configSubmit({ ...values, isEdit }, iconSelect, iconIndex);
-    }
-    form.resetFields();
-    setIconSelect(null);
-    setIconIndex(-1);
+    props.configSubmit(
+      { ...props.formData.formValue, ...values, isEdit },
+      iconSelect,
+      iconIndex,
+    );
+    // form.resetFields();
+    // setIconSelect(null);
+    // setIconIndex(-1);
+    message.success('菜单配置成功!');
     setIsEdit(false);
     setIsShowEdit(false);
   };
 
   return (
-    <Form
-      name="basic"
-      labelCol={{ span: 4 }}
-      className="config-panel__form"
-      onFinish={(v) => onFinish(v)}
-      initialValues={{
-        menuname: '',
-        address: '',
-        icon: null,
-      }}
-      form={form}
-    >
-      <Form.Item
-        label="菜单名称"
-        name="menuname"
-        rules={[{ required: true, message: 'Please input menuname!' }]}
-      >
-        <Input />
-      </Form.Item>
+    <div className="menu-config-wrapper">
+      {visible ? (
+        <Form
+          name="basic"
+          labelCol={{ span: 4 }}
+          className="config-panel__form"
+          onFinish={(v) => onFinish(v)}
+          initialValues={{
+            menuname: '',
+            address: '',
+            authority: '',
+            icon: null,
+          }}
+          form={form}
+        >
+          <Form.Item
+            label="菜单名称"
+            name="menuname"
+            rules={[
+              { required: true, message: 'Please input menuname!' },
+              {
+                pattern: /^([\u4e00-\u9fa5]{1,6}|[^\u4e00-\u9fa5]{1,8})$/,
+                message: '字数不超过6个汉字或8个字符',
+              },
+            ]}
+            tooltip="字数不超过6个汉字或8个字符"
+          >
+            <Input />
+          </Form.Item>
 
-      <Form.Item
-        label="地址"
-        name="address"
-        rules={[{ required: true, message: 'Please input address!' }]}
-      >
-        <Input />
-      </Form.Item>
+          <Form.Item
+            label="地址"
+            name="address"
+            rules={[{ required: true, message: 'Please input address!' }]}
+          >
+            <Input />
+          </Form.Item>
 
-      <Form.Item label="图标" name="icon">
-        <>
-          <p>
-            <span className="icons-span">
-              {iconSelect ? <>已选择：{iconSelect}</> : '从图标库选择'}
-            </span>
-            <Button type="link">
-              {/* {`<UploadOutlined />`} */}
-              <UploadOutlined />
-              上传
-            </Button>
-          </p>
-          <IconBox
-            setIconSelect={setIconSelect}
-            setIconIndex={setIconIndex}
-            iconIndex={iconIndex}
-            iconSelect={iconSelect}
-          />
-        </>
-      </Form.Item>
+          <Form.Item
+            label="权限标识"
+            name="authority"
+            rules={[{ required: true, message: 'Please Select authority!' }]}
+          >
+            <Select
+              style={{
+                width: 180,
+              }}
+              allowClear
+              placeholder="请选择"
+            >
+              {selectList.map((e) => {
+                return (
+                  <Select.Option value={e.value} key={e.value}>
+                    {e.label}
+                  </Select.Option>
+                );
+              })}
+            </Select>
+          </Form.Item>
 
-      <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-        <Space>
-          {/* <Button type="primary" htmlType="submit">
-            <PlusOutlined />
-            添加菜单结点
-          </Button> */}
-
-          {isShowEdit ? (
+          <Form.Item label="图标" name="icon">
             <>
-              <Button type="primary" htmlType="submit">
-                <EditOutlined />
-                修改菜单结点
-              </Button>
+              <p>
+                <span className="icons-span">
+                  {iconIndex >= 0 ? (
+                    <>已选择：{React.createElement(list[iconIndex])}</>
+                  ) : (
+                    '从图标库选择'
+                  )}
+                </span>
+                <Button type="link">
+                  <UploadOutlined />
+                  上传
+                </Button>
+              </p>
+              <IconBox
+                // setIconSelect={setIconSelect}
+                setIconIndex={setIconIndex}
+                iconIndex={iconIndex}
+                iconSelect={iconSelect}
+              />
             </>
-          ) : (
-            <Button type="primary" htmlType="submit">
-              <PlusOutlined />
-              添加菜单结点
-            </Button>
-          )}
-        </Space>
-      </Form.Item>
-    </Form>
+          </Form.Item>
+
+          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                确定
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      ) : (
+        <div>
+          {props?.formData?.formValue?.isTop
+            ? '该节点暂无配置信息'
+            : '请点击查看配置信息'}
+        </div>
+      )}
+    </div>
   );
 }

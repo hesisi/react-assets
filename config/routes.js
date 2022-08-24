@@ -83,15 +83,16 @@ export default [
         path: '/menuManage',
         redirect: '/menuManage/menuList',
       },
-      {
-        name: '系统管理',
-        path: '/menuManage/systemManage',
-        component: '@/pages/menuManage/systemManage',
-      },
+      // {
+      //   name: '系统管理',
+      //   path: '/menuManage/systemManage',
+      //   component: '@/pages/menuManage/systemManage',
+      // },
       {
         name: '菜单管理',
         path: '/menuManage/menuList',
         component: '@/pages/menuManage/menuList',
+        meta: { showMenu: false, showHeader: true },
       },
     ],
   },
@@ -198,6 +199,12 @@ export default [
     name: '首页预览',
     path: '/previewPage/homePage',
     component: '@/pages/previewPage/homePage',
+    meta: { navHidden: true },
+  },
+  {
+    name: '登录页',
+    path: '/login',
+    component: '@/pages/login/login',
     meta: { navHidden: true },
   },
   {

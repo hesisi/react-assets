@@ -1,10 +1,11 @@
 @gray-6: #bfbfbf;
 @gray-5: #d9d9d9;
+@blue-5: #40a9ff;
 
 .tab__text {
   font-size: 12px;
   color: @gray-6;
-  margin-bottom: 50px;
+  line-height: 50px;
 }
 
 .button-tag {
@@ -12,4 +13,19 @@
   border: 1px dashed @gray-5;
   background: white;
   margin-right: 0;
+  border-radius: 5px;
+}
+
+.button-icon {
+  svg:hover {
+    color: @blue-5;
+    cursor: pointer;
+  }
+}
+
+.table-col__title {
+  height: 20px;
+  line-height: 20px;
+  border-left: 4px solid @blue-5;
+  padding-left: 10px;
 }

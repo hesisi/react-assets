@@ -2,6 +2,7 @@ import { Space, Table, Checkbox } from 'antd';
 import { useState, useEffect } from 'react';
 
 export default function FieldTable(props: any) {
+  const { form } = props;
   const data = [
     {
       key: '1',
@@ -46,7 +47,62 @@ export default function FieldTable(props: any) {
       hide: false,
     },
   ];
+  const data2 = [
+    {
+      key: '1',
+      fieldName: '申请人',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '2',
+      fieldName: '报销概述',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '3',
+      fieldName: '报销明细',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '4',
+      fieldName: '报销总金额',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '5',
+      fieldName: '附件',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '6',
+      fieldName: '备注',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+  ];
   const [dataSource, setDataSource] = useState(data);
+  useEffect(() => {
+    let temp: any[] = [];
+    if (form === 'form1') {
+      temp = data;
+    } else if (form === 'form2') {
+      temp = data2;
+    } else {
+      temp = [];
+    }
+    setDataSource(temp);
+  }, [form]);
 
   const onChange = (e: any, record: any) => {
     const temp = dataSource.map((x) => {

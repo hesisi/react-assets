@@ -1,4 +1,4 @@
-import { Form, Input, Button, Select, Checkbox, Table } from 'antd';
+import { Form, Input, Button, Select, Checkbox, Table, Col, Row } from 'antd';
 const { Option } = Select;
 import { PlusCircleOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
@@ -13,6 +13,7 @@ export default function Approver(props: any) {
       hide: false,
     },
   ];
+  const { addApprover } = props;
   const [dataSource, setDataSource] = useState(data);
 
   const onChange = (e: any, record: any) => {
@@ -62,13 +63,17 @@ export default function Approver(props: any) {
     <>
       <Form.Item label="审批人">
         <Form.Item name="approver" noStyle>
-          <Select style={{ width: 120 }}>
+          <Select style={{ width: 120 }} disabled>
             <Option value="approver1">审批人一</Option>
             <Option value="approver2">审批人二</Option>
           </Select>
         </Form.Item>
-        <Button style={{ marginLeft: 10 }} icon={<PlusCircleOutlined />}>
-          创建
+        <Button
+          type={'primary'}
+          style={{ marginLeft: 10 }}
+          onClick={() => addApprover()}
+        >
+          选择审批人
         </Button>
       </Form.Item>
       <Form.Item label="相同人" name="sameApprove">
@@ -94,15 +99,26 @@ export default function Approver(props: any) {
           创建
         </Button>
       </Form.Item>
-      <div>
-        <label>字段权限</label>
-        <Table
-          pagination={false}
-          dataSource={dataSource}
-          columns={columns}
-          style={{ marginTop: 10 }}
-        />
-      </div>
+      <Row style={{ paddingBottom: 20 }}>
+        <Col
+          span={6}
+          style={{
+            textAlign: 'right',
+            color: ' rgba(0, 0, 0, 0.85)',
+            fontWeight: 'bold',
+          }}
+        >
+          字段权限：
+        </Col>
+        <Col span={24}>
+          <Table
+            pagination={false}
+            dataSource={dataSource}
+            columns={columns}
+            style={{ marginTop: 10 }}
+          />
+        </Col>
+      </Row>
     </>
   );
 }

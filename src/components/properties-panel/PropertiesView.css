@@ -12,15 +12,16 @@
   margin-left: 10px;
 }
 .element-properties .panel-tittle{
-  font-weight: bold;
-  font-size: 16px;
-  padding: 10px;
+  font-weight: 600;
+  font-size: 18px;
+  padding: 20px;
   margin: 0;
+  color: #333333;
 }
 .element-properties{
   width: 500px;
-  max-height: 450px;
   overflow-y: scroll;
+  height: 100%;
 }
 .element-properties::-webkit-scrollbar{
   width: 10px;
@@ -40,4 +41,12 @@
   border-radius: 5px;
   box-shadow: 0 0 8px 4px rgba(0,0,0,0.2);
   overflow: hidden;
+  height: 100%;
+}
+.group-card{
+  padding: 0px 20px;
+}
+.group-card .group-tittle{
+  font-size: 16px;
+  color: #333333;
 }

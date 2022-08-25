@@ -45,7 +45,7 @@ export default function Ruler() {
   return (
     <>
       {ruleList.map((x, index) => (
-        <Row key={index} style={{ marginBottom: 10 }}>
+        <Row key={index} style={{ marginBottom: 10, marginTop: 10 }}>
           <Col span={5}>
             <label>AND/OR</label>
             <Select defaultValue={x?.andor || ''} style={{ width: 80 }}>

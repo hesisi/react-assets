@@ -66,10 +66,6 @@ const home = () => {
   useEffect(() => {
     const arr = document.getElementsByClassName('el-carousel__item');
     const tranArr = Array.from(arr).map((item, index) => {
-      console.log(Number(item.style.transform.split(' ')[0].slice(11, -3)));
-      if (Number(item.style.transform.split(' ')[0].slice(11, -3)) === 0) {
-        return Number(item.style.transform.split(' ')[0].slice(11, -3));
-      }
       return Number(item.style.transform.split(' ')[0].slice(11, -3)) * 0.4;
     });
     Array.from(arr).forEach((item, index) => {
@@ -96,6 +92,7 @@ const home = () => {
           height="700px"
           onChange={changeHandler}
           autoplay={false}
+          arrow="never"
         >
           {/* style={{ width: '25%', margin: '0 auto', overflowX: 'unset' }} */}
           {banner.map((item, index) => {

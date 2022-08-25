@@ -181,7 +181,7 @@ export default function (props) {
           setDesingerType(e?.target?.value || 'form');
           onSave();
         }}
-        style={{ padding: '20px' }}
+        style={{ padding: '20px 30px' }}
       >
         <Button value="form">表单字段</Button>
         <Button value="table">列表配置</Button>

@@ -141,6 +141,7 @@ const CommonLayout = (props) => {
           <Content
             style={{
               // padding: '0 24px',
+              height: '100%',
               minHeight: 280,
               backgroundColor: '#f0f2f5',
             }}

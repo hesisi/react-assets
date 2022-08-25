@@ -6,14 +6,21 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-08 11:46:00
  */
-import { Breadcrumb, Layout, Menu } from 'antd';
+import { Breadcrumb, Layout, Menu, Avatar, Col, Row, Space } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link } from 'umi';
 import React, { useMemo } from 'react';
 import routes from '../../config/routes';
 import { dealMenuList } from '../../config/routesDy';
 import Styles from './index.less';
-import logo from '@/assets/icons/u14.png';
+import logo from '@/assets/icons/logo.png';
+import {
+  UserOutlined,
+  QuestionCircleOutlined,
+  BellOutlined,
+  DownOutlined,
+} from '@ant-design/icons';
+import './index.less';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -118,7 +125,7 @@ const CommonLayout = (props) => {
     <Layout>
       <Header
         className={Styles.header}
-        style={{ display: meta && !meta.showHeader ? 'none' : 'block' }}
+        style={{ display: meta && !meta.showHeader ? 'none' : 'flex' }}
       >
         <div className={Styles.logo}>
           <img src={logo} />
@@ -128,11 +135,29 @@ const CommonLayout = (props) => {
           mode="horizontal"
           defaultSelectedKeys={[selectKey]}
           items={navBar}
+          style={{ background: '#0D6BFF' }}
+          className={Styles['menu']}
         />
+        <div className="user-message">
+          <Space size={30}>
+            <QuestionCircleOutlined
+              style={{ color: '#ffffff', fontSize: '16px' }}
+            />
+            <BellOutlined style={{ color: '#ffffff', fontSize: '16px' }} />
+            <div className={'user-detail'}>
+              <Space size={10}>
+                <Avatar src="https://joeschmoe.io/api/v1/random" />
+                <span>欢迎你，用户一</span>
+                <DownOutlined />
+              </Space>
+            </div>
+          </Space>
+        </div>
       </Header>
       <Content
         style={{
           height: 'calc(100vh - 64px)',
+          backgroundColor: '#f0f2f5',
         }}
       >
         <Layout
@@ -163,14 +188,19 @@ const CommonLayout = (props) => {
             style={{
               // padding: '0 24px',
               minHeight: 280,
+              backgroundColor: '#f0f2f5',
             }}
           >
             {meta && meta.breadcrumb ? (
               <Breadcrumb
                 style={{
-                  background: 'white',
+                  background: '#f0f2f5',
                   padding: '20px',
                   borderBottom: '4px solid #f0f0f0',
+                  color: '#333333',
+                  fontSize: '16px',
+                  fontWeight: 600,
+                  fontFamily: 'PingFangSC-Semibold',
                 }}
               >
                 {meta.breadcrumb.map((e, i) => {
@@ -180,7 +210,12 @@ const CommonLayout = (props) => {
             ) : (
               <></>
             )}
-            <div className={Styles.contentWrapper}>{props.children}</div>
+            <div
+              className={Styles.contentWrapper}
+              style={{ background: '#f0f2f5' }}
+            >
+              {props.children}
+            </div>
           </Content>
         </Layout>
       </Content>

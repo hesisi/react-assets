@@ -40,9 +40,11 @@ import {
   SendOutlined,
   CheckSquareOutlined,
   CloseOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { nanoid } from 'nanoid';
 import moment from 'moment';
+// import flowbg from '@/assets/flow_bg.png'
 
 export default function IndexPage() {
   const location = useLocation();
@@ -154,28 +156,7 @@ export default function IndexPage() {
             <Button
               style={{ marginRight: '10px' }}
               type="primary"
-              icon={<SendOutlined />}
-            >
-              发布
-            </Button>
-            <Button
-              style={{ marginRight: '10px' }}
-              type="primary"
-              icon={<CheckSquareOutlined />}
-            >
-              启用
-            </Button>
-            <Button
-              style={{ marginRight: '10px' }}
-              type="primary"
-              icon={<StopOutlined />}
-            >
-              停用
-            </Button>
-            <Button
-              style={{ marginRight: '10px' }}
-              type="primary"
-              icon={<CloseOutlined />}
+              icon={<DeleteOutlined />}
             >
               删除
             </Button>

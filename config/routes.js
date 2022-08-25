@@ -28,7 +28,7 @@ export default [
       {
         name: '首页',
         path: '/homeIndex',
-        component: '@/pages/homeIndex/index',
+        component: '@/pages/homeIndex/home',
       },
     ],
   },
@@ -80,12 +80,14 @@ export default [
             component: '@/pages/userManage/authManage/account/index.tsx',
             exact: true,
             key: 'default-3-1-1',
+            meta: { showMenu: false, showHeader: true },
           },
           {
             name: '角色管理',
             path: '/userManage/authManage/role',
             component: '@/pages/userManage/authManage/role',
             key: 'default-3-1-2',
+            meta: { showMenu: false, showHeader: true },
           },
         ],
       },
@@ -139,7 +141,7 @@ export default [
         meta: {
           showMenu: false,
           showHeader: true,
-          breadcrumb: [{ label: '流程管理' }, { label: '流程列表' }],
+          breadcrumb: [{ label: '流程管理' }],
         },
       },
       {

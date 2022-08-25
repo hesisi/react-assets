@@ -18,9 +18,20 @@
   margin: 0;
 }
 .element-properties{
-  width: 520px;
+  width: 500px;
   max-height: 450px;
   overflow-y: scroll;
+}
+.element-properties::-webkit-scrollbar{
+  width: 10px;
+  display: block;
+}
+.element-properties::-webkit-scrollbar-track {
+  border-radius:10px;
+}
+.element-properties::-webkit-scrollbar-thumb {
+  border-radius:10px;
+  background:rgba(0,0,0,0.1);
 }
 .panel-content{
   /*padding-bottom: 5px;*/

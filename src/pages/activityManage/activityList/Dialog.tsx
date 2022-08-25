@@ -57,7 +57,7 @@ export default function Dialog(props: any) {
 
   return (
     <Modal
-      title="Basic Modal"
+      title="新增流程"
       visible={isModalVisible}
       onOk={confirm}
       onCancel={() => setIsModalVisible(false)}
@@ -76,11 +76,11 @@ export default function Dialog(props: any) {
           name="name"
           rules={[{ required: true, message: '请输入流程名称!' }]}
         >
-          <Input />
+          <Input placeholder={'请输入流程名称'} />
         </Form.Item>
 
         <Form.Item label="备注" name="remarks">
-          <TextArea rows={4} placeholder="maxLength is 6" />
+          <TextArea rows={4} placeholder="请输入备注" />
         </Form.Item>
       </Form>
     </Modal>

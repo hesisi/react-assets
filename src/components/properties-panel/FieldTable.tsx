@@ -5,14 +5,42 @@ export default function FieldTable(props: any) {
   const data = [
     {
       key: '1',
-      fieldName: '标题',
+      fieldName: '申请人',
       edit: false,
       readOnly: false,
       hide: false,
     },
     {
       key: '2',
-      fieldName: '类型',
+      fieldName: '休假类型',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '3',
+      fieldName: '开始日期',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '4',
+      fieldName: '结束日期',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '5',
+      fieldName: '请假原因',
+      edit: false,
+      readOnly: false,
+      hide: false,
+    },
+    {
+      key: '6',
+      fieldName: '上传附件',
       edit: false,
       readOnly: false,
       hide: false,
@@ -21,9 +49,6 @@ export default function FieldTable(props: any) {
   const [dataSource, setDataSource] = useState(data);
 
   const onChange = (e: any, record: any) => {
-    console.log(e);
-    console.log(record);
-    console.log(`checked = ${e.target.checked}`);
     const temp = dataSource.map((x) => {
       if (x.fieldName === record.name) {
         x.edit = !x.edit;
@@ -43,7 +68,12 @@ export default function FieldTable(props: any) {
       dataIndex: 'edit',
       key: 'edit',
       render: (_: any, record: any) => {
-        return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
+        return (
+          <Checkbox
+            defaultChecked
+            onChange={(e) => onChange(e, record)}
+          ></Checkbox>
+        );
       },
     },
     {

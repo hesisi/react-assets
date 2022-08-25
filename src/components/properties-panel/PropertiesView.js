@@ -61,13 +61,14 @@ export default class PropertiesView extends Component {
     const { modeler, flowMsg } = this.props;
 
     const { selectedElements, element } = this.state;
+    // console.log(element)
 
     return (
       <div className={'panel-content'}>
         <div className="element-properties">
           <h3 className={'panel-tittle'}>属性</h3>
           <Form>
-            <Collapse defaultActiveKey={['1']}>
+            <Collapse defaultActiveKey={['1', '2', '3', '4', '5']}>
               <Panel header="常规" key="1">
                 {selectedElements.length > 0 ? null : (
                   <fieldset>
@@ -91,7 +92,7 @@ export default class PropertiesView extends Component {
               {element?.type === 'bpmn:StartEvent' && (
                 <Panel header={'申请人'} key="2">
                   <Form.Item label="申请人" name="applyPerson">
-                    <Select style={{ width: 120 }}>
+                    <Select defaultValue="anyone" style={{ width: 120 }}>
                       <Option value="anyone">任何人可填</Option>
                       <Option value="role">指定角色可填</Option>
                       <Option value="person">指定人可填</Option>
@@ -99,7 +100,8 @@ export default class PropertiesView extends Component {
                   </Form.Item>
                 </Panel>
               )}
-              {element?.type === 'bpmn:UserTask' && (
+              {(element?.type === 'bpmn:UserTask' ||
+                element?.type === 'bpmn:Task') && (
                 <Panel header={'审批人'} key="3">
                   <Approver></Approver>
                 </Panel>

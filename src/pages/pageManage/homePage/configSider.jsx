@@ -4,12 +4,14 @@ const { Search } = Input;
 import {
   SnippetsOutlined,
   DesktopOutlined,
+  PlusOutlined,
+  DownOutlined,
   OrderedListOutlined,
   BarChartOutlined,
   BarsOutlined,
   DashboardOutlined,
   PictureOutlined,
-  PlusSquareOutlined,
+  DatabaseOutlined,
 } from '@ant-design/icons';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -25,17 +27,17 @@ const templateTree = [
       {
         title: '单区域',
         key: 'default-single',
-        icon: <DesktopOutlined />,
+        // icon: <DesktopOutlined />,
       },
       {
         title: '页眉和三区域',
         key: 'default-header-three',
-        icon: <DesktopOutlined />,
+        // icon: <DesktopOutlined />,
       },
       {
         title: '上二下三',
         key: 'default-two-three',
-        icon: <DesktopOutlined />,
+        // icon: <DesktopOutlined />,
       },
     ],
   },
@@ -47,7 +49,7 @@ const templateTree = [
 ];
 const componentsTree = [
   {
-    title: '标准组件',
+    title: '基本类型',
     key: 'standard',
     children: [
       {
@@ -85,7 +87,21 @@ const componentsTree = [
   {
     title: '自定义组件',
     key: 'customer',
-    children: [],
+    children: [
+      {
+        title: '',
+        key: 'standard-charts',
+        icon: (
+          <PlusOutlined
+            style={{
+              fontSize: '22px',
+              border: '1px dashed #ccc',
+              padding: '4px 14px',
+            }}
+          />
+        ),
+      },
+    ],
   },
 ];
 
@@ -133,16 +149,8 @@ const configSider = (props) => {
   const [selectedKeys, setSelectedKeys] = useState('');
 
   const operations = {
-    template: (
-      <Button type="link">
-        <PlusSquareOutlined />
-      </Button>
-    ),
-    components: (
-      <Button type="link">
-        <PlusSquareOutlined />
-      </Button>
-    ),
+    template: <Button type="link">{/* <PlusSquareOutlined /> */}</Button>,
+    components: <Button type="link">{/* <PlusSquareOutlined /> */}</Button>,
   };
 
   const onExpand = (newExpandedKeys) => {
@@ -224,43 +232,69 @@ const configSider = (props) => {
 
   return (
     <div className="sider">
-      <Tabs defaultActiveKey="1" tabBarExtraContent={operations.template}>
-        <TabPane tab="模板" key="1">
-          <Tree
-            defaultExpandedKeys={['default']}
-            treeData={templateTree}
-            showIcon
-            onSelect={(e) => {
-              treeSelect(e, 'template');
-            }}
-          />
-        </TabPane>
-      </Tabs>
+      <div style={{ display: 'flex' }} className="menutab first">
+        <BarsOutlined
+          className="operation_icon"
+          style={{
+            color: '#333333',
+            position: 'relative',
+            top: '16px',
+            right: '8px',
+            fontSize: '18px',
+          }}
+        />
+        <Tabs tabBarExtraContent={operations.template}>
+          <TabPane tab="模板">
+            <Tree
+              switcherIcon={<DownOutlined />}
+              defaultExpandedKeys={['default']}
+              treeData={templateTree}
+              arrow
+              onSelect={(e) => {
+                treeSelect(e, 'template');
+              }}
+            />
+          </TabPane>
+        </Tabs>
+      </div>
 
-      <Tabs defaultActiveKey="1" tabBarExtraContent={operations.components}>
-        <TabPane tab="组件" key="1">
-          <Search
-            style={{
-              marginBottom: 8,
-            }}
-            placeholder="Search"
-            onChange={onChange}
-          />
-          <Tree
-            treeData={treeData}
-            showIcon
-            onExpand={onExpand}
-            expandedKeys={expandedKeys}
-            autoExpandParent={autoExpandParent}
-            defaultExpandParent={true}
-            defaultExpandAll={true}
-            onSelect={(e) => {
-              treeSelect(e, 'component');
-            }}
-            selectedKeys={selectedKeys}
-          />
-        </TabPane>
-      </Tabs>
+      <div style={{ display: 'flex' }} className="menutab second">
+        <DatabaseOutlined
+          className="operation_icon"
+          style={{
+            color: '#333333',
+            position: 'relative',
+            top: '18px',
+            right: '8px',
+            fontSize: '16px',
+          }}
+        />
+        <Tabs tabBarExtraContent={operations.components}>
+          <TabPane tab="组件">
+            <Search
+              style={{
+                marginBottom: 8,
+              }}
+              placeholder="Search"
+              onChange={onChange}
+            />
+            <Tree
+              treeData={treeData}
+              showIcon
+              switcherIcon={<DownOutlined />}
+              onExpand={onExpand}
+              expandedKeys={expandedKeys}
+              autoExpandParent={autoExpandParent}
+              defaultExpandParent={true}
+              defaultExpandAll={true}
+              onSelect={(e) => {
+                treeSelect(e, 'component');
+              }}
+              selectedKeys={selectedKeys}
+            />
+          </TabPane>
+        </Tabs>
+      </div>
     </div>
   );
 };

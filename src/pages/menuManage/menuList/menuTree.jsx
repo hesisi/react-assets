@@ -1,6 +1,7 @@
 import React, { memo, useState, useRef, useEffect } from 'react';
 import { Tree, Tooltip, Input } from 'antd';
 import { Scrollbars } from 'react-custom-scrollbars';
+import { munuDefaultTree } from '../../../../config/routesDy';
 import { list } from './iconBox';
 import { cloneDeep } from 'lodash';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
@@ -11,17 +12,11 @@ import localForage from 'localforage';
 const { TreeNode } = Tree;
 const { Search } = Input;
 
-const defaultTreeParaent = [
-  {
-    title: 'Root Node',
-    key: '00-top',
-    children: [],
-    isTop: true,
-  },
-];
+const defaultTreeParaent = munuDefaultTree;
 let curerntTree = defaultTreeParaent;
+
 let defaultTrreData = {
-  current: defaultTreeParaent,
+  current: [],
 };
 
 function menuTree(props) {
@@ -31,13 +26,14 @@ function menuTree(props) {
   const [operType, setOperType] = useState(''); //区别Modal弹出框的类型，(添加，修改，删除用的是一个Modal)
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedKeys, setExpandedKeys] = useState([]);
+  const [expandedKeys, setExpandedKeys] = useState(['00-top']);
 
   const getTreeNode = async () => {
     // todo: 后续接接口保存的tree data
     setIsLoading(false);
     // 获取保存treeData 初始化
-    const treeSaveData = await localForage.getItem('menuTree');
+    const treeSaveData =
+      (await localForage.getItem('menuTree')) || munuDefaultTree;
     console.log(treeSaveData, '44-------');
     if (treeSaveData?.[0]?.children && treeSaveData?.[0].children.length) {
       defaultTrreData.current = [];
@@ -119,15 +115,18 @@ function menuTree(props) {
 
   const onSelect = async (selectedKeys, info) => {
     const { selectedNodes } = info;
+    console.log(selectedNodes, '118-----');
     if (!selectedNodes.length) {
       props.setForm({
         formValue: {},
       });
       return;
     }
+    console.log(defaultTrreData.current, '125----');
     const selectNodeInfo = defaultTrreData.current.filter(
       (item) => item.key === selectedNodes[0].key,
     );
+
     //这里写点击tree节点的事件逻辑 选中展示节点配置信息
     props.setForm({
       formValue: {
@@ -178,6 +177,7 @@ function menuTree(props) {
                 : `${node.title}-${node.children.length + 1}`,
             key: getUUID(),
             children: [],
+            oper: 'add',
           }
         : {};
 

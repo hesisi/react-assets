@@ -49,9 +49,6 @@ export default function FieldTable(props: any) {
   const [dataSource, setDataSource] = useState(data);
 
   const onChange = (e: any, record: any) => {
-    console.log(e);
-    console.log(record);
-    console.log(`checked = ${e.target.checked}`);
     const temp = dataSource.map((x) => {
       if (x.fieldName === record.name) {
         x.edit = !x.edit;
@@ -71,7 +68,12 @@ export default function FieldTable(props: any) {
       dataIndex: 'edit',
       key: 'edit',
       render: (_: any, record: any) => {
-        return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
+        return (
+          <Checkbox
+            defaultChecked
+            onChange={(e) => onChange(e, record)}
+          ></Checkbox>
+        );
       },
     },
     {

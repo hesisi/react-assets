@@ -1,6 +1,7 @@
 import { Table, Form, Select, Col, Row, Button, Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 const { Option } = Select;
+const { TextArea } = Input;
 import { DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 interface ruleDTO {
@@ -95,6 +96,10 @@ export default function Ruler() {
         <Button type="dashed" icon={<PlusCircleOutlined />} onClick={addLine}>
           增加行
         </Button>
+      </div>
+      <div style={{ marginTop: 10 }}>
+        <label>条件表达式</label>
+        <TextArea style={{ marginTop: 10 }} rows={4} />
       </div>
     </>
   );

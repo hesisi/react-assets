@@ -12,7 +12,7 @@ import { Link } from 'umi';
 import React, { useMemo } from 'react';
 import routes from '../../config/routes';
 import Styles from './index.less';
-import logo from '@/assets/icons/u14.png';
+import logo from '@/assets/icons/logo.png';
 
 const { Header, Content, Footer, Sider } = Layout;
 

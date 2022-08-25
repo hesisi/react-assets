@@ -6,6 +6,10 @@ import Icon, {
   ScissorOutlined,
   CopyOutlined,
   PlusOutlined,
+  LeftOutlined,
+  SaveOutlined,
+  CheckCircleOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import './index.less';
 import ConfigSider from './configSider';
@@ -257,7 +261,18 @@ const homePage = (props) => {
 
     window.open('/previewPage/homePage');
   };
-
+  const saveHandler = (data) => {
+    // console.log(dom);
+    if (template.length > 0 && template[0] === '1-0') {
+      pageBuildRef.current.preview();
+      window.localStorage.removeItem('homeDom');
+    } else {
+      window.localStorage.setItem('homeDom', JSON.stringify(dom));
+      window.localStorage.setItem('homeProperty', JSON.stringify(property));
+    }
+    message.success(`${data}成功!`, 1.5);
+    window.open('/homeIndex');
+  };
   useEffect(() => {
     // 从内存中获取并回显
     if (!homeDom) return;
@@ -284,7 +299,11 @@ const homePage = (props) => {
           <Row gutter={10}>
             <Col span={4}>
               <Space>
-                <img
+                <div className="back">
+                  <LeftOutlined /> <span>主页</span>
+                </div>
+
+                {/* <img
                   src={back}
                   style={{ marginTop: '-5px' }}
                   className="icon"
@@ -295,12 +314,12 @@ const homePage = (props) => {
                   className="icon"
                 />
                 <ScissorOutlined className="icon" />
-                <CopyOutlined className="icon" />
+                <CopyOutlined className="icon" /> */}
               </Space>
             </Col>
             <Col span={15} className="header-config">
               <Space>
-                <div>
+                {/* <div>
                   收缩查看：
                   <Select defaultValue="100%" style={{ width: 120 }}>
                     {shrinks.map((e, i) => {
@@ -313,17 +332,39 @@ const homePage = (props) => {
                   </Select>
                 </div>
                 <RedoOutlined className="icon" />
-                <span className="header-config__text">主页配置面板</span>
+                <span className="header-config__text">主页配置面板</span> */}
               </Space>
             </Col>
-            <Col span={5}>
+            <Col span={4} className="header_button">
               <Space>
-                <Button type="primary">返回</Button>
+                {/* <Button type="primary">返回</Button> */}
+                {/* <Button type="primary">保存</Button>
                 <Button type="primary" onClick={previewHandler}>
                   预览
                 </Button>
-                <Button type="primary">保存</Button>
-                <Button type="primary">启用</Button>
+                <Button type="primary">删除</Button> */}
+                {/* <Button type="primary">启用</Button> */}
+                <Button
+                  type="primary"
+                  icon={<SaveOutlined />}
+                  onClick={() => saveHandler('保存')}
+                >
+                  保存
+                </Button>
+                <Button
+                  type="default"
+                  icon={<EyeOutlined />}
+                  onClick={previewHandler}
+                >
+                  预览
+                </Button>
+                <Button
+                  type="default"
+                  icon={<CheckCircleOutlined />}
+                  onClick={() => saveHandler('启用')}
+                >
+                  启用
+                </Button>
               </Space>
             </Col>
           </Row>

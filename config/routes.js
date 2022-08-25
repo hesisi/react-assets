@@ -75,11 +75,13 @@ export default [
             path: '/userManage/authManage/account',
             component: '@/pages/userManage/authManage/account/index.tsx',
             exact: true,
+            meta: { showMenu: false, showHeader: true },
           },
           {
             name: '角色管理',
             path: '/userManage/authManage/role',
             component: '@/pages/userManage/authManage/role',
+            meta: { showMenu: false, showHeader: true },
           },
         ],
       },

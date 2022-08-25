@@ -7,6 +7,8 @@ import { nanoid } from 'nanoid';
 import { Divider } from 'antd';
 import { DownCircleOutlined } from '@ant-design/icons';
 import { history } from 'umi';
+import HomePage from '@/pages/previewPage/homePage';
+
 const banner = [
   {
     bg: require('../../assets/images/主页管理.png'),
@@ -62,6 +64,11 @@ const banner = [
 
 const home = () => {
   const [curIndex, setCurIndex] = useState(-1);
+  const [isHome, setIsHome] = useState(false);
+
+  useEffect(() => {
+    setIsHome(window.localStorage.getItem('isHome'));
+  }, []);
 
   useEffect(() => {
     const arr = document.getElementsByClassName('el-carousel__item');
@@ -84,53 +91,59 @@ const home = () => {
     history.push(url);
   };
   return (
-    <div className="demo-4 medium home">
-      <p className="home-title">欢迎进入Connectivity Asset</p>
-      <div className="home-carousel">
-        <Carousel
-          type="card"
-          height="700px"
-          onChange={changeHandler}
-          autoplay={false}
-          arrow="never"
-        >
-          {/* style={{ width: '25%', margin: '0 auto', overflowX: 'unset' }} */}
-          {banner.map((item, index) => {
-            return (
-              <Carousel.Item key={item.id}>
-                <div
-                  className="home-carousel__box"
-                  style={{ backgroundImage: `url(${item.bg})` }}
-                >
-                  {/* <img src={item.bg}></img> */}
-                  <div className="carousel-box__icon">
-                    <img src={item.icon} width={70}></img>
-                  </div>
-                  <div className="carousel-box__text">
-                    <p className="text-title">{item.title}</p>
-                    <p className="text-en">{item.en}</p>
-                    <Divider />
-                    <p className="text-des" style={{ margin: 'auto' }}>
-                      {item.description}
-                    </p>
-                    {curIndex === index ? (
-                      <DownCircleOutlined
-                        style={{ color: '#3A63FF', fontSize: '28px' }}
-                        className="text-icon"
-                        onClick={() => {
-                          enterHandler(item.url);
-                        }}
-                      />
-                    ) : (
-                      <></>
-                    )}
-                  </div>
-                </div>
-              </Carousel.Item>
-            );
-          })}
-        </Carousel>
-      </div>
+    <div className="demo-4 medium">
+      {isHome ? (
+        <HomePage />
+      ) : (
+        <div className="home">
+          <p className="home-title">欢迎进入Connectivity Asset</p>
+          <div className="home-carousel">
+            <Carousel
+              type="card"
+              height="700px"
+              onChange={changeHandler}
+              autoplay={false}
+              arrow="never"
+            >
+              {/* style={{ width: '25%', margin: '0 auto', overflowX: 'unset' }} */}
+              {banner.map((item, index) => {
+                return (
+                  <Carousel.Item key={item.id}>
+                    <div
+                      className="home-carousel__box"
+                      style={{ backgroundImage: `url(${item.bg})` }}
+                    >
+                      {/* <img src={item.bg}></img> */}
+                      <div className="carousel-box__icon">
+                        <img src={item.icon} width={70}></img>
+                      </div>
+                      <div className="carousel-box__text">
+                        <p className="text-title">{item.title}</p>
+                        <p className="text-en">{item.en}</p>
+                        <Divider />
+                        <p className="text-des" style={{ margin: 'auto' }}>
+                          {item.description}
+                        </p>
+                        {curIndex === index ? (
+                          <DownCircleOutlined
+                            style={{ color: '#3A63FF', fontSize: '28px' }}
+                            className="text-icon"
+                            onClick={() => {
+                              enterHandler(item.url);
+                            }}
+                          />
+                        ) : (
+                          <></>
+                        )}
+                      </div>
+                    </div>
+                  </Carousel.Item>
+                );
+              })}
+            </Carousel>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

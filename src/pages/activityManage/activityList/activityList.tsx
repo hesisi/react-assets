@@ -13,6 +13,7 @@ import {
   Divider,
   Tag,
   Modal,
+  Switch,
 } from 'antd';
 import {
   SearchOutlined,
@@ -23,7 +24,10 @@ import {
   FormOutlined,
   SendOutlined,
   CheckSquareOutlined,
-  StopOutlined,
+  EyeOutlined,
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { history } from 'umi';
 
@@ -35,20 +39,19 @@ import '@/assets/style/layout.less';
 import { nanoid } from 'nanoid';
 
 interface DataType {
-  key?: string | number;
+  /**流程名称*/
   name: string;
   id?: string | number;
+  /**流程状态*/
   status?: string;
   remarks?: string;
   creatTime?: string;
   updateTime?: string;
-  sequence?: string;
 }
 
 const selectList = [
-  { value: 'enable', label: '已启用' },
-  { value: 'edit', label: '编辑中' },
-  { value: 'disabled', label: '已停用' },
+  { value: 'enable', label: '启用' },
+  { value: 'disabled', label: '停用' },
 ];
 
 export default function Page() {
@@ -58,114 +61,15 @@ export default function Page() {
   const flowData = window.localStorage.getItem('flowGroup');
   const columns: ColumnsType<DataType> = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      align: 'center',
-      render: (_, record, index) => {
-        return <span>{index + 1}</span>;
-      },
-      width: 100,
-      fixed: 'left',
-    },
-    {
-      title: '操作',
-      dataIndex: 'action',
-      key: 'action',
-      render: (_, record) => (
-        <Space split={<Divider type="vertical" />} size={0}>
-          {record.status === 'enable' ? (
-            <>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<SendOutlined />}
-              >
-                发布
-              </Button>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<StopOutlined />}
-                onClick={() => statusHandler(record, 'disabled')}
-              >
-                停用
-              </Button>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<FormOutlined />}
-                onClick={() => handleOk(record.id)}
-              >
-                编辑
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<CheckSquareOutlined />}
-                onClick={() => statusHandler(record, 'enable')}
-              >
-                启用
-              </Button>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<FormOutlined />}
-                onClick={() => handleEdit(record)}
-              >
-                编辑
-              </Button>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<CloseOutlined />}
-                onClick={() => handleDelete(record)}
-              >
-                删除
-              </Button>
-            </>
-          )}
-        </Space>
-      ),
-      width: 300,
-      fixed: 'left',
-      align: 'center',
-    },
-    {
-      title: '流程编号',
-      dataIndex: 'id',
-      key: 'id',
-      align: 'center',
-    },
-    {
       title: '流程名称',
       dataIndex: 'name',
       key: 'name',
       align: 'center',
     },
     {
-      title: '流程状态',
-      dataIndex: 'status',
-      key: 'status',
-      align: 'center',
-      render: (_, { status }, index) => {
-        let color = status === 'enable' ? 'blue' : 'default';
-        return (
-          <Tag color={color} key={index}>
-            {status
-              ? selectList.filter((e) => e.value === status)[0]?.label
-              : '暂无状态'}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: '备注',
-      dataIndex: 'remarks',
-      key: 'remarks',
+      title: '流程编号',
+      dataIndex: 'id',
+      key: 'id',
       align: 'center',
     },
     {
@@ -178,6 +82,76 @@ export default function Page() {
       title: '更新时间',
       dataIndex: 'updateTime',
       key: 'updateTime',
+      align: 'center',
+    },
+    {
+      title: '流程状态',
+      dataIndex: 'status',
+      key: 'status',
+      align: 'center',
+      render: (_, record, index) => {
+        return (
+          <Switch
+            checkedChildren="开启"
+            unCheckedChildren="停用"
+            checked={record?.status === 'enable'}
+            onClick={() => handleChangeStatus(record)}
+          />
+        );
+      },
+    },
+    {
+      title: '备注',
+      dataIndex: 'remarks',
+      key: 'remarks',
+      align: 'center',
+    },
+    {
+      title: '操作',
+      dataIndex: 'action',
+      key: 'action',
+      render: (_, record) => (
+        <Space split={<Divider type="vertical" />} size={0}>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            size={'small'}
+            icon={<EyeOutlined />}
+            onClick={() => handleEdit(record)}
+          >
+            查看
+          </Button>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            size={'small'}
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+          >
+            编辑
+          </Button>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            size={'small'}
+            icon={<DeleteOutlined />}
+            onClick={() => handleDelete(record)}
+          >
+            删除
+          </Button>
+        </Space>
+      ),
+      width: 300,
+      fixed: 'left',
       align: 'center',
     },
   ];
@@ -307,33 +281,40 @@ export default function Page() {
     });
   };
 
+  /**更改状态*/
+  const handleChangeStatus = (data: DataType) => {
+    const temp = tableData.map((x) => {
+      if (x.id === data.id) {
+        x.status = data.status === 'enable' ? 'disabled' : 'enable';
+      }
+      return x;
+    });
+    window.localStorage.setItem('flowGroup', JSON.stringify(temp));
+    setTableData(temp);
+  };
   return (
     <div className="list">
       <Layout className="list-layout">
         <Content className="list-content">
-          <Row justify="space-between" className="list-row">
+          <Row justify="start" className="list-row">
             <Col>
               <Form
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
+                labelCol={{ span: 0 }}
+                wrapperCol={{ span: 24 }}
                 layout="inline"
                 ref={formRef}
               >
-                <Form.Item label="流程编号" name="id">
-                  <Input allowClear placeholder="请输入内容" />
+                <Form.Item label="" name="name">
+                  <Input allowClear placeholder="请输入流程名称" />
                 </Form.Item>
 
-                <Form.Item label="流程名称" name="name">
-                  <Input allowClear placeholder="请输入内容" />
-                </Form.Item>
-
-                <Form.Item label="流程状态" name="status">
+                <Form.Item label="" name="status">
                   <Select
                     style={{
                       width: 180,
                     }}
                     allowClear
-                    placeholder="请选择内容"
+                    placeholder="请选择流程状态"
                   >
                     {selectList.map((e) => {
                       return (
@@ -353,25 +334,37 @@ export default function Page() {
                   type="primary"
                   icon={<SearchOutlined />}
                   onClick={searchHandler}
+                  style={{ borderRadius: '5px' }}
                 >
                   搜索
                 </Button>
-                <Button icon={<MinusCircleOutlined />} onClick={resetHandler}>
+                <Button
+                  icon={<MinusCircleOutlined />}
+                  onClick={resetHandler}
+                  style={{ borderRadius: '5px' }}
+                >
                   清除
                 </Button>
               </Space>
             </Col>
-          </Row>
-
-          <Row justify="end" style={{ padding: '20px 0' }}>
-            <Space size={10}>
-              <Button icon={<PlusCircleOutlined />} onClick={addProcess}>
-                添加
-              </Button>
-              <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
-                删除
-              </Button>
-            </Space>
+            <Col style={{ marginLeft: 'auto' }}>
+              <Space size={10}>
+                <Button
+                  type="primary"
+                  icon={<PlusOutlined />}
+                  onClick={addProcess}
+                >
+                  新增流程
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<DeleteOutlined />}
+                  onClick={deleteHandler}
+                >
+                  删除流程
+                </Button>
+              </Space>
+            </Col>
           </Row>
 
           <Table
@@ -379,6 +372,8 @@ export default function Page() {
             columns={columns}
             dataSource={tableData}
             rowKey={(record: any) => record.id}
+            style={{ marginTop: '20px' }}
+            bordered={false}
           />
         </Content>
       </Layout>

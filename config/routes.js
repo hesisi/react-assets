@@ -130,7 +130,7 @@ export default [
         meta: {
           showMenu: false,
           showHeader: true,
-          breadcrumb: [{ label: '流程管理' }, { label: '流程列表' }],
+          breadcrumb: [{ label: '流程管理' }],
         },
       },
       {

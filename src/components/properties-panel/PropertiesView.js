@@ -61,6 +61,7 @@ export default class PropertiesView extends Component {
     const { modeler, flowMsg } = this.props;
 
     const { selectedElements, element } = this.state;
+    // console.log(element)
 
     return (
       <div className={'panel-content'}>
@@ -99,7 +100,8 @@ export default class PropertiesView extends Component {
                   </Form.Item>
                 </Panel>
               )}
-              {element?.type === 'bpmn:UserTask' && (
+              {(element?.type === 'bpmn:UserTask' ||
+                element?.type === 'bpmn:Task') && (
                 <Panel header={'审批人'} key="3">
                   <Approver></Approver>
                 </Panel>

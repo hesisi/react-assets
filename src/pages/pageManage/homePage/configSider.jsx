@@ -4,6 +4,7 @@ const { Search } = Input;
 import {
   SnippetsOutlined,
   DesktopOutlined,
+  PlusOutlined,
   DownOutlined,
   OrderedListOutlined,
   BarChartOutlined,
@@ -86,7 +87,21 @@ const componentsTree = [
   {
     title: '自定义组件',
     key: 'customer',
-    children: [],
+    children: [
+      {
+        title: '',
+        key: 'standard-charts',
+        icon: (
+          <PlusOutlined
+            style={{
+              fontSize: '22px',
+              border: '1px dashed #ccc',
+              padding: '4px 14px',
+            }}
+          />
+        ),
+      },
+    ],
   },
 ];
 

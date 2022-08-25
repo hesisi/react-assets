@@ -6,14 +6,20 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-08 11:46:00
  */
-import { Breadcrumb, Layout, Menu, Avatar } from 'antd';
+import { Breadcrumb, Layout, Menu, Avatar, Col, Row, Space } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link } from 'umi';
 import React, { useMemo } from 'react';
 import routes from '../../config/routes';
 import Styles from './index.less';
 import logo from '@/assets/icons/logo.png';
-import { UserOutlined } from '@ant-design/icons';
+import {
+  UserOutlined,
+  QuestionCircleOutlined,
+  BellOutlined,
+  DownOutlined,
+} from '@ant-design/icons';
+import './index.less';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -94,7 +100,7 @@ const CommonLayout = (props) => {
     <Layout>
       <Header
         className={Styles.header}
-        style={{ display: meta && !meta.showHeader ? 'none' : 'block' }}
+        style={{ display: meta && !meta.showHeader ? 'none' : 'flex' }}
       >
         <div className={Styles.logo}>
           <img src={logo} />
@@ -107,6 +113,21 @@ const CommonLayout = (props) => {
           style={{ background: '#0D6BFF' }}
           className={Styles['menu']}
         />
+        <div className="user-message">
+          <Space size={30}>
+            <QuestionCircleOutlined
+              style={{ color: '#ffffff', fontSize: '16px' }}
+            />
+            <BellOutlined style={{ color: '#ffffff', fontSize: '16px' }} />
+            <div className={'user-detail'}>
+              <Space size={10}>
+                <Avatar src="https://joeschmoe.io/api/v1/random" />
+                <span>欢迎你，用户一</span>
+                <DownOutlined />
+              </Space>
+            </div>
+          </Space>
+        </div>
       </Header>
       <Content
         style={{

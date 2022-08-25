@@ -20,6 +20,7 @@ import {
   Divider,
   Layout,
   Radio,
+  Switch,
 } from 'antd';
 const { Content } = Layout;
 import { useEffect, useRef, useState } from 'react';
@@ -40,6 +41,7 @@ import {
   FormOutlined,
   CloseOutlined,
   SendOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import '@/assets/style/layout.less';
 
@@ -118,12 +120,96 @@ export default function FormList() {
       width: 100,
       fixed: 'left',
     },
+
+    {
+      title: '表单编号',
+      dataIndex: 'formCode',
+      key: 'formCode',
+      align: 'center',
+    },
+    {
+      title: '表单名称',
+      dataIndex: 'formName',
+      key: 'formName',
+      align: 'center',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      align: 'center',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      key: 'updateTime',
+      align: 'center',
+    },
+    {
+      title: '表单状态',
+      key: 'formStatus',
+      dataIndex: 'formStatus',
+      render: (_, { formStatus }, index) => {
+        let color = formStatus === 'enable' ? 'blue' : 'default';
+        return (
+          <Switch
+            checkedChildren="启用"
+            unCheckedChildren="禁用"
+            checked={formStatus === 'enable'}
+            onClick={() => formStatusHandler(record, 'enable')}
+          />
+          // <Tag color={color} key={index}>
+          //   {formStatus
+          //     ? selectList.filter((e) => e.value === formStatus)[0]?.label
+          //     : '暂无状态'}
+          // </Tag>
+        );
+      },
+      align: 'center',
+      width: 100,
+    },
     {
       title: '操作',
       key: 'action',
       render: (_, record) => (
-        <Space split={<Divider type="vertical" />} size={0}>
-          {record.formStatus === 'enable' ? (
+        <Space size={6}>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            size={'small'}
+            icon={<EyeOutlined />}
+            onClick={() => handleShowDesigner(record)}
+          >
+            查看
+          </Button>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            onClick={() => handleShowDesigner(record)}
+            size={'small'}
+            icon={<FormOutlined />}
+          >
+            编辑
+          </Button>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            onClick={() => handleDelete(record)}
+            size={'small'}
+            icon={<CloseOutlined />}
+          >
+            删除
+          </Button>
+          {/* {record.formStatus === 'enable' ? (
             <>
               <Button
                 type="link"
@@ -176,54 +262,12 @@ export default function FormList() {
                 删除
               </Button>
             </>
-          )}
+          )} */}
         </Space>
       ),
       align: 'center',
       width: 300,
-      fixed: 'left',
-    },
-
-    {
-      title: '表单编号',
-      dataIndex: 'formCode',
-      key: 'formCode',
-      align: 'center',
-    },
-    {
-      title: '表单名称',
-      dataIndex: 'formName',
-      key: 'formName',
-      align: 'center',
-    },
-    {
-      title: '表单状态',
-      key: 'formStatus',
-      dataIndex: 'formStatus',
-      render: (_, { formStatus }, index) => {
-        let color = formStatus === 'enable' ? 'blue' : 'default';
-        return (
-          <Tag color={color} key={index}>
-            {formStatus
-              ? selectList.filter((e) => e.value === formStatus)[0]?.label
-              : '暂无状态'}
-          </Tag>
-        );
-      },
-      align: 'center',
-      width: 100,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
-      align: 'center',
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'updateTime',
-      key: 'updateTime',
-      align: 'center',
+      fixed: 'right',
     },
   ];
 

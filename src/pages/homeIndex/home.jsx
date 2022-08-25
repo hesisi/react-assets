@@ -112,7 +112,6 @@ const home = () => {
               type="card"
               height="700px"
               onChange={changeHandler}
-              autoplay={false}
               arrow="never"
             >
               {/* style={{ width: '25%', margin: '0 auto', overflowX: 'unset' }} */}

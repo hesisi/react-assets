@@ -1,4 +1,5 @@
 import { Layout, Row, Col, Button, Space, Select, message } from 'antd';
+import { history } from 'umi';
 const { Header, Sider, Content } = Layout;
 const { Option } = Select;
 import Icon, {
@@ -262,7 +263,6 @@ const homePage = (props) => {
     window.open('/previewPage/homePage');
   };
   const saveHandler = (data) => {
-    // console.log(dom);
     if (template.length > 0 && template[0] === '1-0') {
       pageBuildRef.current.preview();
       window.localStorage.removeItem('homeDom');
@@ -270,8 +270,11 @@ const homePage = (props) => {
       window.localStorage.setItem('homeDom', JSON.stringify(dom));
       window.localStorage.setItem('homeProperty', JSON.stringify(property));
     }
+    if (data === '启用') {
+      window.localStorage.setItem('isHome', true);
+      history.push('/homeIndex');
+    }
     message.success(`${data}成功!`, 1.5);
-    window.open('/homeIndex');
   };
   useEffect(() => {
     // 从内存中获取并回显

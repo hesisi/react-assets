@@ -187,6 +187,7 @@ const contentSetting = forwardRef((props, ref) => {
 
         <p>Some contents...</p>
       </Modal>
+      <span className="span_title">属性配置</span>
       <Tabs defaultActiveKey="region">
         <TabPane tab="组件" key="components">
           {props.componentData[0] === 'standard-charts' && props.selectId ? (

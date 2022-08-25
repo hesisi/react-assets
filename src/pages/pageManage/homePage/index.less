@@ -14,6 +14,7 @@
 
   .ant-layout:nth-child(1) {
     height: inherit;
+
     header,
     aside,
     main {
@@ -25,13 +26,20 @@
     // &:extend(.border);
     margin: 20px 20px 10px;
     padding: 0;
+
     // padding: 0 20px;
+    .back {
+      cursor: pointer;
+      color: #858585;
+      font-size: 17px;
+    }
 
     .ant-col,
     .ant-row {
       height: 100%;
       line-height: 64px;
     }
+
     .ant-col:nth-child(1) {
       padding-left: 20px !important;
     }
@@ -65,6 +73,67 @@
 .sider {
   padding: 0 20px;
   box-sizing: border-box;
+
+  .menutab .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    width: 36px;
+    height: 25px;
+    font-family: PingFangSC-Semibold;
+    font-size: 18px;
+    color: #333333;
+    letter-spacing: 0;
+  }
+
+  .ant-tree-switcher-noop {
+    display: none;
+  }
+
+  .ant-tree-treenode-selected span {
+    color: #0d6bff;
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    letter-spacing: 0;
+    font-weight: 400;
+  }
+
+  .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    background-color: transparent;
+  }
+
+  .menutab .ant-tabs .ant-tabs-content-holder {
+    position: relative;
+    left: -28px;
+  }
+
+  .first {
+    padding-bottom: 30px;
+    border-bottom: 1px solid rgba(217, 217, 217, 1);
+    .ant-tree-list-holder-inner > div:last-child {
+      .ant-tree-switcher-noop {
+        display: block;
+      }
+    }
+  }
+
+  .menutab .ant-input-group {
+    width: 208px;
+    height: 26px;
+    border-radius: 3px;
+
+    .ant-input-search-button {
+      border-left: none;
+    }
+  }
+
+  .second {
+    .ant-tree-list-holder-inner > div:nth-child(1),
+    .ant-tree-list-holder-inner > div:last-child {
+      font-family: PingFangSC-Regular;
+      font-size: 12px;
+      color: #868686;
+      letter-spacing: 0;
+      font-weight: 400;
+    }
+  }
 }
 
 .site-tree-search-value {
@@ -82,13 +151,16 @@
   border: 10px solid white;
   background: @gray-2;
   overflow: auto;
-  scrollbar-width: none; /* firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none;
+  /* firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
 }
 
 .default-col__top {
   border-top: 0 !important;
 }
+
 .default-col__right {
   border-right: 0 !important;
 }
@@ -106,10 +178,13 @@
   flex-direction: column;
   cursor: pointer;
   overflow: hidden;
+
   .ant-list {
     overflow: auto;
-    scrollbar-width: none; /* firefox */
-    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none;
+    /* firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
   }
 }
 
@@ -117,6 +192,7 @@
   border: 10px solid white;
   background: @bgColor;
   position: relative;
+
   // overflow: auto;
   // scrollbar-width: none; /* firefox */
   // -ms-overflow-style: none; /* IE 10+ */
@@ -131,6 +207,7 @@
     border-left: 2px solid @activeColor;
     z-index: 1;
   }
+
   &::after {
     position: absolute;
     top: 0;
@@ -143,6 +220,7 @@
     z-index: 1;
   }
 }
+
 .active-box {
   position: absolute;
   left: 0;
@@ -155,6 +233,7 @@
   align-items: center;
   flex-direction: column;
   cursor: pointer;
+
   &::before {
     position: absolute;
     bottom: 0;
@@ -166,6 +245,7 @@
     border-left: 2px solid @activeColor;
     z-index: 1;
   }
+
   &::after {
     position: absolute;
     bottom: 0;
@@ -192,6 +272,7 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+
   canvas {
     width: 100% !important;
     height: 100% !important;
@@ -203,10 +284,12 @@
   &:extend(.dom-component);
   object-fit: contain;
 }
+
 .dom-component__todo {
   &:extend(.dom-component);
   position: absolute !important;
   padding: 20px !important;
+
   .ant-list-bordered {
     border: none;
   }
@@ -220,6 +303,7 @@
   div {
     height: 100%;
   }
+
   img {
     height: 100%;
     width: 100%;

@@ -3,11 +3,7 @@ import { Tree, Tooltip, Input } from 'antd';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { list } from './iconBox';
 import { cloneDeep } from 'lodash';
-import {
-  PlusCircleOutlined,
-  EditOutlined,
-  MinusCircleOutlined,
-} from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 
 import { getUUID } from '@/utils/utils';
 import localForage from 'localforage';
@@ -17,7 +13,7 @@ const { Search } = Input;
 
 const defaultTreeParaent = [
   {
-    title: '菜单管理',
+    title: 'Root Node',
     key: '00-top',
     children: [],
     isTop: true,
@@ -73,7 +69,6 @@ function menuTree(props) {
       props.setTree(curerntTree);
       return;
     }
-    console.log(props.config.iconIndex, '72----');
     defaultTrreData.current = defaultTrreData.current.map((item) => {
       if (item.key === form.key) {
         return {
@@ -178,7 +173,7 @@ function menuTree(props) {
       operateIdenty === 'add'
         ? {
             title:
-              node.title === '菜单管理'
+              node.title === 'Root Node'
                 ? `Parent-${node.children.length + 1}`
                 : `${node.title}-${node.children.length + 1}`,
             key: getUUID(),
@@ -277,7 +272,7 @@ function menuTree(props) {
               onClick={(e) => handleOperateSub(e, node, 'add')}
             >
               <Tooltip placement="bottom" title="添加子节点">
-                <PlusCircleOutlined />
+                <PlusOutlined />
               </Tooltip>
             </span>
             {!node.isTop ? (
@@ -295,7 +290,7 @@ function menuTree(props) {
                   onClick={(e) => handleOperateSub(e, node, 'delete')}
                 >
                   <Tooltip placement="bottom" title="删除该节点">
-                    <MinusCircleOutlined />
+                    <DeleteOutlined />
                   </Tooltip>
                 </span>
               </>
@@ -339,9 +334,9 @@ function menuTree(props) {
 
           <div
             className="menu-tree-wrapper-content"
-            style={{ display: 'flex', marginRight: '20px' }}
+            style={{ marginRight: '20px' }}
           >
-            <Scrollbars>
+            <Scrollbars style={{ width: '100%', height: '100%' }}>
               <Tree
                 showIcon
                 blockNode

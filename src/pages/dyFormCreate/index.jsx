@@ -11,7 +11,7 @@ export default function DyFormCreate() {
         frameborder="0"
         allowTransparency="true"
         style={{ width: '100%', height: '100%' }}
-        src="http://localhost:9996/tool-datav/index"
+        src="http://101.34.8.240:8085/tool-datav/index/"
       ></iframe>
     </div>
   );

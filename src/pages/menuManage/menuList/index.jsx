@@ -6,8 +6,8 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-06-15 11:05:37
  */
-import { Button, Col, Row, Breadcrumb, message } from 'antd';
-import { EyeOutlined, FileDoneOutlined } from '@ant-design/icons';
+import { Button, Col, Row, message } from 'antd';
+import { EyeOutlined, FileDoneOutlined, LeftOutlined } from '@ant-design/icons';
 import './index.less';
 import ConfigPanel from './configPanel';
 import MenuTree from './menuTree';
@@ -114,63 +114,58 @@ export default function IndexPage() {
 
   return (
     <div className="menu">
-      <Row justify="space-between" align="middle">
-        <Col span={4}>
-          <span className="back-wrapper">
-            <img src={back} className="icon" onClick={() => handleBack()} />
-            返回
-          </span>
-        </Col>
-        <Col span={4} className="menu__btn-preview">
-          <Button
-            type="primary"
-            icon={<FileDoneOutlined />}
-            onClick={() => previewSave()}
-          >
-            保存
-          </Button>
-          <Button
-            type="primary"
-            icon={<EyeOutlined />}
-            onClick={() => previewHandler()}
-          >
-            预览
-          </Button>
-        </Col>
-      </Row>
+      <div className="menu-wrapper">
+        <Row justify="space-between" align="middle" className="menu-top">
+          <Col span={4}>
+            <span className="back-wrapper" onClick={() => handleBack()}>
+              <LeftOutlined />
+              主页
+            </span>
+          </Col>
+          <Col span={4} className="menu__btn-preview">
+            <Button
+              type="primary"
+              icon={<FileDoneOutlined />}
+              onClick={() => previewSave()}
+            >
+              保存
+            </Button>
+            <Button icon={<EyeOutlined />} onClick={() => previewHandler()}>
+              预览
+            </Button>
+          </Col>
+        </Row>
 
-      <div className="menu-config">
-        <Row wrap>
-          {/* 标题部分 */}
-          <Col span={8}>
-            <div className="menu-config__tree">
-              <span>菜单结构</span>
-              {/* <Button onClick={nodeClear}>清空结点</Button> */}
-            </div>
-          </Col>
-          <Col span={16}>
-            <span className="menu-config__info">菜单信息</span>
-          </Col>
-        </Row>
-        <Row wrap className="row-content">
-          {/* 内容部分 */}
-          <Col span={8}>
-            <MenuTree
-              config={config}
-              setTree={setTree}
-              setForm={setForm}
-              submitFlag={submitFlag}
-            />
-          </Col>
-          <Col span={16} className="config-panel__form-box">
-            <ConfigPanel
-              configSubmit={(values, iconSelect, iconIndex) =>
-                configSubmit(values, iconSelect, iconIndex)
-              }
-              formData={formData}
-            />
-          </Col>
-        </Row>
+        <div className="menu-config">
+          <Row wrap>
+            {/* 标题部分 */}
+            <Col span={8} className="menu-left">
+              <div className="col-wrapper">
+                <div className="menu-config__tree">
+                  <span>菜单架构</span>
+                  {/* <Button onClick={nodeClear}>清空结点</Button> */}
+                </div>
+                <MenuTree
+                  config={config}
+                  setTree={setTree}
+                  setForm={setForm}
+                  submitFlag={submitFlag}
+                />
+              </div>
+            </Col>
+            <Col span={16}>
+              <div className="col-wrapper col-info">
+                <span className="menu-config__info">菜单信息</span>
+                <ConfigPanel
+                  configSubmit={(values, iconSelect, iconIndex) =>
+                    configSubmit(values, iconSelect, iconIndex)
+                  }
+                  formData={formData}
+                />
+              </div>
+            </Col>
+          </Row>
+        </div>
       </div>
     </div>
   );

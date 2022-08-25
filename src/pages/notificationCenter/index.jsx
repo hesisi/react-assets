@@ -89,7 +89,7 @@ export default function NotificationCenter(props) {
   const cardRenderHandler = (item) => {
     return (
       <>
-        <div>{item.count}</div>
+        <div style={{ height: '32px' }}>{item.count}</div>
         <div>
           {item.cateory}
           <span>xxxxx</span>
@@ -194,7 +194,7 @@ export default function NotificationCenter(props) {
           <CardHChnage cardArr={cardData} />
         </div>
         <div className="notificaion-list">
-          <h5>消息管理</h5>
+          <h5 className="table-tab-title">消息管理</h5>
           {/* table 查询条件 */}
           <TableHeader formData={formInitData} formValueSubmit={handleSubmit} />
 

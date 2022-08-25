@@ -3,6 +3,7 @@ import './index.less';
 import IconBox from './iconBox';
 import { UploadOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
 import React, { useState, createRef, useEffect } from 'react';
+import { Scrollbars } from 'react-custom-scrollbars';
 import { Space } from '@formily/antd';
 import { list } from './iconBox';
 
@@ -60,104 +61,108 @@ export default function configPanel(props) {
 
   return (
     <div className="menu-config-wrapper">
-      {visible ? (
-        <Form
-          name="basic"
-          labelCol={{ span: 4 }}
-          className="config-panel__form"
-          onFinish={(v) => onFinish(v)}
-          initialValues={{
-            menuname: '',
-            address: '',
-            authority: '',
-            icon: null,
-          }}
-          form={form}
-        >
-          <Form.Item
-            label="菜单名称"
-            name="menuname"
-            rules={[
-              { required: true, message: 'Please input menuname!' },
-              {
-                pattern: /^([\u4e00-\u9fa5]{1,6}|[^\u4e00-\u9fa5]{1,8})$/,
-                message: '字数不超过6个汉字或8个字符',
-              },
-            ]}
-            tooltip="字数不超过6个汉字或8个字符"
+      <Scrollbars style={{ width: '100%', height: '100%' }}>
+        {visible ? (
+          <Form
+            name="basic"
+            // labelCol={{ span: 4 }}
+            layout="vertical"
+            className="config-panel__form"
+            onFinish={(v) => onFinish(v)}
+            initialValues={{
+              menuname: '',
+              address: '',
+              authority: '',
+              icon: null,
+            }}
+            form={form}
           >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="地址"
-            name="address"
-            rules={[{ required: true, message: 'Please input address!' }]}
-          >
-            <Input />
-          </Form.Item>
-
-          <Form.Item
-            label="权限标识"
-            name="authority"
-            rules={[{ required: true, message: 'Please Select authority!' }]}
-          >
-            <Select
-              style={{
-                width: 180,
-              }}
-              allowClear
-              placeholder="请选择"
+            <Form.Item
+              label="菜单名称"
+              name="menuname"
+              rules={[
+                { required: true, message: 'Please input menuname!' },
+                {
+                  pattern: /^([\u4e00-\u9fa5]{1,6}|[^\u4e00-\u9fa5]{1,8})$/,
+                  message: '字数不超过6个汉字或8个字符',
+                },
+              ]}
+              tooltip="字数不超过6个汉字或8个字符"
             >
-              {selectList.map((e) => {
-                return (
-                  <Select.Option value={e.value} key={e.value}>
-                    {e.label}
-                  </Select.Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
+              <Input />
+            </Form.Item>
 
-          <Form.Item label="图标" name="icon">
-            <>
-              <p>
-                <span className="icons-span">
-                  {iconIndex >= 0 ? (
-                    <>已选择：{React.createElement(list[iconIndex])}</>
-                  ) : (
-                    '从图标库选择'
-                  )}
-                </span>
-                <Button type="link">
-                  <UploadOutlined />
-                  上传
-                </Button>
-              </p>
-              <IconBox
-                // setIconSelect={setIconSelect}
-                setIconIndex={setIconIndex}
-                iconIndex={iconIndex}
-                iconSelect={iconSelect}
-              />
-            </>
-          </Form.Item>
+            <Form.Item
+              label="地址"
+              name="address"
+              rules={[{ required: true, message: 'Please input address!' }]}
+            >
+              <Input />
+            </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-            <Space>
+            <Form.Item
+              label="权限标识"
+              name="authority"
+              rules={[{ required: true, message: 'Please Select authority!' }]}
+            >
+              <Select
+                style={{
+                  width: '100%',
+                }}
+                allowClear
+                placeholder="请选择"
+              >
+                {selectList.map((e) => {
+                  return (
+                    <Select.Option value={e.value} key={e.value}>
+                      {e.label}
+                    </Select.Option>
+                  );
+                })}
+              </Select>
+            </Form.Item>
+
+            <Form.Item label="图标" name="icon">
+              <>
+                <p>
+                  <span className="icons-span">
+                    {iconIndex >= 0 ? (
+                      <>已选择：{React.createElement(list[iconIndex])}</>
+                    ) : (
+                      '从图标库选择'
+                    )}
+                  </span>
+                  <Button type="link">
+                    <UploadOutlined />
+                    上传
+                  </Button>
+                </p>
+                <IconBox
+                  // setIconSelect={setIconSelect}
+                  setIconIndex={setIconIndex}
+                  iconIndex={iconIndex}
+                  iconSelect={iconSelect}
+                />
+              </>
+            </Form.Item>
+
+            <Form.Item
+              wrapperCol={{ offset: 0, span: 24 }}
+              className="form-button"
+            >
               <Button type="primary" htmlType="submit">
                 确定
               </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      ) : (
-        <div>
-          {props?.formData?.formValue?.isTop
-            ? '该节点暂无配置信息'
-            : '请点击查看配置信息'}
-        </div>
-      )}
+            </Form.Item>
+          </Form>
+        ) : (
+          <div>
+            {props?.formData?.formValue?.isTop
+              ? '该节点暂无配置信息'
+              : '请点击查看配置信息'}
+          </div>
+        )}
+      </Scrollbars>
     </div>
   );
 }

@@ -44,6 +44,7 @@ import {
 } from '@ant-design/icons';
 import { nanoid } from 'nanoid';
 import moment from 'moment';
+// import flowbg from '@/assets/flow_bg.png'
 
 export default function IndexPage() {
   const location = useLocation();

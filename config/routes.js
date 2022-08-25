@@ -23,6 +23,7 @@ export default [
     path: '/homeIndex',
     component: '@/layouts/homeIndex/index',
     meta: { showMenu: false, showHeader: true },
+    key: 'default-1',
     routes: [
       {
         name: '首页',
@@ -35,6 +36,7 @@ export default [
     name: '消息中心',
     path: '/notificationCenter',
     component: '@/layouts/homeIndex/index',
+    key: 'default-2',
     meta: { showMenu: false, showHeader: true },
     routes: [
       {
@@ -53,6 +55,7 @@ export default [
     name: '用户管理',
     path: '/userManage',
     component: '@/layouts/userManageLoyout/index',
+    key: 'default-3',
     meta: { showMenu: false, showHeader: true },
     routes: [
       {
@@ -65,6 +68,7 @@ export default [
         icon: React.createElement(LaptopOutlined),
         path: '/userManage/authManage',
         component: '@/layouts/basicLayout',
+        key: 'default-3-1',
         routes: [
           {
             path: '/userManage/authManage',
@@ -75,18 +79,21 @@ export default [
             path: '/userManage/authManage/account',
             component: '@/pages/userManage/authManage/account/index.tsx',
             exact: true,
+            key: 'default-3-1-1',
             meta: { showMenu: false, showHeader: true },
           },
           {
             name: '角色管理',
             path: '/userManage/authManage/role',
             component: '@/pages/userManage/authManage/role',
+            key: 'default-3-1-2',
             meta: { showMenu: false, showHeader: true },
           },
         ],
       },
       {
         name: '组织管理',
+        key: 'default-3-2',
         icon: React.createElement(NotificationOutlined),
         path: '/userManage/orginationManage',
         component: '@/pages/userManage/orginationManage/index',
@@ -96,6 +103,7 @@ export default [
   },
   {
     name: '菜单管理',
+    key: 'default-3-4',
     path: '/menuManage',
     component: '@/layouts/menuManageLayout',
     routes: [
@@ -120,6 +128,7 @@ export default [
     name: '流程管理',
     path: '/activityManage',
     component: '@/layouts/activityManageLayout',
+    key: 'default-5',
     routes: [
       {
         path: '/activityManage',
@@ -147,6 +156,7 @@ export default [
     name: '表单管理',
     path: '/formManage',
     component: '@/layouts/formManageLayout',
+    key: 'default-6',
     routes: [
       {
         path: '/formManage',
@@ -189,6 +199,7 @@ export default [
   {
     name: '主页管理',
     path: '/pageManage',
+    key: 'default-7',
     component: '@/layouts/pageManageLayout/index',
     routes: [
       {
@@ -230,6 +241,7 @@ export default [
   {
     name: '动态报表',
     path: '/dyformManage',
+    key: 'default-8',
     component: '@/layouts/homeIndex/index',
     meta: { showMenu: false, showHeader: true },
     routes: [

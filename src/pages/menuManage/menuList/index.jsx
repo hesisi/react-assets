@@ -78,9 +78,38 @@ export default function IndexPage() {
       message.warning('请先配置菜单!');
       return;
     }
+    let munuListDataSave = JSON.parse(
+      window.localStorage.getItem('munuListData'),
+    );
+    const newKeys = [];
     const temp = (data) => {
       // 回调处理menu所需参数label
       data.forEach((item) => {
+        newKeys.push(item.key);
+        // const findItem = munuListDataSave.find(itemMu => { return itemMu.key === item.key })
+        // if (findItem) {
+        //   munuListDataSave = munuListDataSave.filter(
+        //     (itemF) => itemF.key !== item.key,
+        //   );
+        //   munuListDataSave.push({
+        //     ...findItem,
+        //     name: item.title,
+        //     path: item.address || findItem.path,
+        //     // icon: icon 调整
+        //   });
+        //   delete item.icon;
+        // } else {
+        //   /* 新增 */
+        //   if (item.oper) {
+        //     munuListDataSave.push({
+        //       ...item,
+        //       path: item.address,
+        //       name: item.title,
+        //       //  icon
+        //     });
+        //   }
+        //   delete item.icon;
+        // }
         delete item.icon;
         if (item.children?.length > 0) {
           temp(item.children);
@@ -88,7 +117,13 @@ export default function IndexPage() {
       });
       return data;
     };
-    localForage.setItem('menuTree', temp(cloneDeep(tree)));
+    const treeDataSave = temp(cloneDeep(tree));
+
+    console.log(treeDataSave, '122----');
+    localForage.setItem('menuTree', treeDataSave);
+    // munuListDataSave = munuListDataSave.filter((item) => newKeys.includes(item.key));
+    // localStorage.setItem('munuListData', JSON.stringify(munuListDataSave));
+    localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
     message.success('菜单保存成功!');
   };
 

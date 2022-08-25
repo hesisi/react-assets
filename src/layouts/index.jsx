@@ -11,6 +11,7 @@ import { withRouter } from 'react-router-dom';
 import { Link } from 'umi';
 import React, { useMemo } from 'react';
 import routes from '../../config/routes';
+import { dealMenuList } from '../../config/routesDy';
 import Styles from './index.less';
 import logo from '@/assets/icons/logo.png';
 import {
@@ -23,26 +24,36 @@ import './index.less';
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const renderNavBar = routes
-  .filter((item) => item.name)
-  ?.map((item) => {
-    return {
-      key: item.path,
-      label: item.path ? (
-        <Link to={item.path}>{item.name}</Link>
-      ) : (
-        <div
-          onClick={() => {
-            if (item.name === '动态报表') {
-              window.location.href = 'http://localhost:9996/tool-datav/index';
-            }
-          }}
-        >
-          {item.name}
-        </div>
+const newRoutes = dealMenuList();
+const renderNavBar = [];
+newRoutes
+  .filter((item) => item.title)
+  ?.forEach((item) => {
+    // const isHave = newRoutes.find((newItem) => {
+    //   return newItem.key === item.key;
+    // });
+    // if (isHave) {
+    renderNavBar.push({
+      key: item.address || item.path,
+      label: (
+        <Link to={item.address || item.path}>{item.title || item.name}</Link>
       ),
-      meta: item.meta,
-    };
+      // label: item.path ? (
+      //   <Link to={item.path}>{item.name}</Link>
+      // ) : (
+      //   <div
+      //     onClick={() => {
+      //       if (item.name === '动态报表') {
+      //         window.location.href = 'http://localhost:9996/tool-datav/index';
+      //       }
+      //     }}
+      //   >
+      //     {item.name}
+      //   </div>
+      // ),
+      // meta: item.meta,
+    });
+    // }
   });
 
 const navBar = renderNavBar.filter((e) => !e.meta?.navHidden); // 过滤掉菜单预览
@@ -62,27 +73,41 @@ const CommonLayout = (props) => {
   const selectKey = `/${props.location.pathname?.split('/')[1]}`;
 
   const activePath = props.location.pathname;
-  const curretnItem = routes?.filter((item) => {
-    return item.path === props.pathPrefix;
+  const curretnItem = newRoutes?.filter((item) => {
+    return item.address === props.pathPrefix;
   });
 
+  const judgeMunuChild = (menuArr) => {
+    let backArr = [];
+    menuArr.forEach((item) => {
+      const isHave = newRoutes.find((newItem) => {
+        return newItem.path === item.path;
+      });
+      if (isHave) {
+        backArr.push(item);
+      }
+    });
+    return backArr;
+  };
   // 左侧菜单树
   const MenuList =
-    (curretnItem && curretnItem[0] && curretnItem[0].routes) || [];
+    (curretnItem && curretnItem[0] && curretnItem[0].children) || [];
+  // judgeMunuChild(children[0].children)) ||
+  // [];
 
   // 递归遍历左侧菜单
   const renderItems = function (list = []) {
     return list.map((item, index) => {
-      if (item.name && item.component) {
+      if (item.title || item.name) {
         return {
-          key: item.path,
+          key: item.address || item.path,
           icon: item.icon,
-          label: item.path ? (
-            <Link to={item.path}>{item.name}</Link>
+          label: item.address ? (
+            <Link to={item.address}>{item.title}</Link>
           ) : (
-            item.name
+            item.title || item.name
           ),
-          children: item.routes && renderItems(item.routes),
+          children: item?.children?.length && renderItems(item.children),
         };
       }
     });
@@ -162,6 +187,7 @@ const CommonLayout = (props) => {
           <Content
             style={{
               // padding: '0 24px',
+              height: '100%',
               minHeight: 280,
               backgroundColor: '#f0f2f5',
             }}

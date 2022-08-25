@@ -1,6 +1,6 @@
 import './login.less';
 import { Space, Select, Form, Button, Input, Row, Col, Checkbox } from 'antd';
-const testImg = require('../../assets/panda.jpg'); // TODO:等切图
+const testImg = require('../../assets/images/登录页.png');
 
 const Login = () => {
   const onFinish = (values) => {

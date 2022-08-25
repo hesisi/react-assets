@@ -27,7 +27,7 @@ export default [
       {
         name: '首页',
         path: '/homeIndex',
-        component: '@/pages/homeIndex/index',
+        component: '@/pages/homeIndex/home',
       },
     ],
   },

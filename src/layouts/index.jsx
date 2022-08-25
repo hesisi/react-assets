@@ -6,13 +6,14 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-08 11:46:00
  */
-import { Breadcrumb, Layout, Menu } from 'antd';
+import { Breadcrumb, Layout, Menu, Avatar } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link } from 'umi';
 import React, { useMemo } from 'react';
 import routes from '../../config/routes';
 import Styles from './index.less';
 import logo from '@/assets/icons/logo.png';
+import { UserOutlined } from '@ant-design/icons';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -103,6 +104,8 @@ const CommonLayout = (props) => {
           mode="horizontal"
           defaultSelectedKeys={[selectKey]}
           items={navBar}
+          style={{ background: '#0D6BFF' }}
+          className={Styles['menu']}
         />
       </Header>
       <Content

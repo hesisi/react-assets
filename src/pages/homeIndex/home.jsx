@@ -60,6 +60,16 @@ const banner = [
     en: 'Form Management',
     url: '/formManage/formList',
   },
+  {
+    bg: require('../../assets/images/消息中心bg.png'),
+    title: '消息中心',
+    id: nanoid(),
+    description:
+      '消息中心会通知您关于系统的各类消息，让您能及时得到各类信息的进度状态，并及时进行处理。',
+    icon: require('../../assets/icons/u50.png'),
+    en: 'Notification Center',
+    url: '/notificationCenter/notificationList',
+  },
 ];
 
 const home = () => {

@@ -82,7 +82,7 @@ export default function Approver(props: any) {
     <>
       <Form.Item label="审批人">
         <Form.Item name="approver" noStyle>
-          <Select defaultValue={approver?.id} style={{ width: 120 }} disabled>
+          <Select value={approver?.id} style={{ width: 120 }} disabled>
             {approverList.map((x) => {
               return (
                 <Option key={x.id} value={x.id}>

@@ -42,7 +42,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
     }
   }, []);
   return (
-    <Space style={{ marginRight: 10 }}>
+    <Space style={{ marginRight: 10, padding: '10px 0' }}>
       <Radio.Group
         value={GlobalRegistry.getDesignerLanguage()}
         optionType="button"

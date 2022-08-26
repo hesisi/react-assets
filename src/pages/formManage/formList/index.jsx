@@ -107,6 +107,11 @@ export default function FormList() {
     saveFormList(arr);
   };
 
+  // 查看
+  const previewHandler = (formCode) => {
+    history.push(`/formManage/formPreview?formCode=${formCode}`);
+  };
+
   // 表格配置项
   const columns = [
     {
@@ -176,7 +181,7 @@ export default function FormList() {
             }}
             size={'small'}
             icon={<EyeOutlined />}
-            onClick={() => handleShowDesigner(record)}
+            onClick={() => previewHandler(record.formCode)}
           >
             查看
           </Button>

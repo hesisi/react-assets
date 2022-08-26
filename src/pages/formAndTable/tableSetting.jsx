@@ -428,7 +428,7 @@ const tableSetting = (props) => {
         </Space>
       </Row>
 
-      <Row style={{ height: '100%', width: '100%' }}>
+      <Row>
         {/* 大纲部分 */}
         <Col
           span={4}

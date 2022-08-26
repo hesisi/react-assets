@@ -173,7 +173,7 @@ export default function (props) {
   };
 
   return (
-    <>
+    <div style={{ background: '#f0f2f5' }}>
       <Group
         defaultValue={desingerType}
         buttonStyle="solid"
@@ -196,6 +196,6 @@ export default function (props) {
       ) : (
         <TableSetting formCode={formCode} />
       )}
-    </>
+    </div>
   );
 }

@@ -95,7 +95,7 @@ GlobalRegistry.registerDesignerLocales({
 });
 
 const FormDesigner = (props) => {
-  const { type = 'form', getDesigner,onSave } = props;
+  const { type = 'form', getDesigner, onSave } = props;
 
   const [inputsSource, setInputsSource] = useState([]);
   const [layoutsSource, setLayoutsSource] = useState([
@@ -170,8 +170,14 @@ const FormDesigner = (props) => {
   return (
     <Designer engine={engine}>
       <StudioPanel
-        logo={<LogoWidget />}
-        actions={<ActionsWidget type={type} getDesigner={getDesigner} onSave={onSave} />}
+        // logo={<LogoWidget />}
+        actions={
+          <ActionsWidget
+            type={type}
+            getDesigner={getDesigner}
+            onSave={onSave}
+          />
+        }
       >
         <CompositePanel>
           <CompositePanel.Item title="panels.Component" icon="Component">

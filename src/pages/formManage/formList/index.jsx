@@ -118,6 +118,7 @@ export default function FormList() {
       title: '表单编号',
       dataIndex: 'formCode',
       key: 'formCode',
+      align: 'center',
     },
     {
       title: '创建时间',
@@ -128,6 +129,7 @@ export default function FormList() {
           new Date(a.createTime).getTime() - new Date(b.createTime).getTime()
         );
       },
+      align: 'center',
     },
     {
       title: '更新时间',
@@ -138,6 +140,7 @@ export default function FormList() {
           new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime()
         );
       },
+      align: 'center',
     },
     {
       title: '表单状态',
@@ -257,6 +260,7 @@ export default function FormList() {
         </Space>
       ),
       fixed: 'right',
+      align: 'center',
     },
   ];
 
@@ -418,64 +422,79 @@ export default function FormList() {
       <Layout className="list-layout">
         <Content className="list-content">
           {/* 筛选框 */}
-          <Row justify="space-between" className="list-row">
+          <Row justify="space-between">
             <Col>
-              <Form
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                layout="inline"
-                ref={formRef}
-              >
-                <Form.Item label="表单名称" name="formName">
-                  <Input allowClear placeholder="请输入内容" />
-                </Form.Item>
-
-                <Form.Item label="表单状态" name="formStatus">
-                  <Select
-                    style={{
-                      width: 180,
-                    }}
-                    allowClear
-                    placeholder="请选择内容"
+              <Row justify="flex-start">
+                <Col>
+                  <Form
+                    labelCol={{ span: 0 }}
+                    wrapperCol={{ span: 24 }}
+                    layout="inline"
+                    ref={formRef}
+                    className="default-form"
                   >
-                    {selectList.map((e) => {
-                      return (
-                        <Select.Option value={e.value} key={e.value}>
-                          {e.label}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
-              </Form>
+                    <Form.Item label="" name="formName">
+                      <Input allowClear placeholder="请输入表单名称" />
+                    </Form.Item>
+
+                    <Form.Item label="" name="formStatus">
+                      <Select allowClear placeholder="请选择表单状态">
+                        {selectList.map((e) => {
+                          return (
+                            <Select.Option value={e.value} key={e.value}>
+                              {e.label}
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </Form>
+                </Col>
+
+                <Col>
+                  <Space size={10}>
+                    <Button
+                      icon={<SearchOutlined />}
+                      onClick={searchHandler}
+                      className="ant-btn-primary"
+                    >
+                      搜索
+                    </Button>
+                    <Button
+                      icon={<MinusCircleOutlined />}
+                      onClick={resetHandler}
+                      className="ant-btn-default"
+                    >
+                      清除
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
             </Col>
 
             <Col>
               <Space size={10}>
                 <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  onClick={searchHandler}
+                  icon={<PlusCircleOutlined />}
+                  onClick={handleAdd}
+                  className="ant-btn-primary"
                 >
-                  搜索
+                  新增表单
                 </Button>
-                <Button icon={<MinusCircleOutlined />} onClick={resetHandler}>
-                  清除
+                <Button
+                  icon={<CloseCircleOutlined />}
+                  onClick={deleteHandler}
+                  className="ant-btn-primary"
+                >
+                  删除表单
                 </Button>
               </Space>
             </Col>
           </Row>
 
-          <Row justify="end" style={{ padding: '20px 0' }}>
-            <Space size={10}>
-              <Button icon={<PlusCircleOutlined />} onClick={handleAdd}>
-                添加
-              </Button>
-              <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
-                删除
-              </Button>
-            </Space>
-          </Row>
+          <Divider style={{ margin: '30px 0 22px' }} />
+
+          {/* <Row justify="end" style={{ padding: '20px 0' }}></Row> */}
 
           {/* 列表部分 */}
           <Table
@@ -496,8 +515,11 @@ export default function FormList() {
         visible={visible}
         onOk={handleOk}
         onCancel={handleCancel}
+        className="default-modal"
+        cancelText="取消"
+        okText="确认"
       >
-        <Form labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        <Form layout="vertical">
           <Form.Item label="表单名称">
             <Input
               value={formInfo.formName}
@@ -506,18 +528,19 @@ export default function FormList() {
                   formName: e.target.value,
                 })
               }
+              placeholder="请输入"
             />
           </Form.Item>
 
           <Form.Item label="创建方式">
-            <Radio.Group defaultValue="canvas">
-              <Radio.Button value="canvas">画布创建</Radio.Button>
-              <Radio.Button value="template">模板创建</Radio.Button>
-              <Radio.Button value="data">数据创建</Radio.Button>
+            <Radio.Group defaultValue="canvas" className="default-radio">
+              <Radio value="canvas">画布创建</Radio>
+              <Radio value="template">模板创建</Radio>
+              <Radio value="data">数据创建</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="描述">
+          <Form.Item label="备注">
             <TextArea
               value={formInfo.formDesc}
               onChange={(e) =>
@@ -525,6 +548,8 @@ export default function FormList() {
                   formDesc: e.target.value,
                 })
               }
+              placeholder="请输入"
+              rows={4}
             />
           </Form.Item>
         </Form>

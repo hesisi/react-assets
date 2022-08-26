@@ -29,12 +29,29 @@ export default class PropertiesView extends Component {
       element: null,
       targetForm: '',
       isModalVisible: false,
-      dataSource: [],
+      dataSource: [
+        {
+          key: 11222,
+          id: 12345,
+          name: '张三',
+          tel: 18823452222,
+          email: 'xxx@email.com',
+          creatTime: '2022-8-26',
+        },
+        {
+          key: 12344,
+          id: 20082,
+          name: 'jansen',
+          tel: 1882345111,
+          email: 'xxx@email.com',
+          creatTime: '2022-8-26',
+        },
+      ],
       columns: [
         {
-          title: '序号',
-          dataIndex: 'sequence',
-          key: 'sequence',
+          title: 'ID',
+          dataIndex: 'id',
+          key: 'id',
         },
         {
           title: '姓名',
@@ -57,6 +74,15 @@ export default class PropertiesView extends Component {
           key: 'creatTime',
         },
       ],
+      rowSelection: {
+        onSelect: (record, selected, selectedRows, nativeEvent) => {
+          console.log(record);
+          this.setState({
+            approver: record,
+          });
+        },
+      },
+      approver: null,
     };
   }
   componentDidMount() {
@@ -99,10 +125,19 @@ export default class PropertiesView extends Component {
     flowMsg.targetForm = value;
     this.updateFlowMsg(flowMsg);
   };
+  /**更新流程配置信息*/
   updateFlowMsg = (data) => {
     this.props.setFlowMsg(data);
   };
   handleOk = () => {
+    const { flowMsg } = this.props;
+    flowMsg.approver = this.state.approver;
+    this.updateFlowMsg(flowMsg);
+    this.setState({
+      isModalVisible: false,
+    });
+  };
+  handleCancle = () => {
     this.setState({
       isModalVisible: false,
     });
@@ -171,7 +206,10 @@ export default class PropertiesView extends Component {
                 <div className="group-tittle">
                   审批人 <ExclamationCircleOutlined />
                 </div>
-                <Approver addApprover={this.addApprover}></Approver>
+                <Approver
+                  addApprover={this.addApprover}
+                  approver={flowMsg?.approver}
+                ></Approver>
               </div>
             )}
             {element?.type === 'bpmn:ExclusiveGateway' && (
@@ -197,6 +235,7 @@ export default class PropertiesView extends Component {
                       onChange={(value) => {
                         this.handleChange(value);
                       }}
+                      defaultValue={flowMsg.targetForm}
                     >
                       <Option value="form1">请假表单</Option>
                       <Option value="form2">报销表单</Option>
@@ -224,7 +263,10 @@ export default class PropertiesView extends Component {
                     字段权限：
                   </Col>
                   <Col span={24}>
-                    <FieldTable form={this.state.targetForm}></FieldTable>
+                    <FieldTable
+                      form={flowMsg.targetForm}
+                      type={element?.type}
+                    ></FieldTable>
                   </Col>
                 </Row>
               </div>
@@ -236,7 +278,7 @@ export default class PropertiesView extends Component {
           width={620}
           visible={this.state.isModalVisible}
           onOk={() => this.handleOk()}
-          onCancel={() => this.handleOk()}
+          onCancel={() => this.handleCancle()}
         >
           <Row justify="start" className="list-row" style={{ marginTop: 20 }}>
             <Col span={16}>
@@ -245,11 +287,8 @@ export default class PropertiesView extends Component {
                 wrapperCol={{ span: 24 }}
                 layout="inline"
               >
-                <Form.Item label="ID" name="ID" style={{ width: '40%' }}>
-                  <Input allowClear placeholder="请输入用户ID" />
-                </Form.Item>
-                <Form.Item label="用户名" name="name" style={{ width: '40%' }}>
-                  <Input allowClear placeholder="请输入用户名" />
+                <Form.Item label="ID" name="ID" style={{ width: '80%' }}>
+                  <Input allowClear placeholder="请输入用户ID/用户名" />
                 </Form.Item>
               </Form>
             </Col>
@@ -272,6 +311,10 @@ export default class PropertiesView extends Component {
             </Col>
           </Row>
           <Table
+            rowSelection={{
+              type: 'radio',
+              ...this.state.rowSelection,
+            }}
             style={{ marginTop: 20 }}
             dataSource={this.state.dataSource}
             columns={this.state.columns}

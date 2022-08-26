@@ -174,11 +174,7 @@ export default function FormList() {
       render: (_, record) => (
         <Space size={6}>
           <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+            className="default-table__btn"
             size={'small'}
             icon={<EyeOutlined />}
             onClick={() => previewHandler(record.formCode)}
@@ -186,11 +182,7 @@ export default function FormList() {
             查看
           </Button>
           <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+            className="default-table__btn"
             onClick={() => handleShowDesigner(record)}
             size={'small'}
             icon={<FormOutlined />}
@@ -198,11 +190,7 @@ export default function FormList() {
             编辑
           </Button>
           <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+            className="default-table__btn"
             onClick={() => handleDelete(record)}
             size={'small'}
             icon={<CloseOutlined />}

@@ -150,12 +150,13 @@ const tableSetting = (props) => {
     objSetFunc(properties, formItem);
 
     const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    if (tableConfig && tableConfig.id === props.formCode) {
+    const data = tableConfig && tableConfig[props.formCode];
+    if (data) {
       formItem =
-        JSON.stringify(formItem) === JSON.stringify(tableConfig.tableConfig)
-          ? tableConfig.tableConfig
+        JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
+          ? data.tableConfig
           : formItem;
-      setButtons(tableConfig.buttonConfig);
+      setButtons(data.buttonConfig);
     }
 
     setTable(formItem);
@@ -290,14 +291,20 @@ const tableSetting = (props) => {
 
   // 列表配置保存
   const handleOk = (status) => {
-    window.localStorage.setItem(
-      'tableConfig',
-      JSON.stringify({
+    const obj = window.localStorage.getItem('tableConfig')
+      ? JSON.parse(window.localStorage.getItem('tableConfig'))
+      : {};
+    const data = {
+      [`${props.formCode}`]: {
         tableConfig: table,
         buttonConfig: buttons,
         status: status,
         id: props.formCode,
-      }),
+      },
+    };
+    window.localStorage.setItem(
+      'tableConfig',
+      JSON.stringify(Object.assign(obj, data)),
     );
     setSaveVisible(false);
   };

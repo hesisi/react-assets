@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import * as echarts from 'echarts';
-
+import Icon, { FundProjectionScreenOutlined } from '@ant-design/icons';
 const GaugeChart = (props) => {
   const initChart = () => {
     let element = document.getElementById(props.id);
@@ -36,10 +36,23 @@ const GaugeChart = (props) => {
 
   return (
     <div
-      id={props.id}
-      style={{ width: '100%', height: '100%' }}
-      className={props.className}
-    ></div>
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+      }}
+    >
+      <p style={{ marginBottom: '5px' }}>
+        <FundProjectionScreenOutlined style={{ marginRight: '4px' }} />
+        GaugeChart
+      </p>
+      <div
+        id={props.id}
+        style={{ width: '100%', height: '100%' }}
+        className={props.className}
+      ></div>
+    </div>
   );
 };
 

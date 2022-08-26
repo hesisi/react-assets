@@ -401,7 +401,11 @@ const homePage = (props) => {
                     className={
                       template.length === 0 ? 'content-box__panel' : ''
                     }
-                    style={{ padding: 0, borderRight: '20px solid #f0f2f5' }}
+                    style={{
+                      padding: 0,
+                      borderRight: '20px solid #f0f2f5',
+                      display: 'flex',
+                    }}
                   >
                     {template.length > 0 ? (
                       renderDom(dom)

@@ -69,6 +69,7 @@ export default function Page() {
       title: '流程编号',
       dataIndex: 'id',
       key: 'id',
+      align: 'center',
     },
     {
       title: '创建时间',
@@ -79,6 +80,7 @@ export default function Page() {
           new Date(a.createTime).getTime() - new Date(b.createTime).getTime()
         );
       },
+      align: 'center',
     },
     {
       title: '更新时间',
@@ -89,6 +91,7 @@ export default function Page() {
           new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime()
         );
       },
+      align: 'center',
     },
     {
       title: '流程状态',
@@ -104,18 +107,20 @@ export default function Page() {
           />
         );
       },
+      align: 'center',
     },
     {
       title: '备注',
       dataIndex: 'remarks',
       key: 'remarks',
+      align: 'center',
     },
     {
       title: '操作',
       dataIndex: 'action',
       key: 'action',
       render: (_, record) => (
-        <Space split={<Divider type="vertical" />} size={0}>
+        <Space size={6}>
           <Button
             style={{
               fontSize: '12px',
@@ -155,6 +160,7 @@ export default function Page() {
         </Space>
       ),
       fixed: 'right',
+      align: 'center',
     },
   ];
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
@@ -305,19 +311,14 @@ export default function Page() {
                 wrapperCol={{ span: 24 }}
                 layout="inline"
                 ref={formRef}
+                className="default-form"
               >
                 <Form.Item label="" name="name">
                   <Input allowClear placeholder="请输入流程名称" />
                 </Form.Item>
 
                 <Form.Item label="" name="status">
-                  <Select
-                    style={{
-                      width: 180,
-                    }}
-                    allowClear
-                    placeholder="请选择流程状态"
-                  >
+                  <Select allowClear placeholder="请选择流程状态">
                     {selectList.map((e) => {
                       return (
                         <Select.Option value={e.value} key={e.value}>

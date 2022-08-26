@@ -161,6 +161,7 @@ export default function FormList() {
           // </Tag>
         );
       },
+      align: 'center',
     },
     {
       title: '操作',

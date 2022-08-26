@@ -28,7 +28,6 @@ export default function configPanel(props) {
       form.setFieldsValue({
         menuname: value?.menuname || '',
         address: value?.address || '',
-        authority: value?.authority || '',
         icon: value?.icon || null,
       });
 
@@ -72,7 +71,6 @@ export default function configPanel(props) {
             initialValues={{
               menuname: '',
               address: '',
-              authority: '',
               icon: null,
             }}
             form={form}
@@ -98,28 +96,6 @@ export default function configPanel(props) {
               rules={[{ required: true, message: 'Please input address!' }]}
             >
               <Input />
-            </Form.Item>
-
-            <Form.Item
-              label="权限标识"
-              name="authority"
-              rules={[{ required: true, message: 'Please Select authority!' }]}
-            >
-              <Select
-                style={{
-                  width: '100%',
-                }}
-                allowClear
-                placeholder="请选择"
-              >
-                {selectList.map((e) => {
-                  return (
-                    <Select.Option value={e.value} key={e.value}>
-                      {e.label}
-                    </Select.Option>
-                  );
-                })}
-              </Select>
             </Form.Item>
 
             <Form.Item label="图标" name="icon">

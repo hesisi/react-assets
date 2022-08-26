@@ -119,12 +119,12 @@ export default function IndexPage() {
     };
     const treeDataSave = temp(cloneDeep(tree));
 
-    console.log(treeDataSave, '122----');
     localForage.setItem('menuTree', treeDataSave);
     // munuListDataSave = munuListDataSave.filter((item) => newKeys.includes(item.key));
     // localStorage.setItem('munuListData', JSON.stringify(munuListDataSave));
     localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
     message.success('菜单保存成功!');
+    location.reload();
   };
 
   const nodeClear = () => {

@@ -8,6 +8,7 @@ import {
   Row,
   Col,
   Divider,
+  PageHeader,
 } from 'antd';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './preview.less';
@@ -15,6 +16,7 @@ import { PreviewWidget } from '@/pages/Desinger/widgets';
 import { transformToTreeNode } from '@designable/formily-transformer';
 import Icon from '@/utils/icon';
 import { nanoid } from 'nanoid';
+import { history } from 'umi';
 
 const Preview = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
@@ -194,6 +196,14 @@ const Preview = (props) => {
 
   return (
     <div className="form-preview">
+      <PageHeader
+        className="default-page__header"
+        onBack={() => {
+          history.goBack();
+        }}
+        title="返回"
+      />
+
       <div className="form-preview__table">
         <Row justify="space-between" style={{ padding: '0 40px' }}>
           <Col>

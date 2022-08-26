@@ -290,7 +290,7 @@ const tableSetting = (props) => {
   };
 
   // 列表配置保存
-  const handleOk = (status) => {
+  const handleOk = () => {
     const obj = window.localStorage.getItem('tableConfig')
       ? JSON.parse(window.localStorage.getItem('tableConfig'))
       : {};
@@ -381,6 +381,13 @@ const tableSetting = (props) => {
     btnForm?.resetFields();
     setIcon(btnForm.getFieldValue('icon'));
   };
+
+  // 查看
+  const previewHandler = (formCode) => {
+    handleOk();
+    history.push(`/formManage/formPreview?formCode=${props.formCode}`);
+  };
+
   return (
     <div className="table-setting">
       <Row
@@ -397,6 +404,14 @@ const tableSetting = (props) => {
           <Button
             icon={<Icon icon="SaveOutlined" />}
             type="primary"
+            onClick={previewHandler}
+            className="ant-btn-primary"
+          >
+            预览
+          </Button>
+          <Button
+            icon={<Icon icon="SaveOutlined" />}
+            type="primary"
             onClick={() => {
               setSaveVisible(true);
             }}
@@ -404,25 +419,6 @@ const tableSetting = (props) => {
           >
             保存
           </Button>
-          {/* <Button
-            icon={<Icon icon="CheckSquareOutlined" />}
-            type="primary"
-            ghost
-            onClick={() => handleOk('enable')}
-          >
-            启用
-          </Button>
-          <Button
-            icon={<Icon icon="StopOutlined" />}
-            type="primary"
-            ghost
-            onClick={() => handleOk('disabled')}
-          >
-            停用
-          </Button>
-          <Button icon={<Icon icon="CloseOutlined" />} type="primary" ghost>
-            删除
-          </Button> */}
           <Button
             icon={<Icon icon="ArrowLeftOutlined" />}
             className="ant-btn-default"
@@ -740,7 +736,7 @@ const tableSetting = (props) => {
       <Modal
         title="确认保存"
         visible={saveVisible}
-        onOk={() => handleOk('save')}
+        onOk={handleOk}
         onCancel={handleCancel}
       >
         <p>是否保存当前表单？</p>

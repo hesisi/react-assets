@@ -96,10 +96,10 @@ export default function FormList() {
   };
 
   // 设置表单的状态
-  const formStatusHandler = (record, status) => {
+  const formStatusHandler = (record) => {
     const arr = dataSource.map((e) => {
       if (e.formCode === record.formCode) {
-        e.formStatus = status;
+        e.formStatus = record.formStatus === 'enable' ? 'disabled' : 'enable';
       }
       return e;
     });
@@ -110,53 +110,46 @@ export default function FormList() {
   // 表格配置项
   const columns = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
-      align: 'center',
-      render: (_, record, index) => {
-        return <span>{index + 1}</span>;
-      },
-      width: 100,
-      fixed: 'left',
+      title: '表单名称',
+      dataIndex: 'formName',
+      key: 'formName',
     },
-
     {
       title: '表单编号',
       dataIndex: 'formCode',
       key: 'formCode',
-      align: 'center',
-    },
-    {
-      title: '表单名称',
-      dataIndex: 'formName',
-      key: 'formName',
-      align: 'center',
     },
     {
       title: '创建时间',
       dataIndex: 'createTime',
       key: 'createTime',
-      align: 'center',
+      sorter: (a, b) => {
+        return (
+          new Date(a.createTime).getTime() - new Date(b.createTime).getTime()
+        );
+      },
     },
     {
       title: '更新时间',
       dataIndex: 'updateTime',
       key: 'updateTime',
-      align: 'center',
+      sorter: (a, b) => {
+        return (
+          new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime()
+        );
+      },
     },
     {
       title: '表单状态',
       key: 'formStatus',
       dataIndex: 'formStatus',
-      render: (_, { formStatus }, index) => {
-        let color = formStatus === 'enable' ? 'blue' : 'default';
+      render: (_, record, index) => {
         return (
           <Switch
             checkedChildren="启用"
             unCheckedChildren="禁用"
-            checked={formStatus === 'enable'}
-            onClick={() => formStatusHandler(record, 'enable')}
+            checked={record.formStatus === 'enable'}
+            onClick={() => formStatusHandler(record)}
           />
           // <Tag color={color} key={index}>
           //   {formStatus
@@ -165,8 +158,6 @@ export default function FormList() {
           // </Tag>
         );
       },
-      align: 'center',
-      width: 100,
     },
     {
       title: '操作',
@@ -265,8 +256,6 @@ export default function FormList() {
           )} */}
         </Space>
       ),
-      align: 'center',
-      width: 300,
       fixed: 'right',
     },
   ];
@@ -324,7 +313,7 @@ export default function FormList() {
         formCode: getUUID(),
         createTime: currentTime,
         updateTime: currentTime,
-        formStatus: 'enable',
+        formStatus: 'disabled',
       };
 
       const data = cloneDeep(dataSource);
@@ -425,7 +414,7 @@ export default function FormList() {
   };
 
   return (
-    <div className="list">
+    <div className="list" style={{ paddingBottom: '20px' }}>
       <Layout className="list-layout">
         <Content className="list-content">
           {/* 筛选框 */}
@@ -495,6 +484,7 @@ export default function FormList() {
             rowKey={(record) => record.formCode}
             rowSelection={rowSelection}
             sticky={true}
+            className="default-table"
           />
         </Content>
       </Layout>

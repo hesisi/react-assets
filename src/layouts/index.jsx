@@ -196,7 +196,7 @@ const CommonLayout = (props) => {
               <Breadcrumb
                 style={{
                   background: '#f0f2f5',
-                  padding: '20px',
+                  padding: '20px 30px',
                   borderBottom: '4px solid #f0f0f0',
                   color: '#333333',
                   fontSize: '16px',

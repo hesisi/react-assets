@@ -64,31 +64,36 @@ export default function Page() {
       title: '流程名称',
       dataIndex: 'name',
       key: 'name',
-      align: 'center',
     },
     {
       title: '流程编号',
       dataIndex: 'id',
       key: 'id',
-      align: 'center',
     },
     {
       title: '创建时间',
       dataIndex: 'creatTime',
       key: 'creatTime',
-      align: 'center',
+      sorter: (a: any, b: any) => {
+        return (
+          new Date(a.createTime).getTime() - new Date(b.createTime).getTime()
+        );
+      },
     },
     {
       title: '更新时间',
       dataIndex: 'updateTime',
       key: 'updateTime',
-      align: 'center',
+      sorter: (a: any, b: any) => {
+        return (
+          new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime()
+        );
+      },
     },
     {
       title: '流程状态',
       dataIndex: 'status',
       key: 'status',
-      align: 'center',
       render: (_, record, index) => {
         return (
           <Switch
@@ -104,7 +109,6 @@ export default function Page() {
       title: '备注',
       dataIndex: 'remarks',
       key: 'remarks',
-      align: 'center',
     },
     {
       title: '操作',
@@ -150,9 +154,7 @@ export default function Page() {
           </Button>
         </Space>
       ),
-      width: 300,
-      fixed: 'left',
-      align: 'center',
+      fixed: 'right',
     },
   ];
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
@@ -374,6 +376,7 @@ export default function Page() {
             rowKey={(record: any) => record.id}
             style={{ marginTop: '20px' }}
             bordered={false}
+            className="default-table"
           />
         </Content>
       </Layout>

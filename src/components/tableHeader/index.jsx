@@ -42,6 +42,7 @@ export default function TableHeader({
         initialValues={{}}
         onValuesChange={onFormChange}
         onFinish={onFinish}
+        className="default-form-radios"
       >
         {formStructure.map((item) => {
           return (

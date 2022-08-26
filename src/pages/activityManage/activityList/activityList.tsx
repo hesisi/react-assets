@@ -64,7 +64,6 @@ export default function Page() {
       title: '流程名称',
       dataIndex: 'name',
       key: 'name',
-      align: 'center',
     },
     {
       title: '流程编号',
@@ -73,22 +72,37 @@ export default function Page() {
       align: 'center',
     },
     {
+      title: '备注',
+      dataIndex: 'remarks',
+      key: 'remarks',
+      align: 'center',
+    },
+    {
       title: '创建时间',
       dataIndex: 'creatTime',
       key: 'creatTime',
+      sorter: (a: any, b: any) => {
+        return (
+          new Date(a.createTime).getTime() - new Date(b.createTime).getTime()
+        );
+      },
       align: 'center',
     },
     {
       title: '更新时间',
       dataIndex: 'updateTime',
       key: 'updateTime',
+      sorter: (a: any, b: any) => {
+        return (
+          new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime()
+        );
+      },
       align: 'center',
     },
     {
       title: '流程状态',
       dataIndex: 'status',
       key: 'status',
-      align: 'center',
       render: (_, record, index) => {
         return (
           <Switch
@@ -99,11 +113,6 @@ export default function Page() {
           />
         );
       },
-    },
-    {
-      title: '备注',
-      dataIndex: 'remarks',
-      key: 'remarks',
       align: 'center',
     },
     {
@@ -112,18 +121,18 @@ export default function Page() {
       key: 'action',
       render: (_, record) => (
         <Space split={<Divider type="vertical" />} size={0}>
-          <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
-            size={'small'}
-            icon={<EyeOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            查看
-          </Button>
+          {/*<Button*/}
+          {/*  style={{*/}
+          {/*    fontSize: '12px',*/}
+          {/*    color: '#0D6BFF',*/}
+          {/*    borderColor: '#0D6BFF',*/}
+          {/*  }}*/}
+          {/*  size={'small'}*/}
+          {/*  icon={<EyeOutlined />}*/}
+          {/*  onClick={() => handleEdit(record)}*/}
+          {/*>*/}
+          {/*  查看*/}
+          {/*</Button>*/}
           <Button
             style={{
               fontSize: '12px',
@@ -150,8 +159,7 @@ export default function Page() {
           </Button>
         </Space>
       ),
-      width: 300,
-      fixed: 'left',
+      fixed: 'right',
       align: 'center',
     },
   ];
@@ -303,19 +311,14 @@ export default function Page() {
                 wrapperCol={{ span: 24 }}
                 layout="inline"
                 ref={formRef}
+                className="default-form"
               >
                 <Form.Item label="" name="name">
                   <Input allowClear placeholder="请输入流程名称" />
                 </Form.Item>
 
                 <Form.Item label="" name="status">
-                  <Select
-                    style={{
-                      width: 180,
-                    }}
-                    allowClear
-                    placeholder="请选择流程状态"
-                  >
+                  <Select allowClear placeholder="请选择流程状态">
                     {selectList.map((e) => {
                       return (
                         <Select.Option value={e.value} key={e.value}>
@@ -374,6 +377,7 @@ export default function Page() {
             rowKey={(record: any) => record.id}
             style={{ marginTop: '20px' }}
             bordered={false}
+            className="default-table"
           />
         </Content>
       </Layout>

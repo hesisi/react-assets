@@ -1,3 +1,5 @@
+import { Form, Input, Button } from 'antd';
+import React from 'react';
 export default function ElementProperties(props) {
   let { element, modeler } = props;
 
@@ -79,20 +81,32 @@ export default function ElementProperties(props) {
 
   return (
     <div key={element.id}>
-      <fieldset>
-        <label>id</label>
-        <span>{element.id}</span>
-      </fieldset>
-
-      <fieldset>
-        <label>节点名称</label>
-        <input
-          value={element.businessObject.name || ''}
+      <Form.Item label="id" name="id">
+        <Input defaultValue={element.id} allowClear disabled />
+      </Form.Item>
+      <Form.Item label="节点名称" name="name">
+        <Input
+          defaultValue={element.businessObject.name || ''}
           onChange={(event) => {
             updateName(event.target.value);
           }}
+          allowClear
         />
-      </fieldset>
+      </Form.Item>
+      {/*<fieldset>*/}
+      {/*  <label>id</label>*/}
+      {/*  <span>{element.id}</span>*/}
+      {/*</fieldset>*/}
+
+      {/*<fieldset>*/}
+      {/*  <label>节点名称</label>*/}
+      {/*  <input*/}
+      {/*    value={element.businessObject.name || ''}*/}
+      {/*    onChange={(event) => {*/}
+      {/*      updateName(event.target.value);*/}
+      {/*    }}*/}
+      {/*  />*/}
+      {/*</fieldset>*/}
 
       {/*<fieldset>*/}
       {/*  <label>表单</label>*/}

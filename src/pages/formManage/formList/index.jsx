@@ -20,6 +20,7 @@ import {
   Divider,
   Layout,
   Radio,
+  Switch,
 } from 'antd';
 const { Content } = Layout;
 import { useEffect, useRef, useState } from 'react';
@@ -40,6 +41,7 @@ import {
   FormOutlined,
   CloseOutlined,
   SendOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import '@/assets/style/layout.less';
 
@@ -94,10 +96,10 @@ export default function FormList() {
   };
 
   // 设置表单的状态
-  const formStatusHandler = (record, status) => {
+  const formStatusHandler = (record) => {
     const arr = dataSource.map((e) => {
       if (e.formCode === record.formCode) {
-        e.formStatus = status;
+        e.formStatus = record.formStatus === 'enable' ? 'disabled' : 'enable';
       }
       return e;
     });
@@ -108,22 +110,101 @@ export default function FormList() {
   // 表格配置项
   const columns = [
     {
-      title: '序号',
-      dataIndex: 'index',
-      key: 'index',
+      title: '表单名称',
+      dataIndex: 'formName',
+      key: 'formName',
+    },
+    {
+      title: '表单编号',
+      dataIndex: 'formCode',
+      key: 'formCode',
       align: 'center',
-      render: (_, record, index) => {
-        return <span>{index + 1}</span>;
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      key: 'createTime',
+      sorter: (a, b) => {
+        return (
+          new Date(a.createTime).getTime() - new Date(b.createTime).getTime()
+        );
       },
-      width: 100,
-      fixed: 'left',
+      align: 'center',
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      key: 'updateTime',
+      sorter: (a, b) => {
+        return (
+          new Date(a.updateTime).getTime() - new Date(b.updateTime).getTime()
+        );
+      },
+      align: 'center',
+    },
+    {
+      title: '表单状态',
+      key: 'formStatus',
+      dataIndex: 'formStatus',
+      render: (_, record, index) => {
+        return (
+          <Switch
+            checkedChildren="启用"
+            unCheckedChildren="禁用"
+            checked={record.formStatus === 'enable'}
+            onClick={() => formStatusHandler(record)}
+          />
+          // <Tag color={color} key={index}>
+          //   {formStatus
+          //     ? selectList.filter((e) => e.value === formStatus)[0]?.label
+          //     : '暂无状态'}
+          // </Tag>
+        );
+      },
+      align: 'center',
     },
     {
       title: '操作',
       key: 'action',
       render: (_, record) => (
-        <Space split={<Divider type="vertical" />} size={0}>
-          {record.formStatus === 'enable' ? (
+        <Space size={6}>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            size={'small'}
+            icon={<EyeOutlined />}
+            onClick={() => handleShowDesigner(record)}
+          >
+            查看
+          </Button>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            onClick={() => handleShowDesigner(record)}
+            size={'small'}
+            icon={<FormOutlined />}
+          >
+            编辑
+          </Button>
+          <Button
+            style={{
+              fontSize: '12px',
+              color: '#0D6BFF',
+              borderColor: '#0D6BFF',
+            }}
+            onClick={() => handleDelete(record)}
+            size={'small'}
+            icon={<CloseOutlined />}
+          >
+            删除
+          </Button>
+          {/* {record.formStatus === 'enable' ? (
             <>
               <Button
                 type="link"
@@ -176,53 +257,10 @@ export default function FormList() {
                 删除
               </Button>
             </>
-          )}
+          )} */}
         </Space>
       ),
-      align: 'center',
-      width: 300,
-      fixed: 'left',
-    },
-
-    {
-      title: '表单编号',
-      dataIndex: 'formCode',
-      key: 'formCode',
-      align: 'center',
-    },
-    {
-      title: '表单名称',
-      dataIndex: 'formName',
-      key: 'formName',
-      align: 'center',
-    },
-    {
-      title: '表单状态',
-      key: 'formStatus',
-      dataIndex: 'formStatus',
-      render: (_, { formStatus }, index) => {
-        let color = formStatus === 'enable' ? 'blue' : 'default';
-        return (
-          <Tag color={color} key={index}>
-            {formStatus
-              ? selectList.filter((e) => e.value === formStatus)[0]?.label
-              : '暂无状态'}
-          </Tag>
-        );
-      },
-      align: 'center',
-      width: 100,
-    },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-      key: 'createTime',
-      align: 'center',
-    },
-    {
-      title: '更新时间',
-      dataIndex: 'updateTime',
-      key: 'updateTime',
+      fixed: 'right',
       align: 'center',
     },
   ];
@@ -280,7 +318,7 @@ export default function FormList() {
         formCode: getUUID(),
         createTime: currentTime,
         updateTime: currentTime,
-        formStatus: 'enable',
+        formStatus: 'disabled',
       };
 
       const data = cloneDeep(dataSource);
@@ -381,68 +419,83 @@ export default function FormList() {
   };
 
   return (
-    <div className="list">
+    <div className="list" style={{ paddingBottom: '20px' }}>
       <Layout className="list-layout">
         <Content className="list-content">
           {/* 筛选框 */}
-          <Row justify="space-between" className="list-row">
+          <Row justify="space-between">
             <Col>
-              <Form
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                layout="inline"
-                ref={formRef}
-              >
-                <Form.Item label="表单名称" name="formName">
-                  <Input allowClear placeholder="请输入内容" />
-                </Form.Item>
-
-                <Form.Item label="表单状态" name="formStatus">
-                  <Select
-                    style={{
-                      width: 180,
-                    }}
-                    allowClear
-                    placeholder="请选择内容"
+              <Row justify="flex-start">
+                <Col>
+                  <Form
+                    labelCol={{ span: 0 }}
+                    wrapperCol={{ span: 24 }}
+                    layout="inline"
+                    ref={formRef}
+                    className="default-form"
                   >
-                    {selectList.map((e) => {
-                      return (
-                        <Select.Option value={e.value} key={e.value}>
-                          {e.label}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
-              </Form>
+                    <Form.Item label="" name="formName">
+                      <Input allowClear placeholder="请输入表单名称" />
+                    </Form.Item>
+
+                    <Form.Item label="" name="formStatus">
+                      <Select allowClear placeholder="请选择表单状态">
+                        {selectList.map((e) => {
+                          return (
+                            <Select.Option value={e.value} key={e.value}>
+                              {e.label}
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </Form>
+                </Col>
+
+                <Col>
+                  <Space size={10}>
+                    <Button
+                      icon={<SearchOutlined />}
+                      onClick={searchHandler}
+                      className="ant-btn-primary"
+                    >
+                      搜索
+                    </Button>
+                    <Button
+                      icon={<MinusCircleOutlined />}
+                      onClick={resetHandler}
+                      className="ant-btn-default"
+                    >
+                      清除
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
             </Col>
 
             <Col>
               <Space size={10}>
                 <Button
-                  type="primary"
-                  icon={<SearchOutlined />}
-                  onClick={searchHandler}
+                  icon={<PlusCircleOutlined />}
+                  onClick={handleAdd}
+                  className="ant-btn-primary"
                 >
-                  搜索
+                  新增表单
                 </Button>
-                <Button icon={<MinusCircleOutlined />} onClick={resetHandler}>
-                  清除
+                <Button
+                  icon={<CloseCircleOutlined />}
+                  onClick={deleteHandler}
+                  className="ant-btn-primary"
+                >
+                  删除表单
                 </Button>
               </Space>
             </Col>
           </Row>
 
-          <Row justify="end" style={{ padding: '20px 0' }}>
-            <Space size={10}>
-              <Button icon={<PlusCircleOutlined />} onClick={handleAdd}>
-                添加
-              </Button>
-              <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
-                删除
-              </Button>
-            </Space>
-          </Row>
+          <Divider style={{ margin: '30px 0 22px' }} />
+
+          {/* <Row justify="end" style={{ padding: '20px 0' }}></Row> */}
 
           {/* 列表部分 */}
           <Table
@@ -451,6 +504,7 @@ export default function FormList() {
             rowKey={(record) => record.formCode}
             rowSelection={rowSelection}
             sticky={true}
+            className="default-table"
           />
         </Content>
       </Layout>
@@ -462,8 +516,11 @@ export default function FormList() {
         visible={visible}
         onOk={handleOk}
         onCancel={handleCancel}
+        className="default-modal"
+        cancelText="取消"
+        okText="确认"
       >
-        <Form labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+        <Form layout="vertical">
           <Form.Item label="表单名称">
             <Input
               value={formInfo.formName}
@@ -472,18 +529,19 @@ export default function FormList() {
                   formName: e.target.value,
                 })
               }
+              placeholder="请输入"
             />
           </Form.Item>
 
           <Form.Item label="创建方式">
-            <Radio.Group defaultValue="canvas">
-              <Radio.Button value="canvas">画布创建</Radio.Button>
-              <Radio.Button value="template">模板创建</Radio.Button>
-              <Radio.Button value="data">数据创建</Radio.Button>
+            <Radio.Group defaultValue="canvas" className="default-radio">
+              <Radio value="canvas">画布创建</Radio>
+              <Radio value="template">模板创建</Radio>
+              <Radio value="data">数据创建</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="描述">
+          <Form.Item label="备注">
             <TextArea
               value={formInfo.formDesc}
               onChange={(e) =>
@@ -491,6 +549,8 @@ export default function FormList() {
                   formDesc: e.target.value,
                 })
               }
+              placeholder="请输入"
+              rows={4}
             />
           </Form.Item>
         </Form>

@@ -61,15 +61,17 @@ export default function Dialog(props: any) {
       visible={isModalVisible}
       onOk={confirm}
       onCancel={() => setIsModalVisible(false)}
+      className="default-modal"
+      cancelText="取消"
+      okText="确认"
     >
       <Form
         ref={formRef}
         name="basic"
-        labelCol={{ span: 6 }}
-        wrapperCol={{ span: 18 }}
         initialValues={{ remember: true }}
         onFinish={onFinish}
         autoComplete="off"
+        layout="vertical"
       >
         <Form.Item
           label="流程名称"

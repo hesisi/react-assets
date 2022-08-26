@@ -81,16 +81,16 @@ const home = () => {
   }, []);
 
   useEffect(() => {
-    const arr = document.getElementsByClassName('el-carousel__item');
-    const tranArr = Array.from(arr).map((item, index) => {
-      return Number(item.style.transform.split(' ')[0].slice(11, -3)) * 0.4;
-    });
-    Array.from(arr).forEach((item, index) => {
-      item.style.transform = `translateX(${tranArr[index]}px) ${
-        item.style.transform.split(' ')[1]
-      }`;
-      return item;
-    });
+    // const arr = document.getElementsByClassName('el-carousel__item');
+    // const tranArr = Array.from(arr).map((item, index) => {
+    //   return Number(item.style.transform.split(' ')[0].slice(11, -3)) * 0.5;
+    // });
+    // Array.from(arr).forEach((item, index) => {
+    //   item.style.transform = `translateX(${tranArr[index]}px) ${
+    //     item.style.transform.split(' ')[1]
+    //   }`;
+    //   return item;
+    // });
   });
 
   const changeHandler = (index) => {
@@ -112,7 +112,6 @@ const home = () => {
               type="card"
               height="700px"
               onChange={changeHandler}
-              autoplay={false}
               arrow="never"
             >
               {/* style={{ width: '25%', margin: '0 auto', overflowX: 'unset' }} */}

@@ -1,9 +1,11 @@
 import './login.less';
 import { Space, Select, Form, Button, Input, Row, Col, Checkbox } from 'antd';
 const testImg = require('../../assets/images/登录页.png');
+import { history } from 'umi';
 
 const Login = () => {
   const onFinish = (values) => {
+    history.push('homeIndex');
     console.log('Received values of form: ', values);
   };
   return (

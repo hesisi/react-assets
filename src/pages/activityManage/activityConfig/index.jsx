@@ -7,8 +7,11 @@ import {
   Table,
   Col,
   Row,
+  message,
+  Modal,
 } from 'antd';
 const { Header, Content, Sider } = Layout;
+const { confirm } = Modal;
 import Modeler from 'bpmn-js/lib/Modeler';
 
 import { xmlStr } from '../xml/Xml1';
@@ -41,9 +44,11 @@ import {
   CheckSquareOutlined,
   CloseOutlined,
   DeleteOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { nanoid } from 'nanoid';
 import moment from 'moment';
+
 // import flowbg from '@/assets/flow_bg.png'
 
 export default function IndexPage() {
@@ -53,7 +58,15 @@ export default function IndexPage() {
   const [modeler, setModeler] = useState(null);
   const [group, setGroup] = useState([]);
   const [flowMsg, setFlowMsg] = useState(null);
-
+  useEffect(() => {
+    console.log('-------------->');
+    console.log(flowMsg);
+    flow = flowMsg;
+  }, [flowMsg]);
+  const updateFlow = (data) => {
+    const temp = { ...data };
+    setFlowMsg(temp);
+  };
   let flow = useMemo(() => {
     return null;
   }, []);
@@ -98,6 +111,7 @@ export default function IndexPage() {
       container: refPanel.current,
       modeler,
       flowMsg: flow,
+      setFlowMsg: updateFlow,
     });
     // console.log(flow?.xml)
     modeler.importXML(flow?.xml || xmlStr);
@@ -126,14 +140,34 @@ export default function IndexPage() {
         return x;
       });
       window.localStorage.setItem('flowGroup', JSON.stringify(tempGroup));
-      history.push('/activityManage');
+      // history.push('/activityManage');
+      message.success('保存成功');
     } catch (err) {
       console.error('could not save BPMN 2.0 diagram', err);
     }
   }
+
+  const handleDel = () => {
+    confirm({
+      title: '确定要删除流程吗?',
+      icon: <ExclamationCircleOutlined />,
+      content: '该操作不可逆，请谨慎操作！',
+      onOk() {
+        console.log('OK');
+      },
+      onCancel() {
+        console.log('Cancel');
+      },
+    });
+  };
+
   return (
     <Layout
-      style={{ padding: '10px', backgroundColor: '#f2f2f2', height: '100%' }}
+      style={{
+        padding: '10px',
+        backgroundColor: '#f2f2f2',
+        height: 'calc(100vh - 60px)',
+      }}
     >
       <Header style={{ padding: '0 10px', backgroundColor: '#fff' }}>
         <Row>
@@ -157,6 +191,7 @@ export default function IndexPage() {
               style={{ marginRight: '10px' }}
               type="primary"
               icon={<DeleteOutlined />}
+              onClick={handleDel}
             >
               删除
             </Button>

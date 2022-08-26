@@ -16,7 +16,7 @@ import {
 export default [
   {
     path: '/',
-    redirect: '/homeIndex',
+    redirect: '/login',
   },
   {
     name: '主页',

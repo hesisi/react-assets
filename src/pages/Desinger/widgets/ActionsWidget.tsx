@@ -19,7 +19,7 @@ import {
 } from '@designable/formily-transformer';
 import { onFormSubmitValidateEnd } from '@formily/core';
 import { history } from 'umi';
-
+import Icon from '@/utils/icon';
 interface ActionsWidgetProps {
   type: 'form' | 'table';
   getDesigner: (e: any) => {};
@@ -59,18 +59,22 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
         onClick={() => {
           onSave();
         }}
+        icon={<Icon icon="SaveOutlined" />}
+        className="ant-btn-primary"
       >
-        <TextWidget>保存</TextWidget>
+        保存
+        {/* <TextWidget>保存</TextWidget> */}
       </Button>
 
       <Button
-        type="primary"
         onClick={() => {
           history.push('/formManage/formList');
         }}
-        ghost
+        icon={<Icon icon="ArrowLeftOutlined" />}
+        className="ant-btn-default"
       >
-        <TextWidget>返回</TextWidget>
+        返回
+        {/* <TextWidget>返回</TextWidget> */}
       </Button>
     </Space>
   );

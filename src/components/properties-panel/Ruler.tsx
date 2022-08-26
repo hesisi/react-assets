@@ -45,17 +45,25 @@ export default function Ruler() {
   return (
     <>
       {ruleList.map((x, index) => (
-        <Row key={index} style={{ marginBottom: 10 }}>
+        <Row key={index} style={{ marginBottom: 10, marginTop: 10 }}>
           <Col span={5}>
             <label>AND/OR</label>
-            <Select defaultValue={x?.andor || ''} style={{ width: 80 }}>
+            <Select
+              defaultValue={x?.andor || ''}
+              style={{ width: 80 }}
+              disabled={index === 0}
+            >
               <Option value="anyone">AND</Option>
               <Option value="role">OR</Option>
             </Select>
           </Col>
           <Col span={6}>
             <label>字段名称</label>
-            <Input defaultValue={x?.name || ''} style={{ width: 100 }}></Input>
+            <Select defaultValue={x?.name || ''} style={{ width: 80 }}>
+              <Option value="field1">{'field1'}</Option>
+              <Option value="field2">{'field2'}</Option>
+              <Option value="field3">{'field3'}</Option>
+            </Select>
           </Col>
           <Col span={5}>
             <label>条件</label>

@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import * as echarts from 'echarts';
-
+import Icon, { LineChartOutlined } from '@ant-design/icons';
 const LineChart = (props) => {
+  const [propsData, setPropsData] = useState(props.echartsProps);
   const initChart = () => {
     let element = document.getElementById(props.id);
     let myChart = echarts.init(element);
@@ -32,18 +33,32 @@ const LineChart = (props) => {
     };
     option && myChart.setOption(option);
   };
-
+  const data = useMemo(() => {
+    console.log('数据', propsData);
+  }, [propsData]);
   useEffect(() => {
-    console.log('传过来的数据', props);
     initChart();
   }, [props]);
 
   return (
     <div
-      id={props.id}
-      style={{ width: '100%', height: '100%' }}
-      className={props.className}
-    ></div>
+      style={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+      }}
+    >
+      <p style={{ marginBottom: '5px' }}>
+        <LineChartOutlined style={{ marginRight: '4px' }} />
+        echart
+      </p>
+      <div
+        id={props.id}
+        style={{ width: '100%', height: '100%' }}
+        className={props.className}
+      ></div>
+    </div>
   );
 };
 

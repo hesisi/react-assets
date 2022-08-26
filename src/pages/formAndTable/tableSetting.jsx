@@ -54,7 +54,7 @@ const tableSetting = (props) => {
   const [iconList, setIconList] = useState(config.iconList);
 
   // 从内存获取表格
-  useEffect(async () => {
+  useEffect(() => {
     tableDataFetch();
   }, []);
 
@@ -151,7 +151,10 @@ const tableSetting = (props) => {
 
     const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
     if (tableConfig && tableConfig.id === props.formCode) {
-      formItem = tableConfig.tableConfig;
+      formItem =
+        JSON.stringify(formItem) === JSON.stringify(tableConfig.tableConfig)
+          ? tableConfig.tableConfig
+          : formItem;
       setButtons(tableConfig.buttonConfig);
     }
 
@@ -162,10 +165,13 @@ const tableSetting = (props) => {
     const formTree = formList.filter((e) => e.formCode === props.formCode)[0];
     const children = formItem.map((e) => {
       return {
-        title: e.title,
+        title: e.title || e.name,
         key: e.id,
       };
     });
+    setTableCol(formItem);
+
+    if (!formTree) return;
     const tree = [
       {
         title: `${formTree.formName}    （${children.length}）`,
@@ -174,8 +180,6 @@ const tableSetting = (props) => {
       },
     ];
     setTreeData(tree);
-
-    setTableCol(formItem);
   };
 
   // 添加操作按钮
@@ -371,8 +375,17 @@ const tableSetting = (props) => {
     setIcon(btnForm.getFieldValue('icon'));
   };
   return (
-    <>
-      <Row justify="end" style={{ padding: '10px 15px 10px' }}>
+    <div className="table-setting">
+      <Row
+        justify="end"
+        style={{
+          padding: '10px 15px 10px',
+          background: 'white',
+          marginBottom: '10px',
+          borderRadius: '5px',
+          border: '1px solid rgba(225,229,236,1)',
+        }}
+      >
         <Space size={10}>
           <Button
             icon={<Icon icon="SaveOutlined" />}
@@ -380,10 +393,11 @@ const tableSetting = (props) => {
             onClick={() => {
               setSaveVisible(true);
             }}
+            className="ant-btn-primary"
           >
             保存
           </Button>
-          <Button
+          {/* <Button
             icon={<Icon icon="CheckSquareOutlined" />}
             type="primary"
             ghost
@@ -401,11 +415,10 @@ const tableSetting = (props) => {
           </Button>
           <Button icon={<Icon icon="CloseOutlined" />} type="primary" ghost>
             删除
-          </Button>
+          </Button> */}
           <Button
             icon={<Icon icon="ArrowLeftOutlined" />}
-            type="primary"
-            ghost
+            className="ant-btn-default"
             onClick={() => {
               history.push('/formManage/formList');
             }}
@@ -415,14 +428,16 @@ const tableSetting = (props) => {
         </Space>
       </Row>
 
-      <Row style={{ height: '100%' }}>
+      <Row style={{ height: '100%', width: '100%' }}>
         {/* 大纲部分 */}
         <Col
           span={4}
           style={{
-            border: '1px solid #d9d9d9',
+            border: '1px solid rgba(225,229,236,1)',
             borderRight: 0,
             padding: '10px',
+            borderRadius: '5px',
+            background: 'white',
           }}
         >
           <p className="table-col__title">大纲</p>
@@ -442,9 +457,11 @@ const tableSetting = (props) => {
         <Col
           span={16}
           style={{
-            border: '1px solid #d9d9d9',
+            border: '1px solid rgba(225,229,236,1)',
             borderRight: 0,
             padding: '20px',
+            borderRadius: '5px',
+            background: 'white',
           }}
         >
           <Button
@@ -485,18 +502,16 @@ const tableSetting = (props) => {
                         {e.icon ? (
                           iconPosition === 'front' ? (
                             <Button
-                              type="primary"
-                              ghost
                               onClick={() => buttonSelect(e)}
+                              className="ant-btn-add"
                             >
                               <Icon icon={e.icon} />
                               {e.label}
                             </Button>
                           ) : (
                             <Button
-                              type="primary"
-                              ghost
                               onClick={() => buttonSelect(e)}
+                              className="ant-btn-add"
                             >
                               {e.label}
                               <Icon icon={e.icon} />
@@ -504,9 +519,8 @@ const tableSetting = (props) => {
                           )
                         ) : (
                           <Button
-                            type="primary"
-                            ghost
                             onClick={() => buttonSelect(e)}
+                            className="ant-btn-add"
                           >
                             {e.label}
                           </Button>
@@ -517,7 +531,7 @@ const tableSetting = (props) => {
               </Space>
             </Col>
 
-            <Col span={5}>
+            <Col span={5} style={{ textAlign: 'right' }}>
               <Search
                 placeholder="请输入内容"
                 style={{
@@ -559,7 +573,15 @@ const tableSetting = (props) => {
         </Col>
 
         {/* 配置项部分 */}
-        <Col span={4} style={{ border: '1px solid #d9d9d9', padding: '10px' }}>
+        <Col
+          span={4}
+          style={{
+            border: '1px solid rgba(225,229,236,1)',
+            padding: '10px',
+            borderRadius: '5px',
+            background: 'white',
+          }}
+        >
           <Tabs
             tabPosition="top"
             activeKey={tabsActiveKey}
@@ -730,7 +752,7 @@ const tableSetting = (props) => {
       >
         <PreviewWidget key="form" tree={formTree} ref={formRef} />
       </Modal>
-    </>
+    </div>
   );
 };
 

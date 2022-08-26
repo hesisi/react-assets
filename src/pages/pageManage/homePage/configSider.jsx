@@ -96,7 +96,7 @@ const componentsTree = [
             style={{
               fontSize: '22px',
               border: '1px dashed #ccc',
-              padding: '4px 14px',
+              padding: '4px 10px',
             }}
           />
         ),

@@ -92,10 +92,15 @@ export default class PropertiesView extends Component {
     history.push('/formManage/formList');
   };
   handleChange = (value) => {
-    console.log(value);
     this.setState({
       targetForm: value,
     });
+    const { flowMsg } = this.props;
+    flowMsg.targetForm = value;
+    this.updateFlowMsg(flowMsg);
+  };
+  updateFlowMsg = (data) => {
+    this.props.setFlowMsg(data);
   };
   handleOk = () => {
     this.setState({
@@ -110,6 +115,7 @@ export default class PropertiesView extends Component {
 
   render() {
     const { modeler, flowMsg } = this.props;
+    console.log(flowMsg);
 
     const { selectedElements, element, formRef } = this.state;
     // console.log(element)
@@ -192,8 +198,8 @@ export default class PropertiesView extends Component {
                         this.handleChange(value);
                       }}
                     >
-                      <Option value="form1">表单一</Option>
-                      <Option value="form2">表单二</Option>
+                      <Option value="form1">请假表单</Option>
+                      <Option value="form2">报销表单</Option>
                     </Select>
                   </Form.Item>
                   {element?.type === 'bpmn:StartEvent' && (

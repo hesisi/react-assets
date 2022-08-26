@@ -53,7 +53,15 @@ export default function IndexPage() {
   const [modeler, setModeler] = useState(null);
   const [group, setGroup] = useState([]);
   const [flowMsg, setFlowMsg] = useState(null);
-
+  useEffect(() => {
+    console.log('-------------->');
+    console.log(flowMsg);
+    flow = flowMsg;
+  }, [flowMsg]);
+  const updateFlow = (data) => {
+    const temp = { ...data };
+    setFlowMsg(temp);
+  };
   let flow = useMemo(() => {
     return null;
   }, []);
@@ -98,6 +106,7 @@ export default function IndexPage() {
       container: refPanel.current,
       modeler,
       flowMsg: flow,
+      setFlowMsg: updateFlow,
     });
     // console.log(flow?.xml)
     modeler.importXML(flow?.xml || xmlStr);
@@ -133,7 +142,11 @@ export default function IndexPage() {
   }
   return (
     <Layout
-      style={{ padding: '10px', backgroundColor: '#f2f2f2', height: '100%' }}
+      style={{
+        padding: '10px',
+        backgroundColor: '#f2f2f2',
+        height: 'calc(100vh - 60px)',
+      }}
     >
       <Header style={{ padding: '0 10px', backgroundColor: '#fff' }}>
         <Row>

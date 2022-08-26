@@ -2,7 +2,7 @@ import { Space, Table, Checkbox } from 'antd';
 import { useState, useEffect } from 'react';
 
 export default function FieldTable(props: any) {
-  const { form } = props;
+  const { form, type } = props;
   const data = [
     {
       key: '1',
@@ -105,13 +105,14 @@ export default function FieldTable(props: any) {
   }, [form]);
 
   const onChange = (e: any, record: any) => {
-    const temp = dataSource.map((x) => {
-      if (x.fieldName === record.name) {
-        x.edit = !x.edit;
-      }
-      return x;
-    });
-    setDataSource(temp);
+    // const temp = dataSource.map((x) => {
+    //   if (x.fieldName === record.name) {
+    //     x.edit = !x.edit;
+    //   }
+    //   return x;
+    // });
+    // setDataSource(temp);
+    console.log(record);
   };
   const columns = [
     {
@@ -126,7 +127,7 @@ export default function FieldTable(props: any) {
       render: (_: any, record: any) => {
         return (
           <Checkbox
-            defaultChecked
+            checked={type === 'bpmn:StartEvent'}
             onChange={(e) => onChange(e, record)}
           ></Checkbox>
         );
@@ -137,7 +138,12 @@ export default function FieldTable(props: any) {
       dataIndex: 'readOnly',
       key: 'readOnly',
       render: (_: any, record: any) => {
-        return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
+        return (
+          <Checkbox
+            checked={type === 'bpmn:UserTask' || type === 'bpmn:Task'}
+            onChange={(e) => onChange(e, record)}
+          ></Checkbox>
+        );
       },
     },
     {

@@ -73,6 +73,12 @@ export default function Page() {
       align: 'center',
     },
     {
+      title: '备注',
+      dataIndex: 'remarks',
+      key: 'remarks',
+      align: 'center',
+    },
+    {
       title: '创建时间',
       dataIndex: 'creatTime',
       key: 'creatTime',
@@ -101,29 +107,23 @@ export default function Page() {
       },
     },
     {
-      title: '备注',
-      dataIndex: 'remarks',
-      key: 'remarks',
-      align: 'center',
-    },
-    {
       title: '操作',
       dataIndex: 'action',
       key: 'action',
       render: (_, record) => (
         <Space split={<Divider type="vertical" />} size={0}>
-          <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
-            size={'small'}
-            icon={<EyeOutlined />}
-            onClick={() => handleEdit(record)}
-          >
-            查看
-          </Button>
+          {/*<Button*/}
+          {/*  style={{*/}
+          {/*    fontSize: '12px',*/}
+          {/*    color: '#0D6BFF',*/}
+          {/*    borderColor: '#0D6BFF',*/}
+          {/*  }}*/}
+          {/*  size={'small'}*/}
+          {/*  icon={<EyeOutlined />}*/}
+          {/*  onClick={() => handleEdit(record)}*/}
+          {/*>*/}
+          {/*  查看*/}
+          {/*</Button>*/}
           <Button
             style={{
               fontSize: '12px',

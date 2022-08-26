@@ -13,7 +13,26 @@ export default function Approver(props: any) {
       hide: false,
     },
   ];
-  const { addApprover } = props;
+  const approverList = [
+    {
+      key: 11222,
+      id: 12345,
+      name: '张三',
+      tel: 18823452222,
+      email: 'xxx@email.com',
+      creatTime: '2022-8-26',
+    },
+    {
+      key: 12344,
+      id: 20082,
+      name: 'jansen',
+      tel: 1882345111,
+      email: 'xxx@email.com',
+      creatTime: '2022-8-26',
+    },
+  ];
+  const { addApprover, approver } = props;
+  console.log(approver);
   const [dataSource, setDataSource] = useState(data);
 
   const onChange = (e: any, record: any) => {
@@ -63,9 +82,14 @@ export default function Approver(props: any) {
     <>
       <Form.Item label="审批人">
         <Form.Item name="approver" noStyle>
-          <Select style={{ width: 120 }} disabled>
-            <Option value="approver1">审批人一</Option>
-            <Option value="approver2">审批人二</Option>
+          <Select defaultValue={approver?.id} style={{ width: 120 }} disabled>
+            {approverList.map((x) => {
+              return (
+                <Option key={x.id} value={x.id}>
+                  {x.name}
+                </Option>
+              );
+            })}
           </Select>
         </Form.Item>
         <Button
@@ -77,22 +101,22 @@ export default function Approver(props: any) {
         </Button>
       </Form.Item>
       <Form.Item label="相同人" name="sameApprove">
-        <Select style={{ width: 120 }}>
-          <Option value="jump">跳过审批人</Option>
-          <Option value="none">任需审批</Option>
+        <Select defaultValue={'jump'} style={{ width: 120 }}>
+          <Option value="jump">跳过相同审批人</Option>
+          <Option value="none">仍需审批</Option>
         </Select>
       </Form.Item>
       <Form.Item label="无审批人" name="noApprove">
-        <Select style={{ width: 120 }}>
-          <Option value="jump">跳过审批人</Option>
-          <Option value="none">任需审批</Option>
+        <Select defaultValue={'jump'} style={{ width: 120 }}>
+          <Option value="jump">跳过此步骤</Option>
+          <Option value="none">拦截提示</Option>
         </Select>
       </Form.Item>
       <Form.Item label="审批表单">
         <Form.Item name="targetForm" noStyle>
           <Select style={{ width: 120 }}>
-            <Option value="form1">表单一</Option>
-            <Option value="form2">表单二</Option>
+            <Option value="form1">请假</Option>
+            <Option value="form2">报销</Option>
           </Select>
         </Form.Item>
         <Button style={{ marginLeft: 10 }} icon={<PlusCircleOutlined />}>

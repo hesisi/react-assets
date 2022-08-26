@@ -31,6 +31,7 @@ export default function NotificationCenter(props) {
   ]);
   const [cardData, setCardData] = useState([]);
   const [count, setCount] = useState(0);
+  const [total, setTotal] = useState(0);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const selectedRowKeysRef = useRef(null);
   const [searchValue, setSearchValue] = useState({});
@@ -153,8 +154,8 @@ export default function NotificationCenter(props) {
     };
     setLoading(true);
     const tableData = await getMessageList(params);
-    console.log(tableData, '160-----');
     const dataBack = tableData?.data?.data?.content || [];
+    setTotal(tableData?.data?.data?.totalSize || 0);
     setData(dataBack);
     setLoading(false);
   };
@@ -315,8 +316,12 @@ export default function NotificationCenter(props) {
           <Table
             loading={loading}
             scroll={{ y: 400 }}
+            //  total={total}
             rowSelection={rowSelection}
             pagination={{
+              total,
+              showSizeChanger: true,
+              // showQuickJumper: true,
               onChange: handlePageChange,
             }}
             // onShowSizeChange={onShowSizeChange}

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState, memo } from 'react';
 import { cloneDeep } from 'lodash';
+import { Empty } from 'antd';
 
 import './index.less';
 
@@ -89,17 +90,25 @@ function CardHChnage(props) {
   return (
     <div ref={cardList} className="card-list-wrapper">
       <>
-        {cardArr.map((item, index) => {
-          return (
-            <div
-              ref={cardItem}
-              className="card-wrapper"
-              key={`${index}-${item.name}`}
-            >
-              {item.cardRender && item.cardRender(item)}
-            </div>
-          );
-        })}
+        {cardArr?.length ? (
+          cardArr.map((item, index) => {
+            return (
+              <div
+                ref={cardItem}
+                className={
+                  index === cardArr.length - 1
+                    ? 'card-wrapper'
+                    : 'card-wrapper jg'
+                }
+                key={`${index}-${item.name}`}
+              >
+                {item.cardRender && item.cardRender(item)}
+              </div>
+            );
+          })
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
       </>
       <div
         className={canLeft ? 'forbid-btn btn-left' : 'btn-left'}

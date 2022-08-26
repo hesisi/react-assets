@@ -16,5 +16,11 @@ export default defineConfig({
   // mode: 'history',//去掉#号
   routes,
   fastRefresh: {},
+  proxy: {
+    '/assets/messageData': {
+      // target: config.infraApiOrigin, // 头部infra配置地址
+      target: 'http://10.173.79.189:9202/',
+    },
+  },
   // publicPath: '/',
 });

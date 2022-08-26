@@ -191,8 +191,8 @@ export default [
       {
         name: '动态表单demo',
         path: '/formManage/formPreview',
-        component: '@/pages/formManage/formPreview',
-        meta: { showMenu: false, showHeader: false },
+        component: '@/pages/formManage/formPreview/preview',
+        meta: { showMenu: false, showHeader: true },
       },
     ],
   },

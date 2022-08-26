@@ -152,7 +152,7 @@ export default class PropertiesView extends Component {
     const { modeler, flowMsg } = this.props;
     console.log(flowMsg);
 
-    const { selectedElements, element, formRef } = this.state;
+    const { selectedElements, element } = this.state;
     // console.log(element)
 
     return (

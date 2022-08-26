@@ -1,4 +1,6 @@
 import { Button, Form } from 'antd';
+import { SearchOutlined, MinusCircleOutlined } from '@ant-design/icons';
+
 import { useRef } from 'react';
 
 export default function TableHeader({
@@ -19,12 +21,10 @@ export default function TableHeader({
   const [form] = Form.useForm();
 
   const onFormChange = (values) => {
-    console.log(values);
     formValueChange && formValueChange(values);
   };
 
   const onFinish = (values) => {
-    console.log(values);
     formValueSubmit && formValueSubmit(values);
   };
 
@@ -42,6 +42,7 @@ export default function TableHeader({
         initialValues={{}}
         onValuesChange={onFormChange}
         onFinish={onFinish}
+        className="default-form-radios"
       >
         {formStructure.map((item) => {
           return (
@@ -53,10 +54,19 @@ export default function TableHeader({
 
         {formButton.showButton ? (
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              htmlType="submit"
+              style={{ marginRight: '10px' }}
+            >
               {formButton.submitText}
             </Button>
-            <Button htmlType="button" onClick={onReset}>
+            <Button
+              icon={<MinusCircleOutlined />}
+              htmlType="button"
+              onClick={onReset}
+            >
               {formButton.clearText}
             </Button>
           </Form.Item>

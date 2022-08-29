@@ -88,7 +88,7 @@ const munuDefault = [
   {
     name: '动态表单demo',
     key: 'default-6-3',
-    path: '/formManage/formPreview',
+    path: '/formManage/formPreview/table',
     meta: { showMenu: false, showHeader: true },
   },
   {

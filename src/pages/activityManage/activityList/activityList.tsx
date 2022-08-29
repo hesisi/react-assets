@@ -120,7 +120,7 @@ export default function Page() {
       dataIndex: 'action',
       key: 'action',
       render: (_, record) => (
-        <Space split={<Divider type="vertical" />} size={0}>
+        <Space size={6}>
           {/*<Button*/}
           {/*  style={{*/}
           {/*    fontSize: '12px',*/}

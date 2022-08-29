@@ -280,14 +280,6 @@ export default function FormList() {
     setFormInfo(record);
   };
 
-  // 预览
-  const handlePreview = (record) => {
-    history.push({
-      pathname: '/formManage/formPreview',
-      search: `formCode=${record.formCode}`,
-    });
-  };
-
   // 弹窗表单修改
   const onChange = (value) => {
     setFormInfo({

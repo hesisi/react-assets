@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import * as echarts from 'echarts';
 import Icon, { LineChartOutlined } from '@ant-design/icons';
+import './public.less';
+
 const LineChart = (props) => {
   const [propsData, setPropsData] = useState(props.echartsProps);
   const initChart = () => {
@@ -48,9 +50,10 @@ const LineChart = (props) => {
         flexDirection: 'column',
         justifyContent: 'flex-start',
       }}
+      className="linechart"
     >
-      <p style={{ marginBottom: '5px' }}>
-        <LineChartOutlined style={{ marginRight: '4px' }} />
+      <p>
+        <LineChartOutlined style={{ marginRight: '10px' }} />
         echart
       </p>
       <div

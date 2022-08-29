@@ -1,9 +1,11 @@
 import { Carousel } from 'antd';
 import React from 'react';
-const banner1 = require('../assets/pic.jpg');
-const banner2 = require('../assets/test.jpg');
-const banner3 = require('../assets/panda.jpg');
-
+// const banner1 = require('../assets/pic.jpg');
+// const banner2 = require('../assets/test.jpg');
+// const banner3 = require('../assets/panda.jpg');
+const banner1 = require('../assets/picture.webp');
+const banner2 = require('../assets/picture2.webp');
+const banner3 = require('../assets/picture3.webp');
 const banner = [banner1, banner2, banner3];
 const contentStyle = {
   height: '100%',

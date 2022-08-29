@@ -1,0 +1,46 @@
+.linechart,
+.todolist,
+.guideChart,
+.listCom {
+  p {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    box-shadow: 0 1px 5px 1px rgba(0, 0, 0, 0.1);
+  }
+}
+.todolist {
+  .spanblock {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background-color: rgb(217, 123, 98);
+  }
+  .ant-list-item {
+    cursor: pointer;
+    &:hover {
+      color: rgb(217, 123, 98);
+    }
+  }
+}
+.listCom {
+  .ant-list-item-meta-title {
+    font-size: 14px;
+  }
+  .ant-list-item-meta-description {
+    font-size: 12px;
+    &:hover {
+      color: rgb(26, 115, 232);
+    }
+  }
+}

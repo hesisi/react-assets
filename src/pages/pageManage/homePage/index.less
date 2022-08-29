@@ -73,6 +73,9 @@
   .ant-tree-node-content-wrapper-normal {
     background-color: transparent !important;
   }
+  .ant-tabs-ink-bar {
+    visibility: hidden;
+  }
   .ant-btn-default {
     border-radius: 0 !important;
   }
@@ -84,7 +87,12 @@
     color: #333333;
     letter-spacing: 0;
   }
-
+  .ant-tabs-top > .ant-tabs-nav::before,
+  .ant-tabs-bottom > .ant-tabs-nav::before,
+  .ant-tabs-top > div > .ant-tabs-nav::before,
+  .ant-tabs-bottom > div > .ant-tabs-nav::before {
+    border-color: transparent;
+  }
   .ant-tree-switcher-noop {
     display: none;
   }

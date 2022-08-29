@@ -239,7 +239,7 @@ const homePage = (props) => {
                     <PlusOutlined
                       style={{ color: '#1890ff', fontSize: '30px' }}
                     />
-                    <p className="dom-text">请从组件库选择您想放置的组件</p>
+                    <p className="dom-text">请从组件库选择您想放置的组件哦</p>
                   </>
                 )}
               </div>

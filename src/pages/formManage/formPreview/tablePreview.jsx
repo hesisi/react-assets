@@ -31,20 +31,12 @@ const tablePreview = (props) => {
   const [showPageTitle, setShowPageTitle] = useState(true);
 
   const formRef = useRef(null);
+  const tableRef = useRef(null);
   const formCode = useMemo(() => {
     return props.location?.query?.formCode || props.formCode;
   });
 
   useEffect(() => {
-    // 表格
-    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    const data = tableConfig && tableConfig[formCode];
-    if (data) {
-      console.log(data);
-      setButtons(data.buttonConfig);
-      setTable(data.tableConfig);
-      setTableCol(data.tableConfig);
-    }
     // 表单
     const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
     if (!formColumn) return;
@@ -53,6 +45,36 @@ const tablePreview = (props) => {
       formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
       setFormTree(transformToTreeNode(formItemObj));
     }
+
+    // 表格
+    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
+    const data = tableConfig && tableConfig[formCode];
+    if (data) {
+      setButtons(data.buttonConfig);
+      setTable(data.tableConfig);
+      setTableCol(data.tableConfig);
+    }
+
+    // 处理表格数据为表单
+    // const properties = formItemObj?.schema?.properties;
+    // const idArr = data.tableConfig
+    //   .filter((e) => e.filterEnable)
+    //   .map((e) => e['x-designable-id']);
+    // const proArr = [];
+    // for (let k in properties) {
+    //   if (idArr.includes(k)) {
+    //     proArr.push(properties[k]);
+    //   }
+    // }
+    // const obj = {
+    //   form: { labelCol: 0, wrapperCol: 0, layout: 'inline' },
+    //   schema: {
+    //     ...formItemObj.schema,
+    //     properties: { ...proArr },
+    //   },
+    // };
+    // setTable(transformToTreeNode(obj));
+
     setShowPageTitle(props.showPageTitle);
   }, []);
 
@@ -213,6 +235,7 @@ const tablePreview = (props) => {
         <Row justify="space-between" style={{ padding: '0 40px' }}>
           <Col>
             {/* 检索条件 */}
+            {/* <PreviewWidget key="form" tree={table} /> */}
             <Form form={searchForm} layout="inline" className="default-form">
               {table.map((e) => {
                 if (e.filterEnable) {
@@ -268,12 +291,7 @@ const tablePreview = (props) => {
         okText="确认"
         className="default-modal"
       >
-        <PreviewWidget
-          key="form"
-          tree={formTree}
-          ref={formRef}
-          layout="vertical"
-        />
+        <PreviewWidget key="form" tree={formTree} ref={formRef} />
       </Modal>
     </div>
   );

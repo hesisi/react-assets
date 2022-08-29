@@ -37,7 +37,6 @@ const templateTree = [
       {
         title: '上二下三',
         key: 'default-two-three',
-        // icon: <DesktopOutlined />,
       },
     ],
   },

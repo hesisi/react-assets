@@ -45,7 +45,9 @@ const GaugeChart = (props) => {
       className="guideChart"
     >
       <p>
-        <FundProjectionScreenOutlined style={{ marginRight: '10px' }} />
+        <FundProjectionScreenOutlined
+          style={{ marginRight: '10px', color: 'rgb(84,112,198)' }}
+        />
         GaugeChart
       </p>
       <div

@@ -53,7 +53,9 @@ const LineChart = (props) => {
       className="linechart"
     >
       <p>
-        <LineChartOutlined style={{ marginRight: '10px' }} />
+        <LineChartOutlined
+          style={{ marginRight: '10px', color: 'rgb(84 ,112,198)' }}
+        />
         echart
       </p>
       <div

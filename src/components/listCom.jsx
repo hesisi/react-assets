@@ -41,7 +41,9 @@ const ListCom = (props) => (
     className="listCom"
   >
     <p>
-      <UnorderedListOutlined style={{ marginRight: '10px' }} />
+      <UnorderedListOutlined
+        style={{ marginRight: '10px', color: 'rgb(21,98,166)' }}
+      />
       ListCom
     </p>
     <List

@@ -18,7 +18,7 @@ import Icon from '@/utils/icon';
 import { nanoid } from 'nanoid';
 import { history } from 'umi';
 
-const Preview = (props) => {
+const tablePreview = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
   const [column, setColumn] = useState([]); // 表格的数据项
   const [dataSource, setDataSource] = useState([]); // 表格的数据来源
@@ -28,10 +28,11 @@ const Preview = (props) => {
   const [buttons, setButtons] = useState([]); // 操作按钮数组
   const [searchForm] = Form.useForm(); // 检索条件表单
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
+  const [showPageTitle, setShowPageTitle] = useState(true);
 
   const formRef = useRef(null);
   const formCode = useMemo(() => {
-    return props.location.query.formCode;
+    return props.location?.query?.formCode || props.formCode;
   });
 
   useEffect(() => {
@@ -50,9 +51,9 @@ const Preview = (props) => {
     const formItemObj = formColumn[formCode]['formily-form-schema'];
     if (formItemObj) {
       formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
-      console.log('---formItemObj', formItemObj);
       setFormTree(transformToTreeNode(formItemObj));
     }
+    setShowPageTitle(props.showPageTitle);
   }, []);
 
   // 行删除
@@ -195,16 +196,20 @@ const Preview = (props) => {
   };
 
   return (
-    <div className="form-preview">
-      <PageHeader
-        className="default-page__header"
-        onBack={() => {
-          history.goBack();
-        }}
-        title="返回"
-      />
+    <div className="table-preview">
+      {showPageTitle ? (
+        <PageHeader
+          className="default-page__header"
+          onBack={() => {
+            history.goBack();
+          }}
+          title="返回"
+        />
+      ) : (
+        <></>
+      )}
 
-      <div className="form-preview__table">
+      <div className="table-preview__table">
         <Row justify="space-between" style={{ padding: '0 40px' }}>
           <Col>
             {/* 检索条件 */}
@@ -226,14 +231,14 @@ const Preview = (props) => {
             <Space size={10}>
               <Button
                 icon={<Icon icon="PlusOutlined" />}
-                className="ant-btn-primary"
+                className="primary-btn"
                 onClick={formAdd}
               >
                 新建
               </Button>
               <Button
                 icon={<Icon icon="DeleteOutlined" />}
-                className="ant-btn-default"
+                className="default-btn"
               >
                 删除
               </Button>
@@ -274,4 +279,4 @@ const Preview = (props) => {
   );
 };
 
-export default Preview;
+export default tablePreview;

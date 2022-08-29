@@ -421,7 +421,7 @@ const tableSetting = (props) => {
           <Button
             icon={<Icon icon="FundProjectionScreenOutlined" />}
             type="primary"
-            className="ant-btn-primary"
+            className="primary-btn"
             onClick={() => {
               setUrlVisible(true);
             }}
@@ -432,7 +432,7 @@ const tableSetting = (props) => {
             icon={<Icon icon="SaveOutlined" />}
             type="primary"
             onClick={previewHandler}
-            className="ant-btn-primary"
+            className="primary-btn"
           >
             预览
           </Button>
@@ -442,13 +442,13 @@ const tableSetting = (props) => {
             onClick={() => {
               setSaveVisible(true);
             }}
-            className="ant-btn-primary"
+            className="primary-btn"
           >
             保存
           </Button>
           <Button
             icon={<Icon icon="ArrowLeftOutlined" />}
-            className="ant-btn-default"
+            className="default-btn"
             onClick={() => {
               history.push('/formManage/formList');
             }}

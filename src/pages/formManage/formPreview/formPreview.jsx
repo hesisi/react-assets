@@ -51,9 +51,9 @@ const formPreview = (props) => {
           layout="vertical"
         />
         <Space>
-          <Button className="ant-btn-primary">提交</Button>
-          <Button className="ant-btn-primary">保存</Button>
-          <Button className="ant-btn-default">返回</Button>
+          <Button className="primary-btn">提交</Button>
+          <Button className="primary-btn">保存</Button>
+          <Button className="default-btn">返回</Button>
         </Space>
       </div>
     </div>

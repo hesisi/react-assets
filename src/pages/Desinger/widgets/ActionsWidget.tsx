@@ -74,7 +74,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
         <Button
           type="primary"
           icon={<Icon icon="EyeOutlined" />}
-          className="ant-btn-primary"
+          className="primary-btn"
           onClick={() => {
             onPreview();
           }}
@@ -87,7 +87,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
             onSave();
           }}
           icon={<Icon icon="SaveOutlined" />}
-          className="ant-btn-primary"
+          className="primary-btn"
         >
           保存
           {/* <TextWidget>保存</TextWidget> */}
@@ -98,7 +98,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
             history.push('/formManage/formList');
           }}
           icon={<Icon icon="ArrowLeftOutlined" />}
-          className="ant-btn-default"
+          className="default-btn"
         >
           返回
           {/* <TextWidget>返回</TextWidget> */}

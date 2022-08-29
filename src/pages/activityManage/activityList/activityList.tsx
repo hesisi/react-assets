@@ -134,11 +134,7 @@ export default function Page() {
           {/*  查看*/}
           {/*</Button>*/}
           <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+            className="default-table__btn"
             size={'small'}
             icon={<EditOutlined />}
             onClick={() => handleEdit(record)}
@@ -146,11 +142,7 @@ export default function Page() {
             编辑
           </Button>
           <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+            className="default-table__btn"
             size={'small'}
             icon={<DeleteOutlined />}
             onClick={() => handleDelete(record)}
@@ -334,10 +326,10 @@ export default function Page() {
             <Col>
               <Space size={10}>
                 <Button
-                  type="primary"
                   icon={<SearchOutlined />}
                   onClick={searchHandler}
                   style={{ borderRadius: '5px' }}
+                  className="primary-btn"
                 >
                   搜索
                 </Button>
@@ -345,6 +337,7 @@ export default function Page() {
                   icon={<MinusCircleOutlined />}
                   onClick={resetHandler}
                   style={{ borderRadius: '5px' }}
+                  className="default-btn"
                 >
                   清除
                 </Button>
@@ -353,16 +346,16 @@ export default function Page() {
             <Col style={{ marginLeft: 'auto' }}>
               <Space size={10}>
                 <Button
-                  type="primary"
                   icon={<PlusOutlined />}
                   onClick={addProcess}
+                  className="primary-btn"
                 >
                   新增流程
                 </Button>
                 <Button
-                  type="primary"
                   icon={<DeleteOutlined />}
                   onClick={deleteHandler}
+                  className="primary-btn"
                 >
                   删除流程
                 </Button>

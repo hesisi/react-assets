@@ -231,14 +231,14 @@ const tablePreview = (props) => {
             <Space size={10}>
               <Button
                 icon={<Icon icon="PlusOutlined" />}
-                className="ant-btn-primary"
+                className="primary-btn"
                 onClick={formAdd}
               >
                 新建
               </Button>
               <Button
                 icon={<Icon icon="DeleteOutlined" />}
-                className="ant-btn-default"
+                className="default-btn"
               >
                 删除
               </Button>

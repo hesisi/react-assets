@@ -11,6 +11,15 @@ const LineChart = (props) => {
     myChart.clear();
     let option;
     option = {
+      title: {
+        text: '本周销量统计',
+        left: '10px',
+        top: '14px',
+        textStyle: {
+          fontSize: 14,
+          fontWeight: 500,
+        },
+      },
       grid: {
         left: 50,
         right: 30,
@@ -60,7 +69,7 @@ const LineChart = (props) => {
       </p>
       <div
         id={props.id}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: '100%', height: '90%', marginTop: '20px' }}
         className={props.className}
       ></div>
     </div>

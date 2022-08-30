@@ -17,6 +17,7 @@ import { transformToTreeNode } from '@designable/formily-transformer';
 import Icon from '@/utils/icon';
 import { nanoid } from 'nanoid';
 import { history } from 'umi';
+const { Search } = Input;
 
 const tablePreview = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
@@ -34,6 +35,88 @@ const tablePreview = (props) => {
   const tableRef = useRef(null);
   const formCode = useMemo(() => {
     return props.location?.query?.formCode || props.formCode;
+  });
+
+  // 列检索
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+
+  // 检索搜索
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  // 重置检索
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText('');
+  };
+
+  const getColumnSearchProps = (dataIndex, label) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${label}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: 'block',
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<Icon icon="SearchOutlined" />}
+            size="small"
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    // 表头的检索按钮
+    filterIcon: (filtered) => (
+      <Icon
+        icon="SearchOutlined"
+        style={{
+          color: filtered ? '#1890ff' : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
   });
 
   useEffect(() => {
@@ -114,12 +197,16 @@ const tablePreview = (props) => {
         render: (_, record, index) => {
           return <span>{index + 1}</span>;
         },
+        width: 80,
+        fixed: 'left',
       },
     ];
     const operationCol = [
       {
         title: '操作',
         dataIndex: 'operation',
+        fixed: 'right',
+        width: 150,
         render: (_, record, index) => {
           return (
             <Space size={6}>
@@ -152,12 +239,22 @@ const tablePreview = (props) => {
     ];
     const tableShow = arr.filter((e) => e.isShow);
     const col = tableShow.map((e) => {
-      return {
-        title: e.label,
-        dataIndex: e.name,
-        key: e.id,
-        sorter: e.sorter || false,
-      };
+      if (e.filterEnable) {
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+          sorter: e.sorter || false,
+          ...getColumnSearchProps(e.name, e.label),
+        };
+      } else {
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+          sorter: e.sorter || false,
+        };
+      }
     });
 
     // 设置表格
@@ -233,10 +330,10 @@ const tablePreview = (props) => {
 
       <div className="table-preview__table">
         <Row justify="space-between" style={{ padding: '0 40px' }}>
-          <Col>
-            {/* 检索条件 */}
-            {/* <PreviewWidget key="form" tree={table} /> */}
-            <Form form={searchForm} layout="inline" className="default-form">
+          {/* <Col> */}
+          {/* 检索条件 */}
+          {/* <PreviewWidget key="form" tree={table} /> */}
+          {/* <Form form={searchForm} layout="inline" className="default-form">
               {table.map((e) => {
                 if (e.filterEnable) {
                   return (
@@ -248,7 +345,7 @@ const tablePreview = (props) => {
                 return <div key={e.id}></div>;
               })}
             </Form>
-          </Col>
+          </Col> */}
 
           <Col>
             <Space size={10}>
@@ -267,6 +364,9 @@ const tablePreview = (props) => {
               </Button>
             </Space>
           </Col>
+          <Col>
+            <Search placeholder="请输入内容" className="default-search" />
+          </Col>
         </Row>
 
         <Divider style={{ margin: '30px 0 22px' }} />
@@ -278,6 +378,7 @@ const tablePreview = (props) => {
           style={{ marginTop: '20px', padding: '0 40px' }}
           rowKey={(record) => record.id}
           rowSelection={rowSelection}
+          scroll={{ x: 'max-content' }}
         />
       </div>
 

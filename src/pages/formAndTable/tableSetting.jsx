@@ -60,6 +60,88 @@ const tableSetting = (props) => {
   const [urlVisible, setUrlVisible] = useState(false);
   const [url, setUrl] = useState('');
 
+  // 列检索
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+
+  // 检索搜索
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  // 重置检索
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText('');
+  };
+
+  const getColumnSearchProps = (dataIndex, label) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${label}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: 'block',
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<Icon icon="SearchOutlined" />}
+            size="small"
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    // 表头的检索按钮
+    filterIcon: (filtered) => (
+      <Icon
+        icon="SearchOutlined"
+        style={{
+          color: filtered ? '#1890ff' : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+  });
+
   // 从内存获取表格
   useEffect(() => {
     tableDataFetch();
@@ -78,15 +160,19 @@ const tableSetting = (props) => {
         dataIndex: 'index',
         key: 'index',
         align: 'center',
+        width: 80,
         render: (_, record, index) => {
           return <span>{index + 1}</span>;
         },
+        fixed: 'left',
       },
     ];
     const operationCol = [
       {
         title: '操作',
         dataIndex: 'operation',
+        fixed: 'right',
+        width: 150,
         render: (_, record, index) => {
           return (
             <>
@@ -113,12 +199,22 @@ const tableSetting = (props) => {
     ];
     const tableShow = arr.filter((e) => e.isShow);
     const col = tableShow.map((e) => {
-      return {
-        title: e.label,
-        dataIndex: e.name,
-        key: e.id,
-        sorter: e.sorter || false,
-      };
+      if (e.filterEnable) {
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+          sorter: e.sorter || false,
+          ...getColumnSearchProps(e.name, e.label),
+        };
+      } else {
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+          sorter: e.sorter || false,
+        };
+      }
     });
 
     // 设置表格
@@ -263,6 +359,7 @@ const tableSetting = (props) => {
           width: 300,
         }}
         allowClear
+        className="default-search"
       />
       <Divider />
       <Space className="button-icon" size={10} wrap>
@@ -420,7 +517,6 @@ const tableSetting = (props) => {
         <Space size={10}>
           <Button
             icon={<Icon icon="FundProjectionScreenOutlined" />}
-            type="primary"
             className="primary-btn"
             onClick={() => {
               setUrlVisible(true);
@@ -430,7 +526,6 @@ const tableSetting = (props) => {
           </Button>
           <Button
             icon={<Icon icon="SaveOutlined" />}
-            type="primary"
             onClick={previewHandler}
             className="primary-btn"
           >
@@ -438,7 +533,6 @@ const tableSetting = (props) => {
           </Button>
           <Button
             icon={<Icon icon="SaveOutlined" />}
-            type="primary"
             onClick={() => {
               setSaveVisible(true);
             }}
@@ -485,7 +579,7 @@ const tableSetting = (props) => {
 
         {/* 表格部分 */}
         <Col
-          span={16}
+          span={15}
           style={{
             border: '1px solid rgba(225,229,236,1)',
             borderRight: 0,
@@ -496,26 +590,27 @@ const tableSetting = (props) => {
         >
           <Button
             icon={<Icon icon="SaveOutlined" />}
-            type="primary"
+            className="primary-btn"
             onClick={buttonAdd}
           >
             添加按钮
           </Button>
-
           <Divider />
-
           {/* button和搜索 */}
           <Row justify="space-between">
             <Col span={19}>
               <Space size={10} wrap>
                 <Button
                   icon={<Icon icon="PlusOutlined" />}
-                  type="primary"
+                  className="primary-btn"
                   onClick={formAdd}
                 >
                   新建
                 </Button>
-                <Button icon={<Icon icon="DeleteOutlined" />} type="primary">
+                <Button
+                  icon={<Icon icon="DeleteOutlined" />}
+                  className="primary-btn"
+                >
                   删除
                 </Button>
                 {buttons &&
@@ -533,7 +628,7 @@ const tableSetting = (props) => {
                           iconPosition === 'front' ? (
                             <Button
                               onClick={() => buttonSelect(e)}
-                              className="ant-btn-add"
+                              className="add-btn"
                             >
                               <Icon icon={e.icon} />
                               {e.label}
@@ -541,7 +636,7 @@ const tableSetting = (props) => {
                           ) : (
                             <Button
                               onClick={() => buttonSelect(e)}
-                              className="ant-btn-add"
+                              className="add-btn"
                             >
                               {e.label}
                               <Icon icon={e.icon} />
@@ -550,7 +645,7 @@ const tableSetting = (props) => {
                         ) : (
                           <Button
                             onClick={() => buttonSelect(e)}
-                            className="ant-btn-add"
+                            className="add-btn"
                           >
                             {e.label}
                           </Button>
@@ -562,19 +657,12 @@ const tableSetting = (props) => {
             </Col>
 
             <Col span={5} style={{ textAlign: 'right' }}>
-              <Search
-                placeholder="请输入内容"
-                style={{
-                  width: 200,
-                }}
-              />
+              <Search placeholder="请输入内容" />
             </Col>
           </Row>
-
           <Divider />
-
           {/* 检索条件 */}
-          <Form form={searchForm} layout="inline">
+          {/* <Form form={searchForm} layout="inline">
             {table.map((e) => {
               if (e.filterEnable) {
                 return (
@@ -590,21 +678,22 @@ const tableSetting = (props) => {
               }
               return <div key={e.id}></div>;
             })}
-          </Form>
-
+          </Form> */}
           {/* 表格部分 */}
+
           <Table
             columns={column}
             dataSource={dataSource}
             pagination={{ position: ['none', 'none'] }}
             style={{ marginTop: '20px' }}
             rowKey={(record) => record.id}
+            scroll={{ x: 'max-content' }}
           />
         </Col>
 
         {/* 配置项部分 */}
         <Col
-          span={4}
+          span={5}
           style={{
             border: '1px solid rgba(225,229,236,1)',
             padding: '10px',

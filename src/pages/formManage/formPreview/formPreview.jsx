@@ -11,6 +11,10 @@ const formPreview = (props) => {
   const [showPageTitle, setShowPageTitle] = useState(true);
 
   useEffect(() => {
+    init();
+  }, []);
+
+  const init = () => {
     // 表单
     const formCode = history?.location?.query?.formCode || props.formCode;
     const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
@@ -27,7 +31,10 @@ const formPreview = (props) => {
       formList.filter((e) => e.formCode === formCode)[0]?.formName || '';
     setFormName(formName);
     setShowPageTitle(props.showPageTitle);
-  }, []);
+
+    console.log('===formItemObj', formItemObj);
+  };
+
   return (
     <div className="form-preview">
       {showPageTitle ? (

@@ -143,6 +143,15 @@ export default function FormList() {
       align: 'center',
     },
     {
+      title: 'URL地址',
+      dataIndex: 'formUrl',
+      key: 'formUrl',
+      align: 'center',
+      render: (_, { formStatus, formUrl }, index) => {
+        return formStatus === 'disabled' ? '' : formUrl;
+      },
+    },
+    {
       title: '表单状态',
       key: 'formStatus',
       dataIndex: 'formStatus',
@@ -154,11 +163,6 @@ export default function FormList() {
             checked={record.formStatus === 'enable'}
             onClick={() => formStatusHandler(record)}
           />
-          // <Tag color={color} key={index}>
-          //   {formStatus
-          //     ? selectList.filter((e) => e.value === formStatus)[0]?.label
-          //     : '暂无状态'}
-          // </Tag>
         );
       },
       align: 'center',
@@ -168,19 +172,12 @@ export default function FormList() {
       key: 'action',
       render: (_, record) => (
         <Space size={6}>
-          {/* <Button
-            className="default-table__btn"
-            size={'small'}
-            icon={<EyeOutlined />}
-            onClick={() => previewHandler(record.formCode)}
-          >
-            查看
-          </Button> */}
           <Button
             className="default-table__btn"
             onClick={() => handleShowDesigner(record)}
             size={'small'}
             icon={<FormOutlined />}
+            disabled={record.formStatus === 'enable'}
           >
             编辑
           </Button>
@@ -189,6 +186,7 @@ export default function FormList() {
             onClick={() => handleDelete(record)}
             size={'small'}
             icon={<CloseOutlined />}
+            disabled={record.formStatus === 'enable'}
           >
             删除
           </Button>
@@ -245,6 +243,7 @@ export default function FormList() {
         createTime: currentTime,
         updateTime: currentTime,
         formStatus: 'disabled',
+        formUrl: '',
       };
 
       const data = cloneDeep(dataSource);
@@ -273,7 +272,6 @@ export default function FormList() {
     setFormInfo(initFormInfo); // 清空
 
     history.push(`/formManage/formAndTable?formCode=${item.formCode}`);
-    console.log(item);
   };
 
   // 取消表单

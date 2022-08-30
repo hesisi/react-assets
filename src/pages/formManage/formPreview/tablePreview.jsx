@@ -219,7 +219,7 @@ const tablePreview = (props) => {
                 className="default-table__btn"
                 icon={<Icon icon="FormOutlined" />}
               >
-                Edit
+                编辑
               </Button>
               <Button
                 type="link"
@@ -230,7 +230,7 @@ const tablePreview = (props) => {
                 className="default-table__btn"
                 icon={<Icon icon="CloseOutlined" />}
               >
-                Delete
+                删除
               </Button>
             </Space>
           );

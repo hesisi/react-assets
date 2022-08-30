@@ -229,25 +229,54 @@ const tableSetting = (props) => {
     if (formItemObj) {
       setFormTree(transformToTreeNode(formItemObj));
     }
-    const properties = formItemObj?.schema?.properties;
+    // const properties = formItemObj?.schema?.properties;
+    let properties = formItemObj?.schema?.properties;
+    const p1 = formItemObj?.schema?.properties;
+    for (let k in p1) {
+      // 有外层布局的时候
+      if (p1[k].properties) {
+        properties = p1[k].properties;
+      }
+    }
 
     let formItem = [];
     const objSetFunc = (data, arr) => {
+      console.log('===key', data);
       for (let key in data) {
-        arr.push({
-          ...data[key],
-          name: data[key].name || key, // name对应的属性名
-          label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
-          type: data[key]['x-component'],
-          rules: [
-            {
-              required: data[key]?.required || false,
-              message: `please input ${data[key].title}`,
-            },
-          ],
-          id: data[key]['x-designable-id'],
-          ...config.columnInit,
-        });
+        if (data[key].properties) {
+          // 存在外层布局的时候
+          for (let k in data[key].properties) {
+            arr.push({
+              ...data[key].properties[k],
+              name: data[key].properties[k].name || key, // name对应的属性名
+              label: data[key].properties[k].title, // 表格列名称（title绝对会有，name不一定有）
+              type: data[key].properties[k]['x-component'],
+              rules: [
+                {
+                  required: data[key].properties[k]?.required || false,
+                  message: `please input ${data[key].properties[k].title}`,
+                },
+              ],
+              id: data[key].properties[k]['x-designable-id'],
+              ...config.columnInit,
+            });
+          }
+        } else {
+          arr.push({
+            ...data[key],
+            name: data[key].name || key, // name对应的属性名
+            label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
+            type: data[key]['x-component'],
+            rules: [
+              {
+                required: data[key]?.required || false,
+                message: `please input ${data[key].title}`,
+              },
+            ],
+            id: data[key]['x-designable-id'],
+            ...config.columnInit,
+          });
+        }
       }
     };
     objSetFunc(properties, formItem);
@@ -502,6 +531,19 @@ const tableSetting = (props) => {
     copy(url);
   };
 
+  const generateHandler = () => {
+    setUrlVisible(true);
+    const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+      (e) => {
+        if (e.formCode === props.formCode) {
+          e.formUrl = url;
+        }
+        return e;
+      },
+    );
+    window.localStorage.setItem('formList', JSON.stringify(formList));
+  };
+
   return (
     <div className="table-setting">
       <Row
@@ -518,9 +560,7 @@ const tableSetting = (props) => {
           <Button
             icon={<Icon icon="FundProjectionScreenOutlined" />}
             className="primary-btn"
-            onClick={() => {
-              setUrlVisible(true);
-            }}
+            onClick={generateHandler}
           >
             生成URL
           </Button>
@@ -863,24 +903,33 @@ const tableSetting = (props) => {
       </Modal>
 
       {/* 弹框: 表格 */}
-      <Modal
-        visible={formVisible}
-        title="新增"
-        onCancel={formCancel}
-        onOk={formOk}
-      >
-        <PreviewWidget key="form" tree={formTree} ref={formRef} />
-      </Modal>
+      {formVisible ? (
+        <Modal
+          visible={formVisible}
+          title="新增"
+          onCancel={formCancel}
+          onOk={formOk}
+          width="60%"
+        >
+          <PreviewWidget key="form" tree={formTree} ref={formRef} />
+        </Modal>
+      ) : (
+        <></>
+      )}
 
       {/* 弹框: 预览 */}
-      <Modal
-        visible={previewVisible}
-        title="列表预览"
-        onCancel={() => setPreviewVisible(false)}
-        width="90%"
-      >
-        <TablePreview formCode={props.formCode} showPageTitle={false} />
-      </Modal>
+      {previewVisible ? (
+        <Modal
+          visible={previewVisible}
+          title="列表预览"
+          onCancel={() => setPreviewVisible(false)}
+          width="90%"
+        >
+          <TablePreview formCode={props.formCode} showPageTitle={false} />
+        </Modal>
+      ) : (
+        <></>
+      )}
 
       {/* 弹框: 生成url */}
       <Modal

@@ -252,18 +252,20 @@ const tablePreview = (props) => {
       }
     }
     const cols = colsArr.map((e) => {
+      console.log('表头', e);
+
       if (e.filterEnable) {
         return {
           title: e.label,
-          dataIndex: e.id,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
-          ...getColumnSearchProps(e.id, e.label),
+          ...getColumnSearchProps(e.name || e.id, e.label),
         };
       } else {
         return {
           title: e.label,
-          dataIndex: e.id,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
         };
@@ -297,11 +299,13 @@ const tablePreview = (props) => {
     form.validate().then(() => {
       // 表单提交
       let arr = [...dataSource];
+
       if (index === -1) {
         arr.push({
           ...JSON.parse(JSON.stringify(form.values)),
           id: nanoid(),
         });
+        console.log('确认添加', arr);
       } else {
         // 编辑
         arr[index] = {
@@ -309,6 +313,7 @@ const tablePreview = (props) => {
           id: arr[index].id,
         };
       }
+
       setDataSource(arr);
       // 数据有异步问题，暂存localStorage
       // window.localStorage.setItem('dataSource', JSON.stringify(arr));

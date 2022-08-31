@@ -151,26 +151,38 @@ const tableSetting = (props) => {
   });
 
   const tableEcho = (formInit, columnsInit) => {
-    if (JSON.stringify(formInit) !== JSON.stringify(columnsInit)) {
+    const tableConfig = columnsInit?.tableConfig;
+    const columns = columnsInit?.columns;
+    if (JSON.stringify(formInit) !== JSON.stringify(tableConfig)) {
       const arr = [...formInit];
       formInit.forEach((item, index) => {
-        columnsInit.forEach((e, i) => {
+        tableConfig.forEach((e, i) => {
           if (e.id === item.id) {
             arr[index] = e;
           }
         });
       });
-      // for (let j = 0; j < columnsInit.length; j++) {
-      //   for (let i = 0; i < formInit.length; i++) {
-      //     console.log(formInit[i].id, columnsInit[j].id);
-      //     // if (formInit[i].id === columnsInit[j].id) {
-      //     //   arr.push(columnsInit[j]);
-      //     // } else {
-      //     //   arr.push(formInit[i]);
-      //     // }
-      //   }
-      // }
-      setTable(arr);
+
+      console.log('===echo', formInit, columns);
+
+      let colsArr = [];
+      if (columns === arr.length) {
+        for (let i = 0; i < columns.length; i++) {
+          for (let j = 0; j < arr.length; j++) {
+            if (
+              columns[i].dataIndex === arr[j].name ||
+              columns[i].dataIndex === arr[j].id
+            ) {
+              colsArr.push(arr[j]);
+            }
+          }
+        }
+      } else {
+        // TODO:会造成拖动的顺序被还原，暂未想到解决方案
+        colsArr = arr;
+      }
+
+      setTable(colsArr);
     }
   };
 
@@ -239,19 +251,32 @@ const tableSetting = (props) => {
       },
     ];
     const tableShow = arr.filter((e) => e.isShow);
+    // let colsArr = [];
+    // if (columnInit) {
+    //   for (let i = 0; i < columnInit.length; i++) {
+    //     for (let j = 0; j < tableShow.length; j++) {
+    //       if (columnInit[i].dataIndex === tableShow[j].name) {
+    //         colsArr.push(tableShow[j]);
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   colsArr = tableShow;
+    // }
+
     const col = tableShow.map((e) => {
       if (e.filterEnable) {
         return {
           title: e.label,
-          dataIndex: e.name,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
-          ...getColumnSearchProps(e.name, e.label),
+          ...getColumnSearchProps(e.name || e.id, e.label),
         };
       } else {
         return {
           title: e.label,
-          dataIndex: e.name,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
         };
@@ -294,7 +319,8 @@ const tableSetting = (props) => {
           for (let k in data[key].properties) {
             arr.push({
               ...data[key].properties[k],
-              name: data[key].properties[k].name || key, // name对应的属性名
+              name:
+                data[key].properties[k].name || data[key]['x-designable-id'], // name对应的属性名
               label: data[key].properties[k].title, // 表格列名称（title绝对会有，name不一定有）
               type: data[key].properties[k]['x-component'],
               rules: [
@@ -310,7 +336,7 @@ const tableSetting = (props) => {
         } else {
           arr.push({
             ...data[key],
-            name: data[key].name || key, // name对应的属性名
+            name: data[key].name || data[key]['x-designable-id'], // name对应的属性名
             label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
             type: data[key]['x-component'],
             rules: [
@@ -357,8 +383,8 @@ const tableSetting = (props) => {
     // 如果有值回显
     const tableConfig = window.localStorage.getItem('tableConfig');
     const arr = tableConfig && JSON.parse(tableConfig);
-    if (arr && arr[props.formCode]?.tableConfig) {
-      tableEcho(formItem, arr[props.formCode].tableConfig);
+    if (arr && arr[props.formCode]) {
+      tableEcho(formItem, arr[props.formCode]);
     }
   };
 

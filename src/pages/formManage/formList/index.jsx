@@ -416,7 +416,7 @@ export default function FormList() {
                 <Button
                   icon={<CloseCircleOutlined />}
                   onClick={deleteHandler}
-                  className="primary-btn"
+                  className="default-btn"
                 >
                   删除表单
                 </Button>

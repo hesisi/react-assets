@@ -351,7 +351,7 @@ const tableSetting = (props) => {
     // 如果有值回显
     const tableConfig = window.localStorage.getItem('tableConfig');
     const arr = tableConfig && JSON.parse(tableConfig);
-    if (arr) {
+    if (arr && arr[props.formCode]?.tableConfig) {
       tableEcho(formItem, arr[props.formCode].tableConfig);
     }
   };

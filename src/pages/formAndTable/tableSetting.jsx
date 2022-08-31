@@ -153,37 +153,65 @@ const tableSetting = (props) => {
   const tableEcho = (formInit, columnsInit) => {
     const tableConfig = columnsInit?.tableConfig;
     const columns = columnsInit?.columns;
-    if (JSON.stringify(formInit) !== JSON.stringify(tableConfig)) {
-      const arr = [...formInit];
-      formInit.forEach((item, index) => {
-        tableConfig.forEach((e, i) => {
-          if (e.id === item.id) {
-            arr[index] = e;
-          }
-        });
-      });
+    // if (JSON.stringify(formInit) !== JSON.stringify(tableConfig)) {
+    const arr = [...formInit];
+    console.log('===echo', formInit, tableConfig);
 
-      console.log('===echo', formInit, columns);
-
-      let colsArr = [];
-      if (columns === arr.length) {
-        for (let i = 0; i < columns.length; i++) {
-          for (let j = 0; j < arr.length; j++) {
-            if (
-              columns[i].dataIndex === arr[j].name ||
-              columns[i].dataIndex === arr[j].id
-            ) {
-              colsArr.push(arr[j]);
-            }
-          }
+    formInit.forEach((item, index) => {
+      tableConfig.forEach((e, i) => {
+        if (e && e.id === item.id) {
+          const { filterEnable, isShow, sorter, searchEnable, ...others } =
+            item;
+          arr[index] = {
+            ...e,
+            ...others,
+          };
         }
-      } else {
-        // TODO:会造成拖动的顺序被还原，暂未想到解决方案
-        colsArr = arr;
-      }
+      });
+    });
 
-      setTable(colsArr);
+    let colsArr = [];
+    let max = columns.length - 1;
+    for (let i = 0; i < arr.length; i++) {
+      // for (let j = 0; j< columns.length;j++) {
+      const index = columns.findIndex((e) => e.key === arr[i].id);
+      if (index !== -1) {
+        colsArr[index] = arr[i];
+      } else {
+        max++;
+        colsArr[max] = arr[i];
+      }
+      //  else {
+      //   colsArr[count] = arr[i];
+      // }
+      //  else {
+      //   // colsArr[count] = arr[i];
+      //   // colsArr[columns.length] = arr[i];
+      // }
+      // }
     }
+    // console.log('最大', max);
+
+    console.log('更新后', arr, colsArr);
+
+    // if (columns === arr.length) {
+    //   for (let i = 0; i < columns.length; i++) {
+    //     for (let j = 0; j < arr.length; j++) {
+    //       if (
+    //         columns[i].dataIndex === arr[j].name ||
+    //         columns[i].dataIndex === arr[j].id
+    //       ) {
+    //         colsArr.push({ ...arr[j], ...columns[i] });
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   // TODO:会造成拖动的顺序被还原，暂未想到解决方案
+    //   colsArr = arr;
+    // }
+
+    setTable(colsArr);
+    // }
   };
 
   // 从内存获取表格

@@ -107,11 +107,6 @@ export default function FormList() {
     saveFormList(arr);
   };
 
-  // 查看
-  const previewHandler = (formCode) => {
-    history.push(`/formManage/formPreview?formCode=${formCode}`);
-  };
-
   // 表格配置项
   const columns = [
     {
@@ -173,24 +168,16 @@ export default function FormList() {
       key: 'action',
       render: (_, record) => (
         <Space size={6}>
-          <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+          {/* <Button
+            className="default-table__btn"
             size={'small'}
             icon={<EyeOutlined />}
             onClick={() => previewHandler(record.formCode)}
           >
             查看
-          </Button>
+          </Button> */}
           <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+            className="default-table__btn"
             onClick={() => handleShowDesigner(record)}
             size={'small'}
             icon={<FormOutlined />}
@@ -198,71 +185,13 @@ export default function FormList() {
             编辑
           </Button>
           <Button
-            style={{
-              fontSize: '12px',
-              color: '#0D6BFF',
-              borderColor: '#0D6BFF',
-            }}
+            className="default-table__btn"
             onClick={() => handleDelete(record)}
             size={'small'}
             icon={<CloseOutlined />}
           >
             删除
           </Button>
-          {/* {record.formStatus === 'enable' ? (
-            <>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<SendOutlined />}
-              >
-                发布
-              </Button>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<StopOutlined />}
-                onClick={() => formStatusHandler(record, 'disabled')}
-              >
-                停用
-              </Button>
-              <Button
-                type="link"
-                onClick={() => handleShowDesigner(record)}
-                style={{ padding: 0 }}
-                icon={<FormOutlined />}
-              >
-                编辑
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<CheckSquareOutlined />}
-                onClick={() => formStatusHandler(record, 'enable')}
-              >
-                启用
-              </Button>
-              <Button
-                type="link"
-                onClick={() => handleShowDesigner(record)}
-                style={{ padding: 0 }}
-                icon={<FormOutlined />}
-              >
-                编辑
-              </Button>
-              <Button
-                type="link"
-                onClick={() => handleDelete(record)}
-                style={{ padding: 0 }}
-                icon={<CloseOutlined />}
-              >
-                删除
-              </Button>
-            </>
-          )} */}
         </Space>
       ),
       fixed: 'right',
@@ -295,14 +224,6 @@ export default function FormList() {
     setOperateType('update');
     setVisible(true);
     setFormInfo(record);
-  };
-
-  // 预览
-  const handlePreview = (record) => {
-    history.push({
-      pathname: '/formManage/formPreview',
-      search: `formCode=${record.formCode}`,
-    });
   };
 
   // 弹窗表单修改
@@ -462,14 +383,14 @@ export default function FormList() {
                     <Button
                       icon={<SearchOutlined />}
                       onClick={searchHandler}
-                      className="ant-btn-primary"
+                      className="primary-btn"
                     >
                       搜索
                     </Button>
                     <Button
                       icon={<MinusCircleOutlined />}
                       onClick={resetHandler}
-                      className="ant-btn-default"
+                      className="default-btn"
                     >
                       清除
                     </Button>
@@ -483,14 +404,14 @@ export default function FormList() {
                 <Button
                   icon={<PlusCircleOutlined />}
                   onClick={handleAdd}
-                  className="ant-btn-primary"
+                  className="primary-btn"
                 >
                   新增表单
                 </Button>
                 <Button
                   icon={<CloseCircleOutlined />}
                   onClick={deleteHandler}
-                  className="ant-btn-primary"
+                  className="primary-btn"
                 >
                   删除表单
                 </Button>

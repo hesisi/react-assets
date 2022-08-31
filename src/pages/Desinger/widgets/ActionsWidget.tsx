@@ -6,8 +6,14 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-04 16:16:14
  */
-import React, { useEffect, useImperativeHandle, forwardRef } from 'react';
-import { Space, Button, Radio } from 'antd';
+import React, {
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+  useMemo,
+  useState,
+} from 'react';
+import { Space, Button, Radio, Modal } from 'antd';
 import { useDesigner, TextWidget } from '@designable/react';
 import { GlobalRegistry } from '@designable/core';
 import { observer } from '@formily/react';
@@ -20,6 +26,8 @@ import {
 import { onFormSubmitValidateEnd } from '@formily/core';
 import { history } from 'umi';
 import Icon from '@/utils/icon';
+import FormPreview from '@/pages/formManage/formPreview/formPreview';
+
 interface ActionsWidgetProps {
   type: 'form' | 'table';
   getDesigner: (e: any) => {};
@@ -29,6 +37,8 @@ interface ActionsWidgetProps {
 export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
   const { type, getDesigner, onSave } = props;
   const designer = useDesigner() || Engine;
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [formCode, setFormCode] = useState('');
 
   useEffect(() => {
     getDesigner(designer);
@@ -41,41 +51,69 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
       GlobalRegistry.setDesignerLanguage('zh-cn');
     }
   }, []);
-  return (
-    <Space style={{ marginRight: 10, padding: '10px 0' }}>
-      <Radio.Group
-        value={GlobalRegistry.getDesignerLanguage()}
-        optionType="button"
-        options={[
-          { label: 'English', value: 'en-us' },
-          { label: '简体中文', value: 'zh-cn' },
-        ]}
-        onChange={(e) => {
-          GlobalRegistry.setDesignerLanguage(e.target.value);
-        }}
-      />
-      <Button
-        type="primary"
-        onClick={() => {
-          onSave();
-        }}
-        icon={<Icon icon="SaveOutlined" />}
-        className="ant-btn-primary"
-      >
-        保存
-        {/* <TextWidget>保存</TextWidget> */}
-      </Button>
 
-      <Button
-        onClick={() => {
-          history.push('/formManage/formList');
-        }}
-        icon={<Icon icon="ArrowLeftOutlined" />}
-        className="ant-btn-default"
+  // 预览
+  const onPreview = () => {
+    setPreviewVisible(true);
+  };
+
+  return (
+    <>
+      <Space style={{ marginRight: 10, padding: '10px 0' }}>
+        <Radio.Group
+          value={GlobalRegistry.getDesignerLanguage()}
+          optionType="button"
+          options={[
+            { label: 'English', value: 'en-us' },
+            { label: '简体中文', value: 'zh-cn' },
+          ]}
+          onChange={(e) => {
+            GlobalRegistry.setDesignerLanguage(e.target.value);
+          }}
+        />
+        <Button
+          type="primary"
+          icon={<Icon icon="EyeOutlined" />}
+          className="primary-btn"
+          onClick={() => {
+            onPreview();
+          }}
+        >
+          预览
+        </Button>
+        <Button
+          type="primary"
+          onClick={() => {
+            onSave();
+          }}
+          icon={<Icon icon="SaveOutlined" />}
+          className="primary-btn"
+        >
+          保存
+          {/* <TextWidget>保存</TextWidget> */}
+        </Button>
+
+        <Button
+          onClick={() => {
+            history.push('/formManage/formList');
+          }}
+          icon={<Icon icon="ArrowLeftOutlined" />}
+          className="default-btn"
+        >
+          返回
+          {/* <TextWidget>返回</TextWidget> */}
+        </Button>
+      </Space>
+
+      {/* 弹框: 预览 */}
+      <Modal
+        visible={previewVisible}
+        title="表单预览"
+        onCancel={() => setPreviewVisible(false)}
+        width="90%"
       >
-        返回
-        {/* <TextWidget>返回</TextWidget> */}
-      </Button>
-    </Space>
+        <FormPreview showPageTitle={false} />
+      </Modal>
+    </>
   );
 });

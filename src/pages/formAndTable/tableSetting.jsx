@@ -32,6 +32,9 @@ import { PreviewWidget } from '@/pages/Desinger/widgets';
 import { transformToTreeNode } from '@designable/formily-transformer';
 import { getUUID } from '@/utils/utils.js';
 
+import TablePreview from '@/pages/formManage/formPreview/tablePreview';
+import copy from 'copy-to-clipboard';
+
 const tableSetting = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
   const [columnCount, setColumnCount] = useState(5); // 表格的列数计算
@@ -52,6 +55,10 @@ const tableSetting = (props) => {
   const [icon, setIcon] = useState('');
   const [iconPosition, setIconPosition] = useState('front');
   const [iconList, setIconList] = useState(config.iconList);
+
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [urlVisible, setUrlVisible] = useState(false);
+  const [url, setUrl] = useState('');
 
   // 从内存获取表格
   useEffect(() => {
@@ -150,12 +157,13 @@ const tableSetting = (props) => {
     objSetFunc(properties, formItem);
 
     const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    if (tableConfig && tableConfig.id === props.formCode) {
+    const data = tableConfig && tableConfig[props.formCode];
+    if (data) {
       formItem =
-        JSON.stringify(formItem) === JSON.stringify(tableConfig.tableConfig)
-          ? tableConfig.tableConfig
+        JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
+          ? data.tableConfig
           : formItem;
-      setButtons(tableConfig.buttonConfig);
+      setButtons(data.buttonConfig);
     }
 
     setTable(formItem);
@@ -180,6 +188,10 @@ const tableSetting = (props) => {
       },
     ];
     setTreeData(tree);
+
+    setUrl(
+      `${window.location.host}/formManage/formPreview/table?formCode=${props.formCode}`,
+    );
   };
 
   // 添加操作按钮
@@ -289,15 +301,21 @@ const tableSetting = (props) => {
   };
 
   // 列表配置保存
-  const handleOk = (status) => {
-    window.localStorage.setItem(
-      'tableConfig',
-      JSON.stringify({
+  const handleOk = () => {
+    const obj = window.localStorage.getItem('tableConfig')
+      ? JSON.parse(window.localStorage.getItem('tableConfig'))
+      : {};
+    const data = {
+      [`${props.formCode}`]: {
         tableConfig: table,
         buttonConfig: buttons,
         status: status,
         id: props.formCode,
-      }),
+      },
+    };
+    window.localStorage.setItem(
+      'tableConfig',
+      JSON.stringify(Object.assign(obj, data)),
     );
     setSaveVisible(false);
   };
@@ -374,6 +392,19 @@ const tableSetting = (props) => {
     btnForm?.resetFields();
     setIcon(btnForm.getFieldValue('icon'));
   };
+
+  // 查看
+  const previewHandler = () => {
+    handleOk();
+    setPreviewVisible(true);
+    // history.push(`/formManage/formPreview/table?formCode=${props.formCode}`);
+  };
+
+  // 复制url
+  const copyUrl = () => {
+    copy(url);
+  };
+
   return (
     <div className="table-setting">
       <Row
@@ -388,37 +419,36 @@ const tableSetting = (props) => {
       >
         <Space size={10}>
           <Button
+            icon={<Icon icon="FundProjectionScreenOutlined" />}
+            type="primary"
+            className="primary-btn"
+            onClick={() => {
+              setUrlVisible(true);
+            }}
+          >
+            生成URL
+          </Button>
+          <Button
+            icon={<Icon icon="SaveOutlined" />}
+            type="primary"
+            onClick={previewHandler}
+            className="primary-btn"
+          >
+            预览
+          </Button>
+          <Button
             icon={<Icon icon="SaveOutlined" />}
             type="primary"
             onClick={() => {
               setSaveVisible(true);
             }}
-            className="ant-btn-primary"
+            className="primary-btn"
           >
             保存
           </Button>
-          {/* <Button
-            icon={<Icon icon="CheckSquareOutlined" />}
-            type="primary"
-            ghost
-            onClick={() => handleOk('enable')}
-          >
-            启用
-          </Button>
-          <Button
-            icon={<Icon icon="StopOutlined" />}
-            type="primary"
-            ghost
-            onClick={() => handleOk('disabled')}
-          >
-            停用
-          </Button>
-          <Button icon={<Icon icon="CloseOutlined" />} type="primary" ghost>
-            删除
-          </Button> */}
           <Button
             icon={<Icon icon="ArrowLeftOutlined" />}
-            className="ant-btn-default"
+            className="default-btn"
             onClick={() => {
               history.push('/formManage/formList');
             }}
@@ -733,7 +763,7 @@ const tableSetting = (props) => {
       <Modal
         title="确认保存"
         visible={saveVisible}
-        onOk={() => handleOk('save')}
+        onOk={handleOk}
         onCancel={handleCancel}
       >
         <p>是否保存当前表单？</p>
@@ -751,6 +781,29 @@ const tableSetting = (props) => {
         onOk={formOk}
       >
         <PreviewWidget key="form" tree={formTree} ref={formRef} />
+      </Modal>
+
+      {/* 弹框: 预览 */}
+      <Modal
+        visible={previewVisible}
+        title="列表预览"
+        onCancel={() => setPreviewVisible(false)}
+        width="90%"
+      >
+        <TablePreview formCode={props.formCode} showPageTitle={false} />
+      </Modal>
+
+      {/* 弹框: 生成url */}
+      <Modal
+        visible={urlVisible}
+        title="生成URL"
+        onCancel={() => setUrlVisible(false)}
+        okText="复制地址"
+        cancelText="取消"
+        onOk={copyUrl}
+        width="50%"
+      >
+        <Input addonBefore="当前的URL地址：" value={url} />
       </Modal>
     </div>
   );

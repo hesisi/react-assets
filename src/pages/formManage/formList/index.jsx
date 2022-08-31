@@ -57,7 +57,7 @@ const initFormInfo = {
 };
 const selectList = [
   { value: 'enable', label: '已启用' },
-  { value: 'edit', label: '编辑中' },
+  // { value: 'edit', label: '编辑中' },
   { value: 'disabled', label: '已停用' },
 ];
 
@@ -143,6 +143,15 @@ export default function FormList() {
       align: 'center',
     },
     {
+      title: 'URL地址',
+      dataIndex: 'formUrl',
+      key: 'formUrl',
+      align: 'center',
+      render: (_, { formStatus, formUrl }, index) => {
+        return formStatus === 'disabled' ? '' : formUrl;
+      },
+    },
+    {
       title: '表单状态',
       key: 'formStatus',
       dataIndex: 'formStatus',
@@ -154,11 +163,6 @@ export default function FormList() {
             checked={record.formStatus === 'enable'}
             onClick={() => formStatusHandler(record)}
           />
-          // <Tag color={color} key={index}>
-          //   {formStatus
-          //     ? selectList.filter((e) => e.value === formStatus)[0]?.label
-          //     : '暂无状态'}
-          // </Tag>
         );
       },
       align: 'center',
@@ -168,19 +172,12 @@ export default function FormList() {
       key: 'action',
       render: (_, record) => (
         <Space size={6}>
-          {/* <Button
-            className="default-table__btn"
-            size={'small'}
-            icon={<EyeOutlined />}
-            onClick={() => previewHandler(record.formCode)}
-          >
-            查看
-          </Button> */}
           <Button
             className="default-table__btn"
             onClick={() => handleShowDesigner(record)}
             size={'small'}
             icon={<FormOutlined />}
+            disabled={record.formStatus === 'enable'}
           >
             编辑
           </Button>
@@ -189,63 +186,10 @@ export default function FormList() {
             onClick={() => handleDelete(record)}
             size={'small'}
             icon={<CloseOutlined />}
+            disabled={record.formStatus === 'enable'}
           >
             删除
           </Button>
-          {/* {record.formStatus === 'enable' ? (
-            <>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<SendOutlined />}
-              >
-                发布
-              </Button>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<StopOutlined />}
-                onClick={() => formStatusHandler(record, 'disabled')}
-              >
-                停用
-              </Button>
-              <Button
-                type="link"
-                onClick={() => handleShowDesigner(record)}
-                style={{ padding: 0 }}
-                icon={<FormOutlined />}
-              >
-                编辑
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                type="link"
-                style={{ padding: 0 }}
-                icon={<CheckSquareOutlined />}
-                onClick={() => formStatusHandler(record, 'enable')}
-              >
-                启用
-              </Button>
-              <Button
-                type="link"
-                onClick={() => handleShowDesigner(record)}
-                style={{ padding: 0 }}
-                icon={<FormOutlined />}
-              >
-                编辑
-              </Button>
-              <Button
-                type="link"
-                onClick={() => handleDelete(record)}
-                style={{ padding: 0 }}
-                icon={<CloseOutlined />}
-              >
-                删除
-              </Button>
-            </>
-          )} */}
         </Space>
       ),
       fixed: 'right',
@@ -280,14 +224,6 @@ export default function FormList() {
     setFormInfo(record);
   };
 
-  // 预览
-  const handlePreview = (record) => {
-    history.push({
-      pathname: '/formManage/formPreview',
-      search: `formCode=${record.formCode}`,
-    });
-  };
-
   // 弹窗表单修改
   const onChange = (value) => {
     setFormInfo({
@@ -307,6 +243,7 @@ export default function FormList() {
         createTime: currentTime,
         updateTime: currentTime,
         formStatus: 'disabled',
+        formUrl: '',
       };
 
       const data = cloneDeep(dataSource);
@@ -335,7 +272,6 @@ export default function FormList() {
     setFormInfo(initFormInfo); // 清空
 
     history.push(`/formManage/formAndTable?formCode=${item.formCode}`);
-    console.log(item);
   };
 
   // 取消表单
@@ -384,6 +320,13 @@ export default function FormList() {
           e.formName.indexOf(formName) !== -1 && e.formStatus === formStatus
         );
       }
+      if (formName) {
+        return e.formName.indexOf(formName) !== -1;
+      }
+      if (formStatus) {
+        return e.formStatus === formStatus;
+      }
+
       return e.formName.indexOf(formName) !== -1 || e.formStatus === formStatus;
     });
     setDataSource(data);
@@ -445,14 +388,14 @@ export default function FormList() {
                     <Button
                       icon={<SearchOutlined />}
                       onClick={searchHandler}
-                      className="ant-btn-primary"
+                      className="primary-btn"
                     >
                       搜索
                     </Button>
                     <Button
                       icon={<MinusCircleOutlined />}
                       onClick={resetHandler}
-                      className="ant-btn-default"
+                      className="default-btn"
                     >
                       清除
                     </Button>
@@ -466,14 +409,14 @@ export default function FormList() {
                 <Button
                   icon={<PlusCircleOutlined />}
                   onClick={handleAdd}
-                  className="ant-btn-primary"
+                  className="primary-btn"
                 >
                   新增表单
                 </Button>
                 <Button
                   icon={<CloseCircleOutlined />}
                   onClick={deleteHandler}
-                  className="ant-btn-primary"
+                  className="primary-btn"
                 >
                   删除表单
                 </Button>

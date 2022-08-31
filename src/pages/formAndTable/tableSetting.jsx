@@ -32,6 +32,11 @@ import { PreviewWidget } from '@/pages/Desinger/widgets';
 import { transformToTreeNode } from '@designable/formily-transformer';
 import { getUUID } from '@/utils/utils.js';
 
+import TablePreview from '@/pages/formManage/formPreview/tablePreview';
+import copy from 'copy-to-clipboard';
+import Sortable from 'sortablejs';
+
+let cols = [];
 const tableSetting = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
   const [columnCount, setColumnCount] = useState(5); // 表格的列数计算
@@ -45,7 +50,7 @@ const tableSetting = (props) => {
   const [btnPopoverVisible, setBtnPopoverVisible] = useState(false); // 按钮图标popover可见性
   const [treeData, setTreeData] = useState([]); // 大纲树
   const [saveVisible, setSaveVisible] = useState(false);
-  const [formVisible, setFormVisible] = useState(false);
+  // const [formVisible, setFormVisible] = useState(false);
   const [formTree, setFormTree] = useState(null);
   const formRef = useRef(null);
   const [index, setIndex] = useState(-1);
@@ -53,10 +58,101 @@ const tableSetting = (props) => {
   const [iconPosition, setIconPosition] = useState('front');
   const [iconList, setIconList] = useState(config.iconList);
 
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [urlVisible, setUrlVisible] = useState(false);
+  const [url, setUrl] = useState('');
+
+  // 列检索
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+
+  // 检索搜索
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  // 重置检索
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText('');
+  };
+
+  const getColumnSearchProps = (dataIndex, label) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${label}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: 'block',
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<Icon icon="SearchOutlined" />}
+            size="small"
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    // 表头的检索按钮
+    filterIcon: (filtered) => (
+      <Icon
+        icon="SearchOutlined"
+        style={{
+          color: filtered ? '#1890ff' : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+  });
+
   // 从内存获取表格
   useEffect(() => {
     tableDataFetch();
+    columnDrop();
   }, []);
+
+  useEffect(() => {
+    cols = column;
+  }, [column]);
 
   // 监听修改，重新渲染表格
   useEffect(() => {
@@ -71,47 +167,65 @@ const tableSetting = (props) => {
         dataIndex: 'index',
         key: 'index',
         align: 'center',
+        width: 80,
         render: (_, record, index) => {
           return <span>{index + 1}</span>;
         },
+        fixed: 'left',
       },
     ];
     const operationCol = [
       {
         title: '操作',
         dataIndex: 'operation',
+        fixed: 'right',
+        width: 150,
         render: (_, record, index) => {
           return (
-            <>
+            <Space size={6}>
               <Button
-                type="link"
-                onClick={() => {
-                  rowDelete(_, record, index);
-                }}
-              >
-                Delete
-              </Button>
-              <Button
-                type="link"
                 onClick={() => {
                   rowEdit(_, record, index);
                 }}
+                className="default-table__btn"
+                size={'small'}
+                icon={<Icon icon="CloseOutlined" />}
               >
-                Edit
+                编辑
               </Button>
-            </>
+              <Button
+                onClick={() => {
+                  rowDelete(_, record, index);
+                }}
+                className="default-table__btn"
+                size={'small'}
+                icon={<Icon icon="FormOutlined" />}
+              >
+                删除
+              </Button>
+            </Space>
           );
         },
       },
     ];
     const tableShow = arr.filter((e) => e.isShow);
     const col = tableShow.map((e) => {
-      return {
-        title: e.label,
-        dataIndex: e.name,
-        key: e.id,
-        sorter: e.sorter || false,
-      };
+      if (e.filterEnable) {
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+          sorter: e.sorter || false,
+          ...getColumnSearchProps(e.name, e.label),
+        };
+      } else {
+        return {
+          title: e.label,
+          dataIndex: e.name,
+          key: e.id,
+          sorter: e.sorter || false,
+        };
+      }
     });
 
     // 设置表格
@@ -126,38 +240,62 @@ const tableSetting = (props) => {
     if (formItemObj) {
       setFormTree(transformToTreeNode(formItemObj));
     }
-    const properties = formItemObj?.schema?.properties;
+
+    let data = [];
+    const temp = (prop) => {
+      if (!prop) return [];
+      for (let k in prop) {
+        if (prop[k].properties) {
+          temp(prop[k].properties);
+        } else {
+          data.push(prop[k]);
+        }
+      }
+      return data;
+    };
+
+    let properties = temp(formItemObj?.schema?.properties);
 
     let formItem = [];
     const objSetFunc = (data, arr) => {
       for (let key in data) {
-        arr.push({
-          ...data[key],
-          name: data[key].name || key, // name对应的属性名
-          label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
-          type: data[key]['x-component'],
-          rules: [
-            {
-              required: data[key]?.required || false,
-              message: `please input ${data[key].title}`,
-            },
-          ],
-          id: data[key]['x-designable-id'],
-          ...config.columnInit,
-        });
+        if (data[key].properties) {
+          // 存在外层布局的时候
+          for (let k in data[key].properties) {
+            arr.push({
+              ...data[key].properties[k],
+              name: data[key].properties[k].name || key, // name对应的属性名
+              label: data[key].properties[k].title, // 表格列名称（title绝对会有，name不一定有）
+              type: data[key].properties[k]['x-component'],
+              rules: [
+                {
+                  required: data[key].properties[k]?.required || false,
+                  message: `please input ${data[key].properties[k].title}`,
+                },
+              ],
+              id: data[key].properties[k]['x-designable-id'],
+              ...config.columnInit,
+            });
+          }
+        } else {
+          arr.push({
+            ...data[key],
+            name: data[key].name || key, // name对应的属性名
+            label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
+            type: data[key]['x-component'],
+            rules: [
+              {
+                required: data[key]?.required || false,
+                message: `please input ${data[key].title}`,
+              },
+            ],
+            id: data[key]['x-designable-id'],
+            ...config.columnInit,
+          });
+        }
       }
     };
     objSetFunc(properties, formItem);
-
-    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    const data = tableConfig && tableConfig[props.formCode];
-    if (data) {
-      formItem =
-        JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
-          ? data.tableConfig
-          : formItem;
-      setButtons(data.buttonConfig);
-    }
 
     setTable(formItem);
     setColumnCount(formItem.length);
@@ -181,6 +319,10 @@ const tableSetting = (props) => {
       },
     ];
     setTreeData(tree);
+
+    setUrl(
+      `${window.location.host}/formManage/formPreview/table?formCode=${props.formCode}`,
+    );
   };
 
   // 添加操作按钮
@@ -252,6 +394,7 @@ const tableSetting = (props) => {
           width: 300,
         }}
         allowClear
+        className="default-search"
       />
       <Divider />
       <Space className="button-icon" size={10} wrap>
@@ -300,6 +443,7 @@ const tableSetting = (props) => {
         buttonConfig: buttons,
         status: status,
         id: props.formCode,
+        columns: cols.slice(1, -1),
       },
     };
     window.localStorage.setItem(
@@ -315,66 +459,73 @@ const tableSetting = (props) => {
   };
 
   // 表单添加
-  const formAdd = () => {
-    setFormVisible(true);
-    setIndex(-1);
-  };
+  // const formAdd = () => {
+  //   setFormVisible(true);
+  //   setIndex(-1);
+  // };
 
   // 表单取消
-  const formCancel = () => {
-    setFormVisible(false);
-    formRef.current.form.reset();
-  };
+  // const formCancel = () => {
+  //   setFormVisible(false);
+  //   formRef.current?.form.reset();
+  // };
 
   // 确认添加
-  const formOk = () => {
-    const form = formRef.current.form;
-    form.validate().then(() => {
-      // 表单提交
-      let arr = [...dataSource];
-      if (index === -1) {
-        arr.push({
-          ...JSON.parse(JSON.stringify(form.values)),
-          id: nanoid(),
-        });
-      } else {
-        // 编辑
-        arr[index] = {
-          ...JSON.parse(JSON.stringify(form.values)),
-          id: arr[index].id,
-        };
-      }
-      setDataSource(arr);
-      // 数据有异步问题，暂存localStorage
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
-      formCancel();
-    });
-  };
+  // const formOk = () => {
+  //   const form = formRef.current?.form;
+  //   if (!form) return;
+  //   form.validate().then(() => {
+  //     // 表单提交
+  //     let arr = [...dataSource];
+  //     if (index === -1) {
+  //       arr.push({
+  //         ...JSON.parse(JSON.stringify(form.values)),
+  //         id: nanoid(),
+  //       });
+  //     } else {
+  //       // 编辑
+  //       arr[index] = {
+  //         ...JSON.parse(JSON.stringify(form.values)),
+  //         id: arr[index].id,
+  //       };
+  //     }
+  //     setDataSource(arr);
+  //     // 数据有异步问题，暂存localStorage
+  //     window.localStorage.setItem('dataSource', JSON.stringify(arr));
+  //     formCancel();
+  //   });
+  // };
 
   // 行删除
-  const rowDelete = (_, record, index) => {
-    const data =
-      dataSource.length > 0
-        ? dataSource
-        : JSON.parse(window.localStorage.getItem('dataSource'));
+  // const rowDelete = (_, record, index) => {
+  //   Modal.confirm({
+  //     title: '确定要删除吗',
+  //     content: '该操作不可逆，请谨慎操作！',
+  //     onOk: () => {
+  //       const data =
+  //         dataSource.length > 0
+  //           ? dataSource
+  //           : JSON.parse(window.localStorage.getItem('dataSource'));
 
-    if (index === 0 && data.length === 1) {
-      setDataSource([]);
-      window.localStorage.setItem('dataSource', []);
-    } else {
-      const arr = data.filter((e, i) => i !== index);
-      setDataSource(arr);
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
-    }
-  };
+  //       if (index === 0 && data.length === 1) {
+  //         setDataSource([]);
+  //         window.localStorage.setItem('dataSource', []);
+  //       } else {
+  //         const arr = data.filter((e, i) => i !== index);
+  //         setDataSource(arr);
+  //         window.localStorage.setItem('dataSource', JSON.stringify(arr));
+  //       }
+  //     },
+  //   });
+  // };
 
   // 行编辑
-  const rowEdit = (_, record, index) => {
-    setFormVisible(true);
-    setIndex(index);
-    const form = formRef.current.form;
-    form.setValues(record);
-  };
+  // const rowEdit = (_, record, index) => {
+  //   setFormVisible(true);
+  //   setIndex(index);
+  //   const form = formRef.current.form;
+  //   form.setValues(record);
+  // };
 
   // 按钮属性表单清空
   const btnFormReset = () => {
@@ -383,9 +534,46 @@ const tableSetting = (props) => {
   };
 
   // 查看
-  const previewHandler = (formCode) => {
+  const previewHandler = () => {
     handleOk();
-    history.push(`/formManage/formPreview?formCode=${props.formCode}`);
+    setPreviewVisible(true);
+    // history.push(`/formManage/formPreview/table?formCode=${props.formCode}`);
+  };
+
+  // 复制url
+  const copyUrl = () => {
+    copy(url);
+  };
+
+  const generateHandler = () => {
+    handleOk();
+    setUrlVisible(true);
+    const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+      (e) => {
+        if (e.formCode === props.formCode) {
+          e.formUrl = url;
+        }
+        return e;
+      },
+    );
+    window.localStorage.setItem('formList', JSON.stringify(formList));
+  };
+
+  // 拖拽
+  const columnDrop = () => {
+    const tr = document.querySelector('.ant-table-thead tr');
+    if (!tr) return;
+    Sortable.create(tr, {
+      animation: 180,
+      delay: 0,
+      onEnd: (evt) => {
+        const oldItem = cols[evt.oldIndex];
+        const arr = [...cols];
+        arr.splice(evt.oldIndex, 1);
+        arr.splice(evt.newIndex, 0, oldItem);
+        cols = arr;
+      },
+    });
   };
 
   return (
@@ -402,26 +590,31 @@ const tableSetting = (props) => {
       >
         <Space size={10}>
           <Button
+            icon={<Icon icon="FundProjectionScreenOutlined" />}
+            className="primary-btn"
+            onClick={generateHandler}
+          >
+            生成URL
+          </Button>
+          <Button
             icon={<Icon icon="SaveOutlined" />}
-            type="primary"
             onClick={previewHandler}
-            className="ant-btn-primary"
+            className="primary-btn"
           >
             预览
           </Button>
           <Button
             icon={<Icon icon="SaveOutlined" />}
-            type="primary"
             onClick={() => {
               setSaveVisible(true);
             }}
-            className="ant-btn-primary"
+            className="primary-btn"
           >
             保存
           </Button>
           <Button
             icon={<Icon icon="ArrowLeftOutlined" />}
-            className="ant-btn-default"
+            className="default-btn"
             onClick={() => {
               history.push('/formManage/formList');
             }}
@@ -458,7 +651,7 @@ const tableSetting = (props) => {
 
         {/* 表格部分 */}
         <Col
-          span={16}
+          span={15}
           style={{
             border: '1px solid rgba(225,229,236,1)',
             borderRight: 0,
@@ -469,26 +662,27 @@ const tableSetting = (props) => {
         >
           <Button
             icon={<Icon icon="SaveOutlined" />}
-            type="primary"
+            className="primary-btn"
             onClick={buttonAdd}
           >
             添加按钮
           </Button>
-
           <Divider />
-
           {/* button和搜索 */}
           <Row justify="space-between">
             <Col span={19}>
               <Space size={10} wrap>
                 <Button
                   icon={<Icon icon="PlusOutlined" />}
-                  type="primary"
-                  onClick={formAdd}
+                  className="primary-btn"
                 >
+                  {/* onClick={formAdd} */}
                   新建
                 </Button>
-                <Button icon={<Icon icon="DeleteOutlined" />} type="primary">
+                <Button
+                  icon={<Icon icon="DeleteOutlined" />}
+                  className="primary-btn"
+                >
                   删除
                 </Button>
                 {buttons &&
@@ -506,7 +700,7 @@ const tableSetting = (props) => {
                           iconPosition === 'front' ? (
                             <Button
                               onClick={() => buttonSelect(e)}
-                              className="ant-btn-add"
+                              className="add-btn"
                             >
                               <Icon icon={e.icon} />
                               {e.label}
@@ -514,7 +708,7 @@ const tableSetting = (props) => {
                           ) : (
                             <Button
                               onClick={() => buttonSelect(e)}
-                              className="ant-btn-add"
+                              className="add-btn"
                             >
                               {e.label}
                               <Icon icon={e.icon} />
@@ -523,7 +717,7 @@ const tableSetting = (props) => {
                         ) : (
                           <Button
                             onClick={() => buttonSelect(e)}
-                            className="ant-btn-add"
+                            className="add-btn"
                           >
                             {e.label}
                           </Button>
@@ -535,19 +729,12 @@ const tableSetting = (props) => {
             </Col>
 
             <Col span={5} style={{ textAlign: 'right' }}>
-              <Search
-                placeholder="请输入内容"
-                style={{
-                  width: 200,
-                }}
-              />
+              <Search placeholder="请输入内容" />
             </Col>
           </Row>
-
           <Divider />
-
           {/* 检索条件 */}
-          <Form form={searchForm} layout="inline">
+          {/* <Form form={searchForm} layout="inline">
             {table.map((e) => {
               if (e.filterEnable) {
                 return (
@@ -563,21 +750,23 @@ const tableSetting = (props) => {
               }
               return <div key={e.id}></div>;
             })}
-          </Form>
-
+          </Form> */}
           {/* 表格部分 */}
+
           <Table
             columns={column}
             dataSource={dataSource}
             pagination={{ position: ['none', 'none'] }}
             style={{ marginTop: '20px' }}
             rowKey={(record) => record.id}
+            scroll={{ x: 'max-content' }}
+            className="default-table"
           />
         </Col>
 
         {/* 配置项部分 */}
         <Col
-          span={4}
+          span={5}
           style={{
             border: '1px solid rgba(225,229,236,1)',
             padding: '10px',
@@ -747,13 +936,45 @@ const tableSetting = (props) => {
       </Modal>
 
       {/* 弹框: 表格 */}
+      {/* {formVisible ? (
+        <Modal
+          visible={formVisible}
+          title="新增"
+          onCancel={formCancel}
+          onOk={formOk}
+        >
+          <PreviewWidget key="form" tree={formTree} ref={formRef} />
+        </Modal>
+      ) : (
+        <></>
+      )} */}
+
+      {/* 弹框: 预览 */}
+      {previewVisible ? (
+        <Modal
+          visible={previewVisible}
+          title="列表预览"
+          onCancel={() => setPreviewVisible(false)}
+          width="90%"
+          className="table-preview__modal"
+        >
+          <TablePreview formCode={props.formCode} showPageTitle={false} />
+        </Modal>
+      ) : (
+        <></>
+      )}
+
+      {/* 弹框: 生成url */}
       <Modal
-        visible={formVisible}
-        title="新增"
-        onCancel={formCancel}
-        onOk={formOk}
+        visible={urlVisible}
+        title="生成URL"
+        onCancel={() => setUrlVisible(false)}
+        okText="复制地址"
+        cancelText="取消"
+        onOk={copyUrl}
+        width="50%"
       >
-        <PreviewWidget key="form" tree={formTree} ref={formRef} />
+        <Input addonBefore="当前的URL地址：" value={url} />
       </Modal>
     </div>
   );

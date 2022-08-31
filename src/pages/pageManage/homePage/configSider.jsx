@@ -37,7 +37,6 @@ const templateTree = [
       {
         title: '上二下三',
         key: 'default-two-three',
-        // icon: <DesktopOutlined />,
       },
     ],
   },
@@ -77,11 +76,6 @@ const componentsTree = [
         key: 'standard-charts',
         icon: <BarChartOutlined />,
       },
-      // {
-      //   title: '富文本',
-      //   key: 'standard-editor',
-      //   icon: <SnippetsOutlined />,
-      // },
     ],
   },
   {
@@ -90,7 +84,6 @@ const componentsTree = [
     children: [
       {
         title: '',
-        key: 'standard-charts',
         icon: (
           <PlusOutlined
             style={{

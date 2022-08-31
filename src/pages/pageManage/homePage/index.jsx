@@ -45,11 +45,9 @@ const homePage = (props) => {
   // 获取传过来的值 contentsetting
   const [echartsProps, setEchartsProps] = useState({});
   const getDataFromContentSetting = (data) => {
-    console.log('从组件获得到的数据', data);
     setEchartsProps(data);
   };
   useEffect(() => {
-    console.log('kankan', echartsProps);
     renderComponent(['standard-charts'], selectId);
   }, [echartsProps]);
   useEffect(() => {
@@ -294,7 +292,9 @@ const homePage = (props) => {
         break;
     }
   }, []);
-
+  const goToIndexPage = () => {
+    history.push({ pathname: '/homeIndex' });
+  };
   return (
     <div className="home-page">
       <Layout>
@@ -302,7 +302,7 @@ const homePage = (props) => {
           <Row gutter={10}>
             <Col span={4}>
               <Space>
-                <div className="back">
+                <div className="back" onClick={goToIndexPage}>
                   <LeftOutlined /> <span>主页</span>
                 </div>
 

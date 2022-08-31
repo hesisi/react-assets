@@ -149,9 +149,9 @@ export default class PropertiesView extends Component {
   };
 
   render() {
-    const { modeler, flowMsg } = this.props;
+    const { modeler, flowMsg, forms } = this.props;
     console.log(flowMsg);
-
+    console.log(forms);
     const { selectedElements, element } = this.state;
     // console.log(element)
 
@@ -237,8 +237,13 @@ export default class PropertiesView extends Component {
                       }}
                       defaultValue={flowMsg.targetForm}
                     >
-                      <Option value="form1">请假表单</Option>
-                      <Option value="form2">报销表单</Option>
+                      {forms.map((item) => {
+                        return (
+                          <Option value={item.formCode} key={item.formCode}>
+                            {item.formName}
+                          </Option>
+                        );
+                      })}
                     </Select>
                   </Form.Item>
                   {element?.type === 'bpmn:StartEvent' && (

@@ -1,159 +1,91 @@
-import { Space, Table, Checkbox } from 'antd';
+import { Space, Table, Checkbox, Radio } from 'antd';
 import { useState, useEffect } from 'react';
 
 export default function FieldTable(props: any) {
   const { form, type } = props;
-  const data = [
-    {
-      key: '1',
-      fieldName: '申请人',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '2',
-      fieldName: '休假类型',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '3',
-      fieldName: '开始日期',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '4',
-      fieldName: '结束日期',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '5',
-      fieldName: '请假原因',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '6',
-      fieldName: '上传附件',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-  ];
-  const data2 = [
-    {
-      key: '1',
-      fieldName: '申请人',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '2',
-      fieldName: '报销概述',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '3',
-      fieldName: '报销明细',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '4',
-      fieldName: '报销总金额',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '5',
-      fieldName: '附件',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-    {
-      key: '6',
-      fieldName: '备注',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-  ];
+  const _data_ = window.localStorage.getItem('formMap');
+  const _data = _data_ ? JSON.parse(_data_) : [];
+  console.log('form', form);
+  const data: any[] =
+    _data == ''
+      ? []
+      : form == ''
+      ? []
+      : Object.values(_data[form]['formily-form-schema'].schema.properties);
   const [dataSource, setDataSource] = useState(data);
   useEffect(() => {
     let temp: any[] = [];
-    if (form === 'form1') {
-      temp = data;
-    } else if (form === 'form2') {
-      temp = data2;
-    } else {
-      temp = [];
-    }
+    temp = data;
     setDataSource(temp);
   }, [form]);
 
   const onChange = (e: any, record: any) => {
-    // const temp = dataSource.map((x) => {
-    //   if (x.fieldName === record.name) {
-    //     x.edit = !x.edit;
-    //   }
-    //   return x;
-    // });
-    // setDataSource(temp);
-    console.log(record);
+    const temp = dataSource.map((x) => {
+      // console.log('record',record)
+      if (x.name === record.name) {
+        x.edit = e.target.value;
+      }
+      return x;
+    });
+    setDataSource(temp);
+    console.log(temp);
   };
   const columns = [
     {
       title: '字段名称',
-      dataIndex: 'fieldName',
-      key: 'fieldName',
+      dataIndex: 'title',
+      key: 'x-designable-id',
     },
     {
       title: '可编辑',
       dataIndex: 'edit',
       key: 'edit',
       render: (_: any, record: any) => {
+        console.log('record------------', record);
         return (
-          <Checkbox
-            checked={type === 'bpmn:StartEvent'}
+          // <Checkbox
+          //   // checked={type === 'bpmn:StartEvent'}
+          //   onChange={(e) => onChange(e, record)}
+          // ></Checkbox>
+          <Radio.Group
             onChange={(e) => onChange(e, record)}
-          ></Checkbox>
+            defaultValue={'edit'}
+            value={record.edit}
+          >
+            <Radio style={{ fontWeight: '400' }} value={'edit'}>
+              可编辑
+            </Radio>
+            <Radio style={{ fontWeight: '400' }} value={'readOnly'}>
+              仅可见
+            </Radio>
+            <Radio style={{ fontWeight: '400' }} value={'hide'}>
+              隐藏
+            </Radio>
+          </Radio.Group>
         );
       },
     },
-    {
-      title: '仅可见',
-      dataIndex: 'readOnly',
-      key: 'readOnly',
-      render: (_: any, record: any) => {
-        return (
-          <Checkbox
-            checked={type === 'bpmn:UserTask' || type === 'bpmn:Task'}
-            onChange={(e) => onChange(e, record)}
-          ></Checkbox>
-        );
-      },
-    },
-    {
-      title: '隐藏',
-      dataIndex: 'disable',
-      key: 'disable',
-      render: (_: any, record: any) => {
-        return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
-      },
-    },
+    // {
+    //   title: '仅可见',
+    //   dataIndex: 'readOnly',
+    //   key: 'readOnly',
+    //   render: (_: any, record: any) => {
+    //     return (
+    //       <Checkbox
+    //         // checked={type === 'bpmn:UserTask' || type === 'bpmn:Task'}
+    //         onChange={(e) => onChange(e, record)}
+    //       ></Checkbox>
+    //     );
+    //   },
+    // },
+    // {
+    //   title: '隐藏',
+    //   dataIndex: 'hide',
+    //   key: 'hide',
+    //   render: (_: any, record: any) => {
+    //     return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
+    //   },
+    // },
   ];
 
   return (

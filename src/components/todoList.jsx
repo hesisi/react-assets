@@ -42,11 +42,11 @@ const TodoList = (props) => (
       renderItem={(item, index) => (
         // <List.Item>{`${index + 1}. ${item}`}</List.Item>
         <List.Item>
-          <div>
+          <div className="spantitle">
             <span className="spanblock"></span> {`${item.title}`}
           </div>
-          <div>
-            <EyeFilled style={{ color: '#989898' }} />{' '}
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <EyeFilled style={{ color: '#989898', marginRight: '4px' }} />{' '}
             <span style={{ color: '#989898', fontSize: '12px' }}>
               {item.scan}
             </span>{' '}

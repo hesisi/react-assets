@@ -139,6 +139,11 @@ const tablePreview = (props) => {
       // setColumn(data.columns);
     }
 
+    const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+    if (tableList && tableList[formCode]) {
+      setDataSource(tableList[formCode]);
+    }
+
     // 处理表格数据为表单
     // const properties = formItemObj?.schema?.properties;
     // const idArr = data.tableConfig
@@ -164,19 +169,39 @@ const tablePreview = (props) => {
 
   // 行删除
   const rowDelete = (_, record, index) => {
-    const data =
-      dataSource.length > 0
-        ? dataSource
-        : JSON.parse(window.localStorage.getItem('dataSource'));
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        const data =
+          dataSource.length > 0
+            ? dataSource
+            : JSON.parse(window.localStorage.getItem('tableList'))[formCode];
 
-    if (index === 0 && data.length === 1) {
-      setDataSource([]);
-      window.localStorage.setItem('dataSource', []);
-    } else {
-      const arr = data.filter((e, i) => i !== index);
-      setDataSource(arr);
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
-    }
+        const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+        if (index === 0 && data.length === 1) {
+          setDataSource([]);
+          // saveFormList();
+          for (let k in tableList) {
+            if (k === formCode) {
+              tableList[k] = [];
+            }
+          }
+          saveFormList(tableList);
+          // window.localStorage.setItem('dataSource', []);
+        } else {
+          const arr = data.filter((e, i) => i !== index);
+          setDataSource(arr);
+          for (let k in tableList) {
+            if (k === formCode) {
+              tableList[k] = arr;
+            }
+          }
+          saveFormList(tableList);
+          // window.localStorage.setItem('dataSource', JSON.stringify(arr));
+        }
+      },
+    });
   };
 
   // 行编辑
@@ -307,7 +332,9 @@ const tablePreview = (props) => {
       }
       setDataSource(arr);
       // 数据有异步问题，暂存localStorage
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
+      // window.localStorage.setItem('dataSource', JSON.stringify(arr));
+      // window.localStorage.setItem('tableList', JSON.stringify({ [`${formCode}`]: arr }))
+      saveFormList({ [`${formCode}`]: arr });
       formCancel();
     });
   };
@@ -341,9 +368,9 @@ const tablePreview = (props) => {
   };
 
   // 保存至缓存中
-  // const saveFormList = (data) => {
-  //   data && localStorage.setItem('formList', JSON.stringify(data));
-  // };
+  const saveFormList = (data) => {
+    data && localStorage.setItem('tableList', JSON.stringify(data));
+  };
 
   return (
     <div className="table-preview">

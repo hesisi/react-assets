@@ -252,7 +252,7 @@ const tablePreview = (props) => {
       }
     }
     const cols = colsArr.map((e) => {
-      console.log('表头', e);
+      // console.log('表头', e);
 
       if (e.filterEnable) {
         return {
@@ -357,6 +357,11 @@ const tablePreview = (props) => {
     data && localStorage.setItem('tableList', JSON.stringify(data));
   };
 
+  const onSearch = (str) => {
+    const arr1 = table.filter((e) => e.searchEnable)?.map((e) => e.id);
+    console.log('检索', arr1, str);
+  };
+
   return (
     <div className="table-preview">
       {showPageTitle ? (
@@ -409,7 +414,12 @@ const tablePreview = (props) => {
             </Space>
           </Col>
           <Col>
-            <Search placeholder="请输入内容" className="default-search" />
+            <Search
+              placeholder="请输入内容"
+              className="default-search"
+              onSearch={onSearch}
+              allowClear
+            />
           </Col>
         </Row>
 

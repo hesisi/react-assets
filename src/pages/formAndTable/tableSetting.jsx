@@ -492,6 +492,7 @@ const tableSetting = (props) => {
       }
       return item;
     });
+    console.log('列表配置的下拉框改变的时候', tables);
     setTable(tables);
   };
 
@@ -809,7 +810,12 @@ const tableSetting = (props) => {
                           </Form.Item>
 
                           <Form.Item label="是否可搜索" name="searchEnable">
-                            <Select>
+                            <Select
+                              onChange={(ele) =>
+                                selectChange(e, ele, 'searchEnable')
+                              }
+                              value={e.searchEnable}
+                            >
                               {config.selectList.searchEnable.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>

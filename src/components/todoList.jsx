@@ -1,15 +1,20 @@
 import { Avatar, List } from 'antd';
 import React from 'react';
-import Icon, { OrderedListOutlined } from '@ant-design/icons';
+import Icon, {
+  OrderedListOutlined,
+  EyeOutlined,
+  EyeFilled,
+} from '@ant-design/icons';
 const avatarSrc = require('@/assets/icons/u15.png');
 import '../pages/pageManage/homePage/index.less';
+import './public.less';
 const data = [
-  '完成首页配置提交,认真形式',
-  '解决数据交互问题，做好工作',
-  '优先解决遗留的需求.',
-  '完成今日工作计划',
-  '总结需求开发,撰写需求文档',
-  '编写代码，实现功能需求',
+  { title: '重庆人民齐心协力扑灭山火', scan: 234 },
+  { title: '唐山打人事件主犯被提起诉讼', scan: 134 },
+  { title: '美国派遣即将退役的巡洋舰穿越台湾海峡.', scan: 994 },
+  { title: '今年中秋节假期之前有望结束国内疫情', scan: 294 },
+  { title: '总结需求开发,撰写需求文档', scan: 804 },
+  { title: '编写代码，实现功能需求', scan: 294 },
 ];
 
 const TodoList = (props) => (
@@ -21,20 +26,33 @@ const TodoList = (props) => (
       justifyContent: 'flex-start',
       alignItems: 'center',
     }}
+    className="todolist"
   >
-    <p style={{ marginBottom: '5px' }}>
-      <OrderedListOutlined style={{ marginRight: '4px' }} />
+    <p>
+      <OrderedListOutlined
+        style={{ marginRight: '10px', color: 'rgb(217,123,98)' }}
+      />
       TodoList
     </p>
     <List
       className={props.className}
       size="small"
-      bordered
+      split={true}
       dataSource={data}
       renderItem={(item, index) => (
-        <List.Item>{`${index + 1}. ${item}`}</List.Item>
+        <List.Item>
+          <div className="spantitle">
+            <span className="spanblock"></span> {`${item.title}`}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <EyeFilled style={{ color: '#989898', marginRight: '4px' }} />{' '}
+            <span style={{ color: '#989898', fontSize: '12px' }}>
+              {item.scan}
+            </span>{' '}
+          </div>
+        </List.Item>
       )}
-      style={{ border: 'none' }}
+      style={{ border: 'none', marginTop: '30px' }}
     />
   </div>
 );

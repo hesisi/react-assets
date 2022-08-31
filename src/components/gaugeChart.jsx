@@ -42,9 +42,12 @@ const GaugeChart = (props) => {
         flexDirection: 'column',
         justifyContent: 'flex-start',
       }}
+      className="guideChart"
     >
-      <p style={{ marginBottom: '5px' }}>
-        <FundProjectionScreenOutlined style={{ marginRight: '4px' }} />
+      <p>
+        <FundProjectionScreenOutlined
+          style={{ marginRight: '10px', color: 'rgb(84,112,198)' }}
+        />
         GaugeChart
       </p>
       <div

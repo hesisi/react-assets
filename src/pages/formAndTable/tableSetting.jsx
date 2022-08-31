@@ -17,6 +17,7 @@ import {
   Checkbox,
   Modal,
   Radio,
+  message,
 } from 'antd';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
@@ -66,6 +67,11 @@ const tableSetting = (props) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+
+  const [checkboxValue, setCheckBoxValue] = useState([
+    'active',
+    'saveAsTemplate',
+  ]);
 
   // 检索搜索
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -482,6 +488,18 @@ const tableSetting = (props) => {
       JSON.stringify(Object.assign(obj, data)),
     );
     setSaveVisible(false);
+
+    if (checkboxValue.includes('active')) {
+      const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+        (e) => {
+          if (e.formCode === props.formCode) {
+            e.formStatus = 'enable';
+          }
+          return e;
+        },
+      );
+      window.localStorage.setItem('formList', JSON.stringify(formList));
+    }
   };
 
   // 取消列表配置保存
@@ -503,11 +521,12 @@ const tableSetting = (props) => {
 
   // 复制url
   const copyUrl = () => {
+    handleOk();
     copy(url);
+    message.success('复制成功');
   };
 
   const generateHandler = () => {
-    handleOk();
     setUrlVisible(true);
     const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
       (e) => {
@@ -862,13 +881,23 @@ const tableSetting = (props) => {
       <Modal
         title="确认保存"
         visible={saveVisible}
-        onOk={handleOk}
+        onOk={() => {
+          handleOk();
+          message.success('保存成功');
+        }}
         onCancel={handleCancel}
+        className="default-modal"
+        okText="确认"
+        cancelText="取消"
       >
         <p>是否保存当前表单？</p>
         <Checkbox.Group
           options={config.options}
           defaultValue={['active', 'saveAsTemplate']}
+          onChange={(checked) => {
+            setCheckBoxValue(checked);
+          }}
+          value={checkboxValue}
         />
       </Modal>
 
@@ -879,7 +908,7 @@ const tableSetting = (props) => {
           title="列表预览"
           onCancel={() => setPreviewVisible(false)}
           width="90%"
-          className="table-preview__modal"
+          className="table-preview__modal default-modal"
         >
           <TablePreview formCode={props.formCode} showPageTitle={false} />
         </Modal>
@@ -895,7 +924,7 @@ const tableSetting = (props) => {
         okText="复制地址"
         cancelText="取消"
         onOk={copyUrl}
-        width="50%"
+        className="default-modal"
       >
         <Input addonBefore="当前的URL地址：" value={url} />
       </Modal>

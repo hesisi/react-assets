@@ -108,7 +108,7 @@ export default function Dialog(props: any) {
           style={{ display: 'inline-block' }}
         >
           <Select
-            defaultValue={processGroup[0].typeIndex}
+            // defaultValue={processGroup[0].typeIndex}
             style={{ width: 150 }}
           >
             {processGroup.map((item: any) => {

@@ -113,9 +113,17 @@ export default function FormList() {
 
     if (record.formStatus === 'enable') {
       setUrlVisible(true);
-      setUrl(
-        `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${record.formCode}`,
+      const urlStr = `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${record.formCode}`;
+      setUrl(urlStr);
+      const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+        (e) => {
+          if (e.formCode === record.formCode) {
+            e.formUrl = urlStr;
+          }
+          return e;
+        },
       );
+      window.localStorage.setItem('formList', JSON.stringify(formList));
     }
   };
 

@@ -33,7 +33,7 @@ const pic = require('@/assets/pic.jpg');
 const shrinks = ['100%', '80%', '60%', '40%', '20%'];
 
 const homePage = (props) => {
-  const [template, setTemplate] = useState([]); // 当前选中的模板类
+  const [template, setTemplate] = useState([]); // 当前选中的模板类型
   const [component, setComponent] = useState([]); // 当前选中的组件类型
   const [dom, setDom] = useState([]);
   const [selectId, setSelectId] = useState('');

@@ -40,7 +40,6 @@ const TodoList = (props) => (
       split={true}
       dataSource={data}
       renderItem={(item, index) => (
-        // <List.Item>{`${index + 1}. ${item}`}</List.Item>
         <List.Item>
           <div className="spantitle">
             <span className="spanblock"></span> {`${item.title}`}

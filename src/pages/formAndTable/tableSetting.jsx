@@ -240,8 +240,7 @@ const tableSetting = (props) => {
     if (formItemObj) {
       setFormTree(transformToTreeNode(formItemObj));
     }
-    // const properties = formItemObj?.schema?.properties;
-    // let properties = formItemObj?.schema?.properties;
+
     let data = [];
     const temp = (prop) => {
       if (!prop) return [];
@@ -298,31 +297,7 @@ const tableSetting = (props) => {
     };
     objSetFunc(properties, formItem);
 
-    // const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    // if (tableConfig && tableConfig[props.formCode]) {
-    //   const arr = [];
-    //   const col = tableConfig[props.formCode].columns;
-    //   for (let i = 0; i < formItem.length; i++) {
-    //     for (let j = 0; j < col.length; j++) {
-    //       if (col[j].key === formItem[i].id) {
-    //         arr.push(formItem[i]);
-    //       }
-    //     }
-    //   }
-    //   const obj =
-    //     JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
-    //       ? formItem
-    //       : arr;
-    //   setButtons(data.buttonConfig);
-    //   setTable(obj);
-    //   console.log(
-    //     '相等:',
-    //     JSON.stringify(formItem) === JSON.stringify(data.tableConfig),
-    //   );
-    // } else {
     setTable(formItem);
-    // }
-
     setColumnCount(formItem.length);
 
     const formList = JSON.parse(window.localStorage.getItem('formList'));
@@ -571,6 +546,7 @@ const tableSetting = (props) => {
   };
 
   const generateHandler = () => {
+    handleOk();
     setUrlVisible(true);
     const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
       (e) => {

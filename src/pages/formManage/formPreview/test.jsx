@@ -163,7 +163,6 @@ const App = (props) => {
     setFormVisible(true);
     for (let e in record) {
       const reg = /^(\d{4})-(\d{2})-(\d{2})$/g;
-      console.log(record[e]);
       if (
         record[e] &&
         record[e].length > 10 &&

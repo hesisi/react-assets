@@ -136,33 +136,12 @@ const tablePreview = (props) => {
       setButtons(data.buttonConfig);
       setTable(data.tableConfig);
       setTableCol(data.tableConfig, data.columns);
-      // setColumn(data.columns);
     }
 
     const tableList = JSON.parse(window.localStorage.getItem('tableList'));
     if (tableList && tableList[formCode]) {
       setDataSource(tableList[formCode]);
     }
-
-    // 处理表格数据为表单
-    // const properties = formItemObj?.schema?.properties;
-    // const idArr = data.tableConfig
-    //   .filter((e) => e.filterEnable)
-    //   .map((e) => e['x-designable-id']);
-    // const proArr = [];
-    // for (let k in properties) {
-    //   if (idArr.includes(k)) {
-    //     proArr.push(properties[k]);
-    //   }
-    // }
-    // const obj = {
-    //   form: { labelCol: 0, wrapperCol: 0, layout: 'inline' },
-    //   schema: {
-    //     ...formItemObj.schema,
-    //     properties: { ...proArr },
-    //   },
-    // };
-    // setTable(transformToTreeNode(obj));
 
     setShowPageTitle(props.showPageTitle);
   }, []);

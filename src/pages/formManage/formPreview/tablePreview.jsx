@@ -323,6 +323,28 @@ const tablePreview = (props) => {
     onChange: onSelectChange,
   };
 
+  // 批量删除
+  const deleteHandler = () => {
+    if (selectedRowKeys.length === 0) return;
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        let data = dataSource;
+        selectedRowKeys.forEach((item) => {
+          data = data.filter((e) => e.id !== item);
+        });
+        setDataSource(data);
+        // saveFormList(data);
+      },
+    });
+  };
+
+  // 保存至缓存中
+  // const saveFormList = (data) => {
+  //   data && localStorage.setItem('formList', JSON.stringify(data));
+  // };
+
   return (
     <div className="table-preview">
       {showPageTitle ? (
@@ -368,6 +390,7 @@ const tablePreview = (props) => {
               <Button
                 icon={<Icon icon="DeleteOutlined" />}
                 className="default-btn"
+                onClick={deleteHandler}
               >
                 删除
               </Button>

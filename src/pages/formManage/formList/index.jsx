@@ -57,7 +57,7 @@ const initFormInfo = {
 };
 const selectList = [
   { value: 'enable', label: '已启用' },
-  { value: 'edit', label: '编辑中' },
+  // { value: 'edit', label: '编辑中' },
   { value: 'disabled', label: '已停用' },
 ];
 
@@ -320,6 +320,13 @@ export default function FormList() {
           e.formName.indexOf(formName) !== -1 && e.formStatus === formStatus
         );
       }
+      if (formName) {
+        return e.formName.indexOf(formName) !== -1;
+      }
+      if (formStatus) {
+        return e.formStatus === formStatus;
+      }
+
       return e.formName.indexOf(formName) !== -1 || e.formStatus === formStatus;
     });
     setDataSource(data);

@@ -17,6 +17,7 @@ import { transformToTreeNode } from '@designable/formily-transformer';
 import Icon from '@/utils/icon';
 import { nanoid } from 'nanoid';
 import { history } from 'umi';
+const { Search } = Input;
 
 const tablePreview = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
@@ -31,20 +32,94 @@ const tablePreview = (props) => {
   const [showPageTitle, setShowPageTitle] = useState(true);
 
   const formRef = useRef(null);
+  const tableRef = useRef(null);
   const formCode = useMemo(() => {
     return props.location?.query?.formCode || props.formCode;
   });
 
+  // 列检索
+  const [searchText, setSearchText] = useState('');
+  const [searchedColumn, setSearchedColumn] = useState('');
+  const searchInput = useRef(null);
+
+  // 检索搜索
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+
+  // 重置检索
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText('');
+  };
+
+  const getColumnSearchProps = (dataIndex, label) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${label}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: 'block',
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<Icon icon="SearchOutlined" />}
+            size="small"
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() => clearFilters && handleReset(clearFilters)}
+            size="small"
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    // 表头的检索按钮
+    filterIcon: (filtered) => (
+      <Icon
+        icon="SearchOutlined"
+        style={{
+          color: filtered ? '#1890ff' : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex]
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+  });
+
   useEffect(() => {
-    // 表格
-    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    const data = tableConfig && tableConfig[formCode];
-    if (data) {
-      console.log(data);
-      setButtons(data.buttonConfig);
-      setTable(data.tableConfig);
-      setTableCol(data.tableConfig);
-    }
     // 表单
     const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
     if (!formColumn) return;
@@ -53,24 +128,59 @@ const tablePreview = (props) => {
       formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
       setFormTree(transformToTreeNode(formItemObj));
     }
+
+    // 表格
+    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
+    const data = tableConfig && tableConfig[formCode];
+    if (data) {
+      setButtons(data.buttonConfig);
+      setTable(data.tableConfig);
+      setTableCol(data.tableConfig, data.columns);
+    }
+
+    const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+    if (tableList && tableList[formCode]) {
+      setDataSource(tableList[formCode]);
+    }
+
     setShowPageTitle(props.showPageTitle);
   }, []);
 
   // 行删除
   const rowDelete = (_, record, index) => {
-    const data =
-      dataSource.length > 0
-        ? dataSource
-        : JSON.parse(window.localStorage.getItem('dataSource'));
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        const data =
+          dataSource.length > 0
+            ? dataSource
+            : JSON.parse(window.localStorage.getItem('tableList'))[formCode];
 
-    if (index === 0 && data.length === 1) {
-      setDataSource([]);
-      window.localStorage.setItem('dataSource', []);
-    } else {
-      const arr = data.filter((e, i) => i !== index);
-      setDataSource(arr);
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
-    }
+        const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+        if (index === 0 && data.length === 1) {
+          setDataSource([]);
+          // saveFormList();
+          for (let k in tableList) {
+            if (k === formCode) {
+              tableList[k] = [];
+            }
+          }
+          saveFormList(tableList);
+          // window.localStorage.setItem('dataSource', []);
+        } else {
+          const arr = data.filter((e, i) => i !== index);
+          setDataSource(arr);
+          for (let k in tableList) {
+            if (k === formCode) {
+              tableList[k] = arr;
+            }
+          }
+          saveFormList(tableList);
+          // window.localStorage.setItem('dataSource', JSON.stringify(arr));
+        }
+      },
+    });
   };
 
   // 行编辑
@@ -82,7 +192,7 @@ const tablePreview = (props) => {
   };
 
   // 设置表格
-  const setTableCol = (arr) => {
+  const setTableCol = (arr, col) => {
     const indexCol = [
       {
         title: '序号',
@@ -92,12 +202,16 @@ const tablePreview = (props) => {
         render: (_, record, index) => {
           return <span>{index + 1}</span>;
         },
+        width: 80,
+        fixed: 'left',
       },
     ];
     const operationCol = [
       {
         title: '操作',
         dataIndex: 'operation',
+        fixed: 'right',
+        width: 150,
         render: (_, record, index) => {
           return (
             <Space size={6}>
@@ -110,7 +224,7 @@ const tablePreview = (props) => {
                 className="default-table__btn"
                 icon={<Icon icon="FormOutlined" />}
               >
-                Edit
+                编辑
               </Button>
               <Button
                 type="link"
@@ -121,7 +235,7 @@ const tablePreview = (props) => {
                 className="default-table__btn"
                 icon={<Icon icon="CloseOutlined" />}
               >
-                Delete
+                删除
               </Button>
             </Space>
           );
@@ -129,17 +243,35 @@ const tablePreview = (props) => {
       },
     ];
     const tableShow = arr.filter((e) => e.isShow);
-    const col = tableShow.map((e) => {
-      return {
-        title: e.label,
-        dataIndex: e.name,
-        key: e.id,
-        sorter: e.sorter || false,
-      };
+    const colsArr = [];
+    for (let i = 0; i < col.length; i++) {
+      for (let j = 0; j < tableShow.length; j++) {
+        if (col[i].dataIndex === tableShow[j].name) {
+          colsArr.push(tableShow[j]);
+        }
+      }
+    }
+    const cols = colsArr.map((e) => {
+      if (e.filterEnable) {
+        return {
+          title: e.label,
+          dataIndex: e.id,
+          key: e.id,
+          sorter: e.sorter || false,
+          ...getColumnSearchProps(e.id, e.label),
+        };
+      } else {
+        return {
+          title: e.label,
+          dataIndex: e.id,
+          key: e.id,
+          sorter: e.sorter || false,
+        };
+      }
     });
 
     // 设置表格
-    setColumn(indexCol.concat(col).concat(operationCol));
+    setColumn(indexCol.concat(cols).concat(operationCol));
   };
 
   // 取消列表配置保存
@@ -179,7 +311,9 @@ const tablePreview = (props) => {
       }
       setDataSource(arr);
       // 数据有异步问题，暂存localStorage
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
+      // window.localStorage.setItem('dataSource', JSON.stringify(arr));
+      // window.localStorage.setItem('tableList', JSON.stringify({ [`${formCode}`]: arr }))
+      saveFormList({ [`${formCode}`]: arr });
       formCancel();
     });
   };
@@ -193,6 +327,28 @@ const tablePreview = (props) => {
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
+  };
+
+  // 批量删除
+  const deleteHandler = () => {
+    if (selectedRowKeys.length === 0) return;
+    Modal.confirm({
+      title: '确定要删除吗',
+      content: '该操作不可逆，请谨慎操作！',
+      onOk: () => {
+        let data = dataSource;
+        selectedRowKeys.forEach((item) => {
+          data = data.filter((e) => e.id !== item);
+        });
+        setDataSource(data);
+        // saveFormList(data);
+      },
+    });
+  };
+
+  // 保存至缓存中
+  const saveFormList = (data) => {
+    data && localStorage.setItem('tableList', JSON.stringify(data));
   };
 
   return (
@@ -211,9 +367,10 @@ const tablePreview = (props) => {
 
       <div className="table-preview__table">
         <Row justify="space-between" style={{ padding: '0 40px' }}>
-          <Col>
-            {/* 检索条件 */}
-            <Form form={searchForm} layout="inline" className="default-form">
+          {/* <Col> */}
+          {/* 检索条件 */}
+          {/* <PreviewWidget key="form" tree={table} /> */}
+          {/* <Form form={searchForm} layout="inline" className="default-form">
               {table.map((e) => {
                 if (e.filterEnable) {
                   return (
@@ -225,7 +382,7 @@ const tablePreview = (props) => {
                 return <div key={e.id}></div>;
               })}
             </Form>
-          </Col>
+          </Col> */}
 
           <Col>
             <Space size={10}>
@@ -239,10 +396,14 @@ const tablePreview = (props) => {
               <Button
                 icon={<Icon icon="DeleteOutlined" />}
                 className="default-btn"
+                onClick={deleteHandler}
               >
                 删除
               </Button>
             </Space>
+          </Col>
+          <Col>
+            <Search placeholder="请输入内容" className="default-search" />
           </Col>
         </Row>
 
@@ -255,6 +416,8 @@ const tablePreview = (props) => {
           style={{ marginTop: '20px', padding: '0 40px' }}
           rowKey={(record) => record.id}
           rowSelection={rowSelection}
+          scroll={{ x: 'max-content' }}
+          className="default-table"
         />
       </div>
 
@@ -266,14 +429,13 @@ const tablePreview = (props) => {
         onOk={formOk}
         cancelText="取消"
         okText="确认"
-        className="default-modal"
+        className="form-preview__modal default-modal"
       >
-        <PreviewWidget
-          key="form"
-          tree={formTree}
-          ref={formRef}
-          layout="vertical"
-        />
+        {formTree ? (
+          <PreviewWidget key="form" tree={formTree} ref={formRef} />
+        ) : (
+          <></>
+        )}
       </Modal>
     </div>
   );

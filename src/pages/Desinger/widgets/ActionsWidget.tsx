@@ -27,6 +27,7 @@ import { onFormSubmitValidateEnd } from '@formily/core';
 import { history } from 'umi';
 import Icon from '@/utils/icon';
 import FormPreview from '@/pages/formManage/formPreview/formPreview';
+import '../index.less';
 
 interface ActionsWidgetProps {
   type: 'form' | 'table';
@@ -54,6 +55,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
 
   // 预览
   const onPreview = () => {
+    onSave();
     setPreviewVisible(true);
   };
 
@@ -106,14 +108,18 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
       </Space>
 
       {/* 弹框: 预览 */}
-      <Modal
-        visible={previewVisible}
-        title="表单预览"
-        onCancel={() => setPreviewVisible(false)}
-        width="90%"
-      >
-        <FormPreview showPageTitle={false} />
-      </Modal>
+      {previewVisible ? (
+        <Modal
+          visible={previewVisible}
+          title="表单预览"
+          onCancel={() => setPreviewVisible(false)}
+          className="form-preview__modal default-modal"
+        >
+          <FormPreview showPageTitle={false} />
+        </Modal>
+      ) : (
+        <></>
+      )}
     </>
   );
 });

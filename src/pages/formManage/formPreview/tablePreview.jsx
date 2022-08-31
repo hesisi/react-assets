@@ -313,7 +313,8 @@ const tablePreview = (props) => {
       // 数据有异步问题，暂存localStorage
       // window.localStorage.setItem('dataSource', JSON.stringify(arr));
       // window.localStorage.setItem('tableList', JSON.stringify({ [`${formCode}`]: arr }))
-      saveFormList({ [`${formCode}`]: arr });
+      const obj = JSON.parse(window.localStorage.getItem('tableList')) ?? {};
+      saveFormList({ ...obj, [`${formCode}`]: arr });
       formCancel();
     });
   };

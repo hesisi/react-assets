@@ -144,6 +144,30 @@ const tableSetting = (props) => {
     },
   });
 
+  const tableEcho = (formInit, columnsInit) => {
+    if (JSON.stringify(formInit) !== JSON.stringify(columnsInit)) {
+      const arr = [...formInit];
+      formInit.forEach((item, index) => {
+        columnsInit.forEach((e, i) => {
+          if (e.id === item.id) {
+            arr[index] = e;
+          }
+        });
+      });
+      // for (let j = 0; j < columnsInit.length; j++) {
+      //   for (let i = 0; i < formInit.length; i++) {
+      //     console.log(formInit[i].id, columnsInit[j].id);
+      //     // if (formInit[i].id === columnsInit[j].id) {
+      //     //   arr.push(columnsInit[j]);
+      //     // } else {
+      //     //   arr.push(formInit[i]);
+      //     // }
+      //   }
+      // }
+      setTable(arr);
+    }
+  };
+
   // 从内存获取表格
   useEffect(() => {
     tableDataFetch();
@@ -321,8 +345,15 @@ const tableSetting = (props) => {
     setTreeData(tree);
 
     setUrl(
-      `${window.location.host}/formManage/formPreview/table?formCode=${props.formCode}`,
+      `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${props.formCode}`,
     );
+
+    // 如果有值回显
+    const tableConfig = window.localStorage.getItem('tableConfig');
+    const arr = tableConfig && JSON.parse(tableConfig);
+    if (arr && arr[props.formCode]?.tableConfig) {
+      tableEcho(formItem, arr[props.formCode].tableConfig);
+    }
   };
 
   // 添加操作按钮
@@ -458,75 +489,6 @@ const tableSetting = (props) => {
     setSaveVisible(false);
   };
 
-  // 表单添加
-  // const formAdd = () => {
-  //   setFormVisible(true);
-  //   setIndex(-1);
-  // };
-
-  // 表单取消
-  // const formCancel = () => {
-  //   setFormVisible(false);
-  //   formRef.current?.form.reset();
-  // };
-
-  // 确认添加
-  // const formOk = () => {
-  //   const form = formRef.current?.form;
-  //   if (!form) return;
-  //   form.validate().then(() => {
-  //     // 表单提交
-  //     let arr = [...dataSource];
-  //     if (index === -1) {
-  //       arr.push({
-  //         ...JSON.parse(JSON.stringify(form.values)),
-  //         id: nanoid(),
-  //       });
-  //     } else {
-  //       // 编辑
-  //       arr[index] = {
-  //         ...JSON.parse(JSON.stringify(form.values)),
-  //         id: arr[index].id,
-  //       };
-  //     }
-  //     setDataSource(arr);
-  //     // 数据有异步问题，暂存localStorage
-  //     window.localStorage.setItem('dataSource', JSON.stringify(arr));
-  //     formCancel();
-  //   });
-  // };
-
-  // 行删除
-  // const rowDelete = (_, record, index) => {
-  //   Modal.confirm({
-  //     title: '确定要删除吗',
-  //     content: '该操作不可逆，请谨慎操作！',
-  //     onOk: () => {
-  //       const data =
-  //         dataSource.length > 0
-  //           ? dataSource
-  //           : JSON.parse(window.localStorage.getItem('dataSource'));
-
-  //       if (index === 0 && data.length === 1) {
-  //         setDataSource([]);
-  //         window.localStorage.setItem('dataSource', []);
-  //       } else {
-  //         const arr = data.filter((e, i) => i !== index);
-  //         setDataSource(arr);
-  //         window.localStorage.setItem('dataSource', JSON.stringify(arr));
-  //       }
-  //     },
-  //   });
-  // };
-
-  // 行编辑
-  // const rowEdit = (_, record, index) => {
-  //   setFormVisible(true);
-  //   setIndex(index);
-  //   const form = formRef.current.form;
-  //   form.setValues(record);
-  // };
-
   // 按钮属性表单清空
   const btnFormReset = () => {
     btnForm?.resetFields();
@@ -537,7 +499,6 @@ const tableSetting = (props) => {
   const previewHandler = () => {
     handleOk();
     setPreviewVisible(true);
-    // history.push(`/formManage/formPreview/table?formCode=${props.formCode}`);
   };
 
   // 复制url
@@ -733,25 +694,6 @@ const tableSetting = (props) => {
             </Col>
           </Row>
           <Divider />
-          {/* 检索条件 */}
-          {/* <Form form={searchForm} layout="inline">
-            {table.map((e) => {
-              if (e.filterEnable) {
-                return (
-                  <Form.Item
-                    label={e.label}
-                    name={e.name}
-                    key={e.id}
-                    style={{ marginBottom: '10px' }}
-                  >
-                    <Input />
-                  </Form.Item>
-                );
-              }
-              return <div key={e.id}></div>;
-            })}
-          </Form> */}
-          {/* 表格部分 */}
 
           <Table
             columns={column}
@@ -895,11 +837,6 @@ const tableSetting = (props) => {
                     </Popover>
                     {icon ? <Icon icon={icon} /> : <></>}
                   </Space>
-
-                  {/* {btnForm && btnForm.getFieldValue('icon') ? (
-                    <Icon icon={btnForm.getFieldValue('icon')} />
-                  ) : (
-                  )} */}
                 </Form.Item>
 
                 <Form.Item label="按钮事件" name="method">
@@ -934,20 +871,6 @@ const tableSetting = (props) => {
           defaultValue={['active', 'saveAsTemplate']}
         />
       </Modal>
-
-      {/* 弹框: 表格 */}
-      {/* {formVisible ? (
-        <Modal
-          visible={formVisible}
-          title="新增"
-          onCancel={formCancel}
-          onOk={formOk}
-        >
-          <PreviewWidget key="form" tree={formTree} ref={formRef} />
-        </Modal>
-      ) : (
-        <></>
-      )} */}
 
       {/* 弹框: 预览 */}
       {previewVisible ? (

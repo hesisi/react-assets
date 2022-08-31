@@ -299,27 +299,30 @@ const tableSetting = (props) => {
     objSetFunc(properties, formItem);
 
     // const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    // const data = tableConfig && tableConfig[props.formCode];
-    // if (data) {
-    //   formItem =
-    //     JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
-    //       ? data.tableConfig
-    //       : formItem;
-    //   const col = data.columns;
-    //   const colsArr = [];
-    //   for (let i = 0; i < col.length; i++) {
-    //     for (let j = 0; j < formItem.length; j++) {
-    //       if (col[i].dataIndex === formItem[j].name) {
-    //         colsArr.push(formItem[j]);
+    // if (tableConfig && tableConfig[props.formCode]) {
+    //   const arr = [];
+    //   const col = tableConfig[props.formCode].columns;
+    //   for (let i = 0; i < formItem.length; i++) {
+    //     for (let j = 0; j < col.length; j++) {
+    //       if (col[j].key === formItem[i].id) {
+    //         arr.push(formItem[i]);
     //       }
     //     }
     //   }
-    //   objSetFunc(colsArr, formItem);
-    //   // formItem = colsArr;
+    //   const obj =
+    //     JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
+    //       ? formItem
+    //       : arr;
     //   setButtons(data.buttonConfig);
+    //   setTable(obj);
+    //   console.log(
+    //     '相等:',
+    //     JSON.stringify(formItem) === JSON.stringify(data.tableConfig),
+    //   );
+    // } else {
+    setTable(formItem);
     // }
 
-    setTable(formItem);
     setColumnCount(formItem.length);
 
     const formList = JSON.parse(window.localStorage.getItem('formList'));

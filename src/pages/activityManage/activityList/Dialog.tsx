@@ -1,13 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Modal, Form } from 'antd';
+import { Input, Modal, Form, Select } from 'antd';
+import { FormOutlined } from '@ant-design/icons';
 const { TextArea } = Input;
+const { Option } = Select;
 import type { ColumnsType } from 'antd/es/table';
 import type { FormInstance } from 'antd/es/form';
 import { nanoid } from 'nanoid';
 import moment from 'moment';
+import TypeDialog from './TypeDialog';
+import { useForm } from '@formily/react';
 
 export default function Dialog(props: any) {
   const formRef = React.createRef<FormInstance>();
+  const _processGroup = window.localStorage.getItem('processGroup') || '';
+  const processGroup =
+    _processGroup != ''
+      ? JSON.parse(_processGroup)
+      : [
+          {
+            key: 1,
+            typeIndex: '1',
+            typeName: '默认分组',
+          },
+        ];
+
+  const [isTypeVisible, setIsTypeVisible] = useState(false);
   const { isModalVisible, handleOk, setIsModalVisible } = props;
   useEffect(() => {
     if (isModalVisible) {
@@ -55,6 +72,10 @@ export default function Dialog(props: any) {
       });
   };
 
+  const updateType = () => {
+    setIsTypeVisible(true);
+  };
+
   return (
     <Modal
       title="新增流程"
@@ -75,16 +96,47 @@ export default function Dialog(props: any) {
       >
         <Form.Item
           label="流程名称"
-          name="name"
+          name="proessName"
           rules={[{ required: true, message: '请输入流程名称!' }]}
         >
           <Input placeholder={'请输入流程名称'} />
         </Form.Item>
-
+        <Form.Item
+          label="流程分组"
+          name="proessGroup"
+          rules={[{ required: true, message: '请选择流程分组!' }]}
+          style={{ display: 'inline-block' }}
+        >
+          <Select
+            defaultValue={processGroup[0].typeIndex}
+            style={{ width: 150 }}
+          >
+            {processGroup.map((item: any) => {
+              return (
+                <Option value={item.typeIndex} key={item.key}>
+                  {item.typeName}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+        <FormOutlined
+          onClick={updateType}
+          style={{
+            color: '#40a9ff',
+            fontSize: '20px',
+            marginTop: '36px',
+            marginLeft: '10px',
+          }}
+        />
         <Form.Item label="备注" name="remarks">
           <TextArea rows={4} placeholder="请输入备注" />
         </Form.Item>
       </Form>
+      <TypeDialog
+        setIsTypeVisible={setIsTypeVisible}
+        isTypeVisible={isTypeVisible}
+      ></TypeDialog>
     </Modal>
   );
 }

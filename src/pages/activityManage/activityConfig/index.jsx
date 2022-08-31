@@ -83,6 +83,8 @@ export default function IndexPage() {
   useEffect(() => {
     const _flowGroup = window.localStorage.getItem('flowGroup');
     const group = _flowGroup ? JSON.parse(_flowGroup) : [];
+    const _formList = window.localStorage.getItem('formList');
+    const forms = _formList ? JSON.parse(_formList) : [];
     // console.log(group)
     setGroup(group);
     getFlow(group);
@@ -111,6 +113,7 @@ export default function IndexPage() {
       container: refPanel.current,
       modeler,
       flowMsg: flow,
+      forms: forms,
       setFlowMsg: updateFlow,
     });
     // console.log(flow?.xml)

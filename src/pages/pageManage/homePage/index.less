@@ -2,7 +2,7 @@
 @activeColor: #1890ff;
 @gray-5: #d9d9d9;
 @gray-2: #fafafa;
-@bgColor: #e6f7ff;
+@bgColor: #fcfeff;
 
 .border {
   border: 10px solid @gray;
@@ -20,7 +20,9 @@
       background: white;
     }
   }
-
+  .ant-layout-header {
+    height: 56px;
+  }
   .home-page__header {
     // &:extend(.border);
     margin: 20px 20px 10px;
@@ -28,13 +30,13 @@
     .back {
       cursor: pointer;
       color: #858585;
-      font-size: 17px;
+      font-size: 16px;
     }
 
     .ant-col,
     .ant-row {
       height: 100%;
-      line-height: 60px;
+      line-height: 56px;
     }
 
     .ant-col:nth-child(1) {
@@ -73,6 +75,12 @@
   .ant-tree-node-content-wrapper-normal {
     background-color: transparent !important;
   }
+  .ant-tabs-ink-bar {
+    visibility: hidden;
+  }
+  .ant-btn-default {
+    border-radius: 0 !important;
+  }
   .menutab .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
     width: 36px;
     height: 25px;
@@ -81,7 +89,12 @@
     color: #333333;
     letter-spacing: 0;
   }
-
+  .ant-tabs-top > .ant-tabs-nav::before,
+  .ant-tabs-bottom > .ant-tabs-nav::before,
+  .ant-tabs-top > div > .ant-tabs-nav::before,
+  .ant-tabs-bottom > div > .ant-tabs-nav::before {
+    border-color: transparent;
+  }
   .ant-tree-switcher-noop {
     display: none;
   }
@@ -127,7 +140,6 @@
     .ant-tree-list-holder-inner > div:nth-child(1),
     .ant-tree-list-holder-inner > div:last-child {
       font-family: PingFangSC-Regular;
-      font-size: 12px;
       color: #868686;
       letter-spacing: 0;
       font-weight: 400;

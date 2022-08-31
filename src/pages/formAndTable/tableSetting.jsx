@@ -17,6 +17,7 @@ import {
   Checkbox,
   Modal,
   Radio,
+  message,
 } from 'antd';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
@@ -66,6 +67,11 @@ const tableSetting = (props) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+
+  const [checkboxValue, setCheckBoxValue] = useState([
+    'active',
+    'saveAsTemplate',
+  ]);
 
   // 检索搜索
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -145,26 +151,38 @@ const tableSetting = (props) => {
   });
 
   const tableEcho = (formInit, columnsInit) => {
-    if (JSON.stringify(formInit) !== JSON.stringify(columnsInit)) {
+    const tableConfig = columnsInit?.tableConfig;
+    const columns = columnsInit?.columns;
+    if (JSON.stringify(formInit) !== JSON.stringify(tableConfig)) {
       const arr = [...formInit];
       formInit.forEach((item, index) => {
-        columnsInit.forEach((e, i) => {
+        tableConfig.forEach((e, i) => {
           if (e.id === item.id) {
             arr[index] = e;
           }
         });
       });
-      // for (let j = 0; j < columnsInit.length; j++) {
-      //   for (let i = 0; i < formInit.length; i++) {
-      //     console.log(formInit[i].id, columnsInit[j].id);
-      //     // if (formInit[i].id === columnsInit[j].id) {
-      //     //   arr.push(columnsInit[j]);
-      //     // } else {
-      //     //   arr.push(formInit[i]);
-      //     // }
-      //   }
-      // }
-      setTable(arr);
+
+      console.log('===echo', formInit, columns);
+
+      let colsArr = [];
+      if (columns === arr.length) {
+        for (let i = 0; i < columns.length; i++) {
+          for (let j = 0; j < arr.length; j++) {
+            if (
+              columns[i].dataIndex === arr[j].name ||
+              columns[i].dataIndex === arr[j].id
+            ) {
+              colsArr.push(arr[j]);
+            }
+          }
+        }
+      } else {
+        // TODO:会造成拖动的顺序被还原，暂未想到解决方案
+        colsArr = arr;
+      }
+
+      setTable(colsArr);
     }
   };
 
@@ -233,19 +251,32 @@ const tableSetting = (props) => {
       },
     ];
     const tableShow = arr.filter((e) => e.isShow);
+    // let colsArr = [];
+    // if (columnInit) {
+    //   for (let i = 0; i < columnInit.length; i++) {
+    //     for (let j = 0; j < tableShow.length; j++) {
+    //       if (columnInit[i].dataIndex === tableShow[j].name) {
+    //         colsArr.push(tableShow[j]);
+    //       }
+    //     }
+    //   }
+    // } else {
+    //   colsArr = tableShow;
+    // }
+
     const col = tableShow.map((e) => {
       if (e.filterEnable) {
         return {
           title: e.label,
-          dataIndex: e.name,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
-          ...getColumnSearchProps(e.name, e.label),
+          ...getColumnSearchProps(e.name || e.id, e.label),
         };
       } else {
         return {
           title: e.label,
-          dataIndex: e.name,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
         };
@@ -288,7 +319,8 @@ const tableSetting = (props) => {
           for (let k in data[key].properties) {
             arr.push({
               ...data[key].properties[k],
-              name: data[key].properties[k].name || key, // name对应的属性名
+              name:
+                data[key].properties[k].name || data[key]['x-designable-id'], // name对应的属性名
               label: data[key].properties[k].title, // 表格列名称（title绝对会有，name不一定有）
               type: data[key].properties[k]['x-component'],
               rules: [
@@ -304,7 +336,7 @@ const tableSetting = (props) => {
         } else {
           arr.push({
             ...data[key],
-            name: data[key].name || key, // name对应的属性名
+            name: data[key].name || data[key]['x-designable-id'], // name对应的属性名
             label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
             type: data[key]['x-component'],
             rules: [
@@ -351,8 +383,8 @@ const tableSetting = (props) => {
     // 如果有值回显
     const tableConfig = window.localStorage.getItem('tableConfig');
     const arr = tableConfig && JSON.parse(tableConfig);
-    if (arr && arr[props.formCode]?.tableConfig) {
-      tableEcho(formItem, arr[props.formCode].tableConfig);
+    if (arr && arr[props.formCode]) {
+      tableEcho(formItem, arr[props.formCode]);
     }
   };
 
@@ -460,6 +492,7 @@ const tableSetting = (props) => {
       }
       return item;
     });
+    console.log('列表配置的下拉框改变的时候', tables);
     setTable(tables);
   };
 
@@ -482,6 +515,18 @@ const tableSetting = (props) => {
       JSON.stringify(Object.assign(obj, data)),
     );
     setSaveVisible(false);
+
+    if (checkboxValue.includes('active')) {
+      const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+        (e) => {
+          if (e.formCode === props.formCode) {
+            e.formStatus = 'enable';
+          }
+          return e;
+        },
+      );
+      window.localStorage.setItem('formList', JSON.stringify(formList));
+    }
   };
 
   // 取消列表配置保存
@@ -503,11 +548,12 @@ const tableSetting = (props) => {
 
   // 复制url
   const copyUrl = () => {
+    handleOk();
     copy(url);
+    message.success('复制成功');
   };
 
   const generateHandler = () => {
-    handleOk();
     setUrlVisible(true);
     const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
       (e) => {
@@ -764,7 +810,12 @@ const tableSetting = (props) => {
                           </Form.Item>
 
                           <Form.Item label="是否可搜索" name="searchEnable">
-                            <Select>
+                            <Select
+                              onChange={(ele) =>
+                                selectChange(e, ele, 'searchEnable')
+                              }
+                              value={e.searchEnable}
+                            >
                               {config.selectList.searchEnable.map((e) => {
                                 return (
                                   <Select.Option value={e.value} key={e.value}>
@@ -862,13 +913,23 @@ const tableSetting = (props) => {
       <Modal
         title="确认保存"
         visible={saveVisible}
-        onOk={handleOk}
+        onOk={() => {
+          handleOk();
+          message.success('保存成功');
+        }}
         onCancel={handleCancel}
+        className="default-modal"
+        okText="确认"
+        cancelText="取消"
       >
         <p>是否保存当前表单？</p>
         <Checkbox.Group
           options={config.options}
           defaultValue={['active', 'saveAsTemplate']}
+          onChange={(checked) => {
+            setCheckBoxValue(checked);
+          }}
+          value={checkboxValue}
         />
       </Modal>
 
@@ -879,7 +940,7 @@ const tableSetting = (props) => {
           title="列表预览"
           onCancel={() => setPreviewVisible(false)}
           width="90%"
-          className="table-preview__modal"
+          className="table-preview__modal default-modal"
         >
           <TablePreview formCode={props.formCode} showPageTitle={false} />
         </Modal>
@@ -895,7 +956,7 @@ const tableSetting = (props) => {
         okText="复制地址"
         cancelText="取消"
         onOk={copyUrl}
-        width="50%"
+        className="default-modal"
       >
         <Input addonBefore="当前的URL地址：" value={url} />
       </Modal>

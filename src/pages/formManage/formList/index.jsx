@@ -21,6 +21,7 @@ import {
   Layout,
   Radio,
   Switch,
+  message,
 } from 'antd';
 const { Content } = Layout;
 import { useEffect, useRef, useState } from 'react';
@@ -44,6 +45,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons';
 import '@/assets/style/layout.less';
+import copy from 'copy-to-clipboard';
 
 const { TextArea } = Input;
 
@@ -69,6 +71,9 @@ export default function FormList() {
   const history = useHistory();
   const formRef = useRef(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
+
+  const [urlVisible, setUrlVisible] = useState(false);
+  const [url, setUrl] = useState('');
 
   // 获取formList
   const getFormList = () => {
@@ -105,6 +110,21 @@ export default function FormList() {
     });
     setDataSource(arr);
     saveFormList(arr);
+
+    if (record.formStatus === 'enable') {
+      setUrlVisible(true);
+      const urlStr = `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${record.formCode}`;
+      setUrl(urlStr);
+      const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+        (e) => {
+          if (e.formCode === record.formCode) {
+            e.formUrl = urlStr;
+          }
+          return e;
+        },
+      );
+      window.localStorage.setItem('formList', JSON.stringify(formList));
+    }
   };
 
   // 表格配置项
@@ -349,6 +369,12 @@ export default function FormList() {
     });
   };
 
+  // 复制url
+  const copyUrl = () => {
+    copy(url);
+    message.success('复制成功');
+  };
+
   return (
     <div className="list" style={{ paddingBottom: '20px' }}>
       <Layout className="list-layout">
@@ -416,7 +442,7 @@ export default function FormList() {
                 <Button
                   icon={<CloseCircleOutlined />}
                   onClick={deleteHandler}
-                  className="primary-btn"
+                  className="default-btn"
                 >
                   删除表单
                 </Button>
@@ -485,6 +511,19 @@ export default function FormList() {
             />
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* 弹框: 生成url */}
+      <Modal
+        visible={urlVisible}
+        title="生成URL"
+        onCancel={() => setUrlVisible(false)}
+        okText="复制地址"
+        cancelText="取消"
+        onOk={copyUrl}
+        className="default-modal"
+      >
+        <Input addonBefore="当前的URL地址：" value={url} />
       </Modal>
     </div>
   );

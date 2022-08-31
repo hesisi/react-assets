@@ -27,6 +27,7 @@ import { onFormSubmitValidateEnd } from '@formily/core';
 import { history } from 'umi';
 import Icon from '@/utils/icon';
 import FormPreview from '@/pages/formManage/formPreview/formPreview';
+import '../index.less';
 
 interface ActionsWidgetProps {
   type: 'form' | 'table';
@@ -112,7 +113,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
           visible={previewVisible}
           title="表单预览"
           onCancel={() => setPreviewVisible(false)}
-          width="90%"
+          className="form-preview__modal default-modal"
         >
           <FormPreview showPageTitle={false} />
         </Modal>

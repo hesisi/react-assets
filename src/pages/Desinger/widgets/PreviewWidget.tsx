@@ -98,6 +98,8 @@ export const PreviewWidget: React.FC<IPreviewWidgetProps> = forwardRef(
     const form = useMemo(() => createForm(), []);
     const { form: formProps, schema } = transformToSchema(props.tree); // treeNode模式 json -> treeNode -> schema
 
+    console.log('===PreviewWidget', formProps);
+
     useImperativeHandle(ref, () => {
       return {
         form: form,

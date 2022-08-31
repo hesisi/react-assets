@@ -135,7 +135,8 @@ const tablePreview = (props) => {
     if (data) {
       setButtons(data.buttonConfig);
       setTable(data.tableConfig);
-      setTableCol(data.tableConfig);
+      setTableCol(data.tableConfig, data.columns);
+      // setColumn(data.columns);
     }
 
     // 处理表格数据为表单
@@ -187,7 +188,7 @@ const tablePreview = (props) => {
   };
 
   // 设置表格
-  const setTableCol = (arr) => {
+  const setTableCol = (arr, col) => {
     const indexCol = [
       {
         title: '序号',
@@ -238,19 +239,27 @@ const tablePreview = (props) => {
       },
     ];
     const tableShow = arr.filter((e) => e.isShow);
-    const col = tableShow.map((e) => {
+    const colsArr = [];
+    for (let i = 0; i < col.length; i++) {
+      for (let j = 0; j < tableShow.length; j++) {
+        if (col[i].dataIndex === tableShow[j].name) {
+          colsArr.push(tableShow[j]);
+        }
+      }
+    }
+    const cols = colsArr.map((e) => {
       if (e.filterEnable) {
         return {
           title: e.label,
-          dataIndex: e.name,
+          dataIndex: e.id,
           key: e.id,
           sorter: e.sorter || false,
-          ...getColumnSearchProps(e.name, e.label),
+          ...getColumnSearchProps(e.id, e.label),
         };
       } else {
         return {
           title: e.label,
-          dataIndex: e.name,
+          dataIndex: e.id,
           key: e.id,
           sorter: e.sorter || false,
         };
@@ -258,7 +267,7 @@ const tablePreview = (props) => {
     });
 
     // 设置表格
-    setColumn(indexCol.concat(col).concat(operationCol));
+    setColumn(indexCol.concat(cols).concat(operationCol));
   };
 
   // 取消列表配置保存
@@ -379,6 +388,7 @@ const tablePreview = (props) => {
           rowKey={(record) => record.id}
           rowSelection={rowSelection}
           scroll={{ x: 'max-content' }}
+          className="default-table"
         />
       </div>
 
@@ -390,9 +400,13 @@ const tablePreview = (props) => {
         onOk={formOk}
         cancelText="取消"
         okText="确认"
-        className="default-modal"
+        className="form-preview__modal default-modal"
       >
-        <PreviewWidget key="form" tree={formTree} ref={formRef} />
+        {formTree ? (
+          <PreviewWidget key="form" tree={formTree} ref={formRef} />
+        ) : (
+          <></>
+        )}
       </Modal>
     </div>
   );

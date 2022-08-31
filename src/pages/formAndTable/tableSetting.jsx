@@ -34,7 +34,9 @@ import { getUUID } from '@/utils/utils.js';
 
 import TablePreview from '@/pages/formManage/formPreview/tablePreview';
 import copy from 'copy-to-clipboard';
+import Sortable from 'sortablejs';
 
+let cols = [];
 const tableSetting = (props) => {
   const [table, setTable] = useState([]); // 从内存获取的表格
   const [columnCount, setColumnCount] = useState(5); // 表格的列数计算
@@ -48,7 +50,7 @@ const tableSetting = (props) => {
   const [btnPopoverVisible, setBtnPopoverVisible] = useState(false); // 按钮图标popover可见性
   const [treeData, setTreeData] = useState([]); // 大纲树
   const [saveVisible, setSaveVisible] = useState(false);
-  const [formVisible, setFormVisible] = useState(false);
+  // const [formVisible, setFormVisible] = useState(false);
   const [formTree, setFormTree] = useState(null);
   const formRef = useRef(null);
   const [index, setIndex] = useState(-1);
@@ -145,7 +147,12 @@ const tableSetting = (props) => {
   // 从内存获取表格
   useEffect(() => {
     tableDataFetch();
+    columnDrop();
   }, []);
+
+  useEffect(() => {
+    cols = column;
+  }, [column]);
 
   // 监听修改，重新渲染表格
   useEffect(() => {
@@ -175,24 +182,28 @@ const tableSetting = (props) => {
         width: 150,
         render: (_, record, index) => {
           return (
-            <>
+            <Space size={6}>
               <Button
-                type="link"
-                onClick={() => {
-                  rowDelete(_, record, index);
-                }}
-              >
-                Delete
-              </Button>
-              <Button
-                type="link"
                 onClick={() => {
                   rowEdit(_, record, index);
                 }}
+                className="default-table__btn"
+                size={'small'}
+                icon={<Icon icon="CloseOutlined" />}
               >
-                Edit
+                编辑
               </Button>
-            </>
+              <Button
+                onClick={() => {
+                  rowDelete(_, record, index);
+                }}
+                className="default-table__btn"
+                size={'small'}
+                icon={<Icon icon="FormOutlined" />}
+              >
+                删除
+              </Button>
+            </Space>
           );
         },
       },
@@ -230,18 +241,24 @@ const tableSetting = (props) => {
       setFormTree(transformToTreeNode(formItemObj));
     }
     // const properties = formItemObj?.schema?.properties;
-    let properties = formItemObj?.schema?.properties;
-    const p1 = formItemObj?.schema?.properties;
-    for (let k in p1) {
-      // 有外层布局的时候
-      if (p1[k].properties) {
-        properties = p1[k].properties;
+    // let properties = formItemObj?.schema?.properties;
+    let data = [];
+    const temp = (prop) => {
+      if (!prop) return [];
+      for (let k in prop) {
+        if (prop[k].properties) {
+          temp(prop[k].properties);
+        } else {
+          data.push(prop[k]);
+        }
       }
-    }
+      return data;
+    };
+
+    let properties = temp(formItemObj?.schema?.properties);
 
     let formItem = [];
     const objSetFunc = (data, arr) => {
-      console.log('===key', data);
       for (let key in data) {
         if (data[key].properties) {
           // 存在外层布局的时候
@@ -281,15 +298,26 @@ const tableSetting = (props) => {
     };
     objSetFunc(properties, formItem);
 
-    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    const data = tableConfig && tableConfig[props.formCode];
-    if (data) {
-      formItem =
-        JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
-          ? data.tableConfig
-          : formItem;
-      setButtons(data.buttonConfig);
-    }
+    // const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
+    // const data = tableConfig && tableConfig[props.formCode];
+    // if (data) {
+    //   formItem =
+    //     JSON.stringify(formItem) === JSON.stringify(data.tableConfig)
+    //       ? data.tableConfig
+    //       : formItem;
+    //   const col = data.columns;
+    //   const colsArr = [];
+    //   for (let i = 0; i < col.length; i++) {
+    //     for (let j = 0; j < formItem.length; j++) {
+    //       if (col[i].dataIndex === formItem[j].name) {
+    //         colsArr.push(formItem[j]);
+    //       }
+    //     }
+    //   }
+    //   objSetFunc(colsArr, formItem);
+    //   // formItem = colsArr;
+    //   setButtons(data.buttonConfig);
+    // }
 
     setTable(formItem);
     setColumnCount(formItem.length);
@@ -437,6 +465,7 @@ const tableSetting = (props) => {
         buttonConfig: buttons,
         status: status,
         id: props.formCode,
+        columns: cols.slice(1, -1),
       },
     };
     window.localStorage.setItem(
@@ -452,66 +481,73 @@ const tableSetting = (props) => {
   };
 
   // 表单添加
-  const formAdd = () => {
-    setFormVisible(true);
-    setIndex(-1);
-  };
+  // const formAdd = () => {
+  //   setFormVisible(true);
+  //   setIndex(-1);
+  // };
 
   // 表单取消
-  const formCancel = () => {
-    setFormVisible(false);
-    formRef.current.form.reset();
-  };
+  // const formCancel = () => {
+  //   setFormVisible(false);
+  //   formRef.current?.form.reset();
+  // };
 
   // 确认添加
-  const formOk = () => {
-    const form = formRef.current.form;
-    form.validate().then(() => {
-      // 表单提交
-      let arr = [...dataSource];
-      if (index === -1) {
-        arr.push({
-          ...JSON.parse(JSON.stringify(form.values)),
-          id: nanoid(),
-        });
-      } else {
-        // 编辑
-        arr[index] = {
-          ...JSON.parse(JSON.stringify(form.values)),
-          id: arr[index].id,
-        };
-      }
-      setDataSource(arr);
-      // 数据有异步问题，暂存localStorage
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
-      formCancel();
-    });
-  };
+  // const formOk = () => {
+  //   const form = formRef.current?.form;
+  //   if (!form) return;
+  //   form.validate().then(() => {
+  //     // 表单提交
+  //     let arr = [...dataSource];
+  //     if (index === -1) {
+  //       arr.push({
+  //         ...JSON.parse(JSON.stringify(form.values)),
+  //         id: nanoid(),
+  //       });
+  //     } else {
+  //       // 编辑
+  //       arr[index] = {
+  //         ...JSON.parse(JSON.stringify(form.values)),
+  //         id: arr[index].id,
+  //       };
+  //     }
+  //     setDataSource(arr);
+  //     // 数据有异步问题，暂存localStorage
+  //     window.localStorage.setItem('dataSource', JSON.stringify(arr));
+  //     formCancel();
+  //   });
+  // };
 
   // 行删除
-  const rowDelete = (_, record, index) => {
-    const data =
-      dataSource.length > 0
-        ? dataSource
-        : JSON.parse(window.localStorage.getItem('dataSource'));
+  // const rowDelete = (_, record, index) => {
+  //   Modal.confirm({
+  //     title: '确定要删除吗',
+  //     content: '该操作不可逆，请谨慎操作！',
+  //     onOk: () => {
+  //       const data =
+  //         dataSource.length > 0
+  //           ? dataSource
+  //           : JSON.parse(window.localStorage.getItem('dataSource'));
 
-    if (index === 0 && data.length === 1) {
-      setDataSource([]);
-      window.localStorage.setItem('dataSource', []);
-    } else {
-      const arr = data.filter((e, i) => i !== index);
-      setDataSource(arr);
-      window.localStorage.setItem('dataSource', JSON.stringify(arr));
-    }
-  };
+  //       if (index === 0 && data.length === 1) {
+  //         setDataSource([]);
+  //         window.localStorage.setItem('dataSource', []);
+  //       } else {
+  //         const arr = data.filter((e, i) => i !== index);
+  //         setDataSource(arr);
+  //         window.localStorage.setItem('dataSource', JSON.stringify(arr));
+  //       }
+  //     },
+  //   });
+  // };
 
   // 行编辑
-  const rowEdit = (_, record, index) => {
-    setFormVisible(true);
-    setIndex(index);
-    const form = formRef.current.form;
-    form.setValues(record);
-  };
+  // const rowEdit = (_, record, index) => {
+  //   setFormVisible(true);
+  //   setIndex(index);
+  //   const form = formRef.current.form;
+  //   form.setValues(record);
+  // };
 
   // 按钮属性表单清空
   const btnFormReset = () => {
@@ -542,6 +578,23 @@ const tableSetting = (props) => {
       },
     );
     window.localStorage.setItem('formList', JSON.stringify(formList));
+  };
+
+  // 拖拽
+  const columnDrop = () => {
+    const tr = document.querySelector('.ant-table-thead tr');
+    if (!tr) return;
+    Sortable.create(tr, {
+      animation: 180,
+      delay: 0,
+      onEnd: (evt) => {
+        const oldItem = cols[evt.oldIndex];
+        const arr = [...cols];
+        arr.splice(evt.oldIndex, 1);
+        arr.splice(evt.newIndex, 0, oldItem);
+        cols = arr;
+      },
+    });
   };
 
   return (
@@ -643,8 +696,8 @@ const tableSetting = (props) => {
                 <Button
                   icon={<Icon icon="PlusOutlined" />}
                   className="primary-btn"
-                  onClick={formAdd}
                 >
+                  {/* onClick={formAdd} */}
                   新建
                 </Button>
                 <Button
@@ -728,6 +781,7 @@ const tableSetting = (props) => {
             style={{ marginTop: '20px' }}
             rowKey={(record) => record.id}
             scroll={{ x: 'max-content' }}
+            className="default-table"
           />
         </Col>
 
@@ -903,19 +957,18 @@ const tableSetting = (props) => {
       </Modal>
 
       {/* 弹框: 表格 */}
-      {formVisible ? (
+      {/* {formVisible ? (
         <Modal
           visible={formVisible}
           title="新增"
           onCancel={formCancel}
           onOk={formOk}
-          width="60%"
         >
           <PreviewWidget key="form" tree={formTree} ref={formRef} />
         </Modal>
       ) : (
         <></>
-      )}
+      )} */}
 
       {/* 弹框: 预览 */}
       {previewVisible ? (
@@ -924,6 +977,7 @@ const tableSetting = (props) => {
           title="列表预览"
           onCancel={() => setPreviewVisible(false)}
           width="90%"
+          className="table-preview__modal"
         >
           <TablePreview formCode={props.formCode} showPageTitle={false} />
         </Modal>

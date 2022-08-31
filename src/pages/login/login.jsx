@@ -6,7 +6,6 @@ import { history } from 'umi';
 const Login = () => {
   const onFinish = (values) => {
     history.push('homeIndex');
-    console.log('Received values of form: ', values);
   };
   return (
     <div className="login">

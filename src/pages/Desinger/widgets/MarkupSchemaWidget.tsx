@@ -147,7 +147,7 @@ export default ()=>{
     </SchemaField>
   </Form>
 }
-  
+
 `;
 };
 
@@ -161,7 +161,6 @@ export const MarkupSchemaWidget: React.FC<IMarkupSchemaWidgetProps> = (
       value={transformToMarkupSchemaCode(props.tree)}
       onChange={(value) => {
         // 没有提供tsx字符串转成treeNode的方法
-        // console.log("========333 value:", value)
         // props.onChange?.(transformToTreeNode(value))
         // props.onChange?.(value)
       }}

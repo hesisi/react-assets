@@ -11,6 +11,10 @@ const formPreview = (props) => {
   const [showPageTitle, setShowPageTitle] = useState(true);
 
   useEffect(() => {
+    init();
+  }, []);
+
+  const init = () => {
     // 表单
     const formCode = history?.location?.query?.formCode || props.formCode;
     const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
@@ -27,7 +31,8 @@ const formPreview = (props) => {
       formList.filter((e) => e.formCode === formCode)[0]?.formName || '';
     setFormName(formName);
     setShowPageTitle(props.showPageTitle);
-  }, []);
+  };
+
   return (
     <div className="form-preview">
       {showPageTitle ? (
@@ -44,13 +49,8 @@ const formPreview = (props) => {
 
       <div className="form-preview__box">
         <h1 className="form-preview__title">{formName}</h1>
-        <PreviewWidget
-          key="form"
-          tree={formTree}
-          ref={formRef}
-          layout="vertical"
-        />
-        <Space>
+        <PreviewWidget key="form" tree={formTree} ref={formRef} />
+        <Space style={{ marginTop: '30px' }}>
           <Button className="primary-btn">提交</Button>
           <Button className="primary-btn">保存</Button>
           <Button className="default-btn">返回</Button>

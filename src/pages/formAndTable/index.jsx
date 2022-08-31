@@ -138,7 +138,6 @@ export default function (props) {
   // 保存，暂时保存至localStorage中
   const onSave = () => {
     const schemaJsonStr = transformToSchema(designer.getCurrentTree());
-    console.log('---desingerType', desingerType, schemaJsonStr);
 
     // 修改
     let formList =

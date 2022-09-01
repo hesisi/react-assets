@@ -177,6 +177,9 @@ const CommonLayout = (props) => {
           >
             <Menu
               mode="inline"
+              defaultOpenKeys={
+                MenuList?.[0]?.address ? [MenuList[0].address] : []
+              }
               selectedKeys={[activePath]}
               style={{
                 height: '100%',

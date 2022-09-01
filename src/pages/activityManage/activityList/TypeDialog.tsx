@@ -143,6 +143,7 @@ export default function TypeDialog(props: any) {
       title: '操作',
       dataIndex: 'operation',
       align: 'center',
+      width: '80px',
       render: (_: any, record: { key: React.Key }) => {
         const findId = dataSource.findIndex((item) => item.key === record.key);
         if (findId === 0) {
@@ -163,6 +164,7 @@ export default function TypeDialog(props: any) {
     {
       title: '编号',
       dataIndex: 'key',
+      width: '80px',
       render: (_: any, record: { key: React.Key }) => {
         const findId = dataSource.findIndex((item) => item.key === record.key);
         console.log(findId);
@@ -172,7 +174,6 @@ export default function TypeDialog(props: any) {
     {
       title: '流程分组',
       dataIndex: 'typeName',
-      width: '30%',
       editable: true,
     },
   ];

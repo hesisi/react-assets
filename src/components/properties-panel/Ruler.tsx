@@ -24,7 +24,7 @@ export default function Ruler(props: any) {
       : form == undefined
       ? []
       : Object.values(_data[form]['formily-form-schema'].schema.properties);
-  const _ruleList_ = window.localStorage.getItem(`${element.id}`);
+  const _ruleList_ = window.localStorage.getItem(`${element.id + form}`);
   const _ruleList = _ruleList_ ? JSON.parse(_ruleList_) : [];
   const [dataSource, setDataSource] = useState(data);
   const [words, setWords] = useState('');
@@ -87,7 +87,7 @@ export default function Ruler(props: any) {
     }
     setRuleWord(arr);
     window.localStorage.setItem(
-      `${element.id}`,
+      `${element.id + form}`,
       JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
     );
   };
@@ -105,7 +105,7 @@ export default function Ruler(props: any) {
     }
     setRuleWord(arr);
     window.localStorage.setItem(
-      `${element.id}`,
+      `${element.id + form}`,
       JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
     );
   };
@@ -123,7 +123,7 @@ export default function Ruler(props: any) {
     }
     setRuleWord(arr);
     window.localStorage.setItem(
-      `${element.id}`,
+      `${element.id + form}`,
       JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
     );
   };
@@ -140,7 +140,7 @@ export default function Ruler(props: any) {
     }
     setRuleWord(arr);
     window.localStorage.setItem(
-      `${element.id}`,
+      `${element.id + form}`,
       JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
     );
   };

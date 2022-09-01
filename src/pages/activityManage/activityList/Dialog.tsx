@@ -13,16 +13,19 @@ import { useForm } from '@formily/react';
 export default function Dialog(props: any) {
   const formRef = React.createRef<FormInstance>();
   const _processGroup = window.localStorage.getItem('processGroup') || '';
-  const processGroup =
-    _processGroup != ''
-      ? JSON.parse(_processGroup)
-      : [
-          {
-            key: 1,
-            typeIndex: '1',
-            typeName: '默认分组',
-          },
-        ];
+  let processGroup: any[] = [];
+  if (_processGroup != '') {
+    processGroup = JSON.parse(_processGroup);
+  } else {
+    processGroup = [
+      {
+        key: 1,
+        typeIndex: '1',
+        typeName: '默认分组',
+      },
+    ];
+    window.localStorage.setItem('processGroup', JSON.stringify(processGroup));
+  }
 
   const [isTypeVisible, setIsTypeVisible] = useState(false);
   const { isModalVisible, handleOk, setIsModalVisible } = props;

@@ -3,6 +3,26 @@
   height: 100%;
   background: #f0f2f5;
   padding: 30px;
+  // /*里面的代码可以根据自己需求去进行更改*/
+  /* 设置滚动条的样式 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  /* 滚动槽 */
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+  }
+  /* 滚动条滑块 */
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
+  }
+  ::-webkit-scrollbar-thumb:window-inactive {
+    background: #0d6bff;
+  }
 }
 .form-preview {
   width: 100%;
@@ -43,25 +63,4 @@
   color: #0d6bff;
   letter-spacing: 0;
   font-weight: 600;
-}
-
-/*里面的代码可以根据自己需求去进行更改*/
-/* 设置滚动条的样式 */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-/* 滚动槽 */
-::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-}
-/* 滚动条滑块 */
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
-}
-::-webkit-scrollbar-thumb:window-inactive {
-  background: #0d6bff;
 }

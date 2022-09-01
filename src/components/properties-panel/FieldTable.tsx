@@ -9,7 +9,7 @@ export default function FieldTable(props: any) {
   const data: any[] =
     _data == ''
       ? []
-      : form == ''
+      : form == undefined
       ? []
       : Object.values(_data[form]['formily-form-schema'].schema.properties);
   const [dataSource, setDataSource] = useState(data);

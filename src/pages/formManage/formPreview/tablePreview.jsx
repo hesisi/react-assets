@@ -137,7 +137,6 @@ const tablePreview = (props) => {
       setButtons(data.buttonConfig);
       setTable(data.tableConfig);
       setTableCol(data.tableConfig, data.columns);
-      console.log('按钮', data.buttonConfig);
     }
 
     const tableList = JSON.parse(window.localStorage.getItem('tableList'));
@@ -359,9 +358,44 @@ const tablePreview = (props) => {
     data && localStorage.setItem('tableList', JSON.stringify(data));
   };
 
+  // 只搜索可搜索列
   const onSearch = (str) => {
-    const arr1 = table.filter((e) => e.searchEnable)?.map((e) => e.id);
-    console.log('检索', arr1, str);
+    if (!str) {
+      // 清空搜索值时，重设表格
+      const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+      setDataSource(tableList[formCode]);
+      return;
+    }
+
+    const arr1 = table.filter((e) => !e.searchEnable)?.map((e) => e.id); // 可搜索的字段
+    const arr2 = dataSource.map((item) => {
+      // 过滤表格数据不可搜索字段
+      for (let k in item) {
+        if (arr1.includes(k)) {
+          delete item[k];
+        }
+      }
+      return item;
+    });
+    const arr3 = [];
+    arr2.forEach((item) => {
+      // 判断表格数据可搜索字段是否和搜索值有重叠部分
+      for (let k in item) {
+        if (item[k].toString().indexOf(str) !== -1 && k !== 'id') {
+          arr3.push(item);
+        }
+      }
+    });
+    const arr4 = [];
+    dataSource.forEach((item, index) => {
+      // 去重搜索结果，比对id返回正确的行数据
+      [...new Set(arr3)].forEach((e, i) => {
+        if (e.id === item.id) {
+          arr4.push(item);
+        }
+      });
+    });
+    setDataSource(arr4);
   };
 
   return (

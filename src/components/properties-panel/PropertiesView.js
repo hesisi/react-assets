@@ -84,6 +84,7 @@ export default class PropertiesView extends Component {
       },
       approver: null,
     };
+    this.formRef = React.createRef();
   }
   componentDidMount() {
     const { modeler } = this.props;
@@ -150,8 +151,8 @@ export default class PropertiesView extends Component {
 
   render() {
     const { modeler, flowMsg, forms } = this.props;
-    console.log('flowMsg', flowMsg);
-    console.log('forms', forms);
+    // console.log(flowMsg);
+    console.log(forms);
     const { selectedElements, element } = this.state;
     // console.log(element)
 
@@ -159,14 +160,18 @@ export default class PropertiesView extends Component {
       <div className={'panel-content'}>
         <div className="element-properties">
           <h3 className={'panel-tittle'}>属性配置</h3>
-          <Form labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+          <Form
+            labelCol={{ span: 6 }}
+            wrapperCol={{ span: 18 }}
+            ref={this.formRef}
+          >
             <div className="group-card">
               <div className="group-tittle">
                 常规 <ExclamationCircleOutlined />
               </div>
               {selectedElements.length > 0 ? null : (
                 <Form.Item label="流程名称" name="name">
-                  <Input defaultValue={flowMsg?.name} allowClear disabled />
+                  <Input value={flowMsg?.name} allowClear disabled />
                 </Form.Item>
                 // <fieldset>
                 //   <label>流程名称</label>
@@ -175,7 +180,11 @@ export default class PropertiesView extends Component {
               )}
 
               {selectedElements.length === 1 && (
-                <ElementProperties modeler={modeler} element={element} />
+                <ElementProperties
+                  modeler={modeler}
+                  element={element}
+                  fromRef={this.formRef}
+                />
               )}
 
               {/*{selectedElements.length === 0 && (*/}
@@ -243,9 +252,11 @@ export default class PropertiesView extends Component {
                     >
                       {forms.map((item) => {
                         return (
-                          <Option value={item.formCode} key={item.formCode}>
-                            {item.formName}
-                          </Option>
+                          item.formStatus === 'enable' && (
+                            <Option value={item.formCode} key={item.formCode}>
+                              {item.formName}
+                            </Option>
+                          )
                         );
                       })}
                     </Select>

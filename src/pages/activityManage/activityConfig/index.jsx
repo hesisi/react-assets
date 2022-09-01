@@ -59,8 +59,8 @@ export default function IndexPage() {
   const [group, setGroup] = useState([]);
   const [flowMsg, setFlowMsg] = useState(null);
   useEffect(() => {
-    console.log('-------------->');
-    console.log(flowMsg);
+    // console.log('-------------->');
+    // console.log(flowMsg);
     flow = flowMsg;
   }, [flowMsg]);
   const updateFlow = (data) => {

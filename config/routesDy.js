@@ -223,7 +223,6 @@ export const munuDefaultTree = [
         address: '/pageManage',
         key: getUUID(),
         children: [],
-        key: 'default-7',
       },
       // {
       //   name: '首页管理',

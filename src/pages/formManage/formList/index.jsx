@@ -331,9 +331,10 @@ export default function FormList() {
     }
 
     const source =
-      dataSource.length > 0
-        ? dataSource
-        : JSON.parse(localStorage.getItem('formList'));
+      (localStorage.getItem('formList') &&
+        JSON.parse(localStorage.getItem('formList'))) ||
+      [];
+
     const data = source.filter((e) => {
       if (formName && formStatus) {
         return (

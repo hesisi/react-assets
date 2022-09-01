@@ -331,9 +331,10 @@ export default function FormList() {
     }
 
     const source =
-      dataSource.length > 0
-        ? dataSource
-        : JSON.parse(localStorage.getItem('formList'));
+      (localStorage.getItem('formList') &&
+        JSON.parse(localStorage.getItem('formList'))) ||
+      [];
+
     const data = source.filter((e) => {
       if (formName && formStatus) {
         return (
@@ -382,6 +383,25 @@ export default function FormList() {
           {/* 筛选框 */}
           <Row justify="space-between">
             <Col>
+              <Space size={10}>
+                <Button
+                  icon={<PlusCircleOutlined />}
+                  onClick={handleAdd}
+                  className="primary-btn"
+                >
+                  新增表单
+                </Button>
+                <Button
+                  icon={<CloseCircleOutlined />}
+                  onClick={deleteHandler}
+                  className="default-btn"
+                >
+                  删除表单
+                </Button>
+              </Space>
+            </Col>
+
+            <Col>
               <Row justify="flex-start">
                 <Col>
                   <Form
@@ -428,25 +448,6 @@ export default function FormList() {
                   </Space>
                 </Col>
               </Row>
-            </Col>
-
-            <Col>
-              <Space size={10}>
-                <Button
-                  icon={<PlusCircleOutlined />}
-                  onClick={handleAdd}
-                  className="primary-btn"
-                >
-                  新增表单
-                </Button>
-                <Button
-                  icon={<CloseCircleOutlined />}
-                  onClick={deleteHandler}
-                  className="default-btn"
-                >
-                  删除表单
-                </Button>
-              </Space>
             </Col>
           </Row>
 

@@ -548,17 +548,18 @@ const tableSetting = (props) => {
     );
     setSaveVisible(false);
 
-    if (checkboxValue.includes('active')) {
-      const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
-        (e) => {
-          if (e.formCode === props.formCode) {
-            e.formStatus = 'enable';
-          }
-          return e;
-        },
-      );
-      window.localStorage.setItem('formList', JSON.stringify(formList));
-    }
+    // if (checkboxValue.includes('active')) {
+    const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+      (e) => {
+        if (e.formCode === props.formCode && checkboxValue.includes('active')) {
+          e.formStatus = 'enable';
+        }
+        e.formUrl = url;
+        return e;
+      },
+    );
+    window.localStorage.setItem('formList', JSON.stringify(formList));
+    // }
   };
 
   // 取消列表配置保存
@@ -811,7 +812,14 @@ const tableSetting = (props) => {
                     console.log('操作面板', e);
                     return (
                       <Panel header={e.label} key={e.id}>
-                        <Form initialValues={config.columnInit}>
+                        <Form
+                          initialValues={{
+                            isShow: e.isShow,
+                            sorter: e.sorter,
+                            searchEnable: e.searchEnable,
+                            filterEnable: e.filterEnable,
+                          }}
+                        >
                           <Form.Item label="在列表显示" name="isShow">
                             <Select
                               onChange={(ele) => selectChange(e, ele, 'isShow')}

@@ -226,7 +226,11 @@ export default class PropertiesView extends Component {
                 <div className="group-tittle">
                   规则 <ExclamationCircleOutlined />
                 </div>
-                <Ruler></Ruler>
+                <Ruler
+                  form={flowMsg.targetForm}
+                  flowId={flowMsg.id}
+                  element={element}
+                ></Ruler>
               </div>
             )}
             {(element?.type === 'bpmn:StartEvent' ||
@@ -282,6 +286,7 @@ export default class PropertiesView extends Component {
                     <FieldTable
                       form={flowMsg.targetForm}
                       type={element?.type}
+                      flowId={flowMsg.id}
                     ></FieldTable>
                   </Col>
                 </Row>

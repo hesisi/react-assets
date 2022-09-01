@@ -9,6 +9,26 @@
   padding: 0 30px 30px;
   // height: calc(100vh - 200px);
   box-sizing: border-box;
+  /*里面的代码可以根据自己需求去进行更改*/
+  /* 设置滚动条的样式 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  /* 滚动槽 */
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+  }
+  /* 滚动条滑块 */
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
+  }
+  ::-webkit-scrollbar-thumb:window-inactive {
+    background: #0d6bff;
+  }
 }
 
 .tab__text {
@@ -37,27 +57,6 @@
   line-height: 20px;
   border-left: 4px solid @blue-5;
   padding-left: 10px;
-}
-
-/*里面的代码可以根据自己需求去进行更改*/
-/* 设置滚动条的样式 */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-/* 滚动槽 */
-::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
-  border-radius: 10px;
-}
-/* 滚动条滑块 */
-::-webkit-scrollbar-thumb {
-  border-radius: 10px;
-  background: rgba(0, 0, 0, 0.1);
-  -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
-}
-::-webkit-scrollbar-thumb:window-inactive {
-  background: #0d6bff;
 }
 
 .table-preview__modal {

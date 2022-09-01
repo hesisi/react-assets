@@ -18,10 +18,10 @@ const { Header, Footer, Sider, Content } = Layout;
 import {
   InfoCircleOutlined,
   DeleteOutlined,
-  EyeOutlined,
   PlusOutlined,
-  UploadOutlined,
+  EditOutlined,
   InboxOutlined,
+  ReloadOutlined,
 } from '@ant-design/icons';
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
@@ -71,8 +71,14 @@ export default function Account({ accountIdenty = 'user' }) {
   const columns = [
     {
       title: '序号',
-      dataIndex: 'sequence',
-      key: 'sequence',
+      dataIndex: 'index',
+      key: 'index',
+      align: 'center',
+      render: (_, record, index) => {
+        return <span>{index + 1}</span>;
+      },
+      width: 80,
+      fixed: 'left',
     },
     {
       title: '姓名',
@@ -111,12 +117,12 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '操作',
       key: 'action',
       align: 'center',
-      width: '120',
+      width: 290,
       render: (_, record) => (
         <Space size="middle">
           <span className="table-button" onClick={() => handleEdit(record.id)}>
             <span style={{ marginRight: '5px' }}>
-              <EyeOutlined />
+              <EditOutlined />
             </span>
             编辑
           </span>
@@ -128,6 +134,15 @@ export default function Account({ accountIdenty = 'user' }) {
               <DeleteOutlined />
             </span>
             删除
+          </span>
+          <span
+            className="table-button"
+            onClick={() => handleDelete([record.id])}
+          >
+            <span style={{ marginRight: '5px' }}>
+              <ReloadOutlined />
+            </span>
+            密码重置
           </span>
         </Space>
       ),
@@ -248,6 +263,10 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleBatchDelete = () => {
+    if (!selectedRowKeys?.length) {
+      message.warn('请选择一条数据');
+      return;
+    }
     handleDelete(selectedRowKeys);
   };
 
@@ -262,7 +281,7 @@ export default function Account({ accountIdenty = 'user' }) {
 
   const creatSelct = (list = [], place = '') => {
     return (
-      <Select placeholder={place}>
+      <Select placeholder={`${place}`}>
         {list.map((x) => {
           return (
             <Option key={x.value || x.id} value={x.value || x.id}>
@@ -375,7 +394,12 @@ export default function Account({ accountIdenty = 'user' }) {
                   </span>
                 </span>
               )}
-              <div className="user-add-content">
+              <div
+                className="user-add-content"
+                style={{
+                  paddingTop: '12px',
+                }}
+              >
                 {userAddC ? (
                   <Form
                     ref={formRef}

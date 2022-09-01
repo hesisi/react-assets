@@ -14,25 +14,44 @@ interface ruleDTO {
   /**条件值*/
   value: string;
 }
-export default function Ruler() {
+export default function Ruler(props: any) {
+  const { form, flowId, element } = props;
+  const _data_ = window.localStorage.getItem('formMap');
+  const _data = _data_ ? JSON.parse(_data_) : [];
+  const data: any[] =
+    _data == ''
+      ? []
+      : form == undefined
+      ? []
+      : Object.values(_data[form]['formily-form-schema'].schema.properties);
+  const _ruleList_ = window.localStorage.getItem(`${element.id + form}`);
+  const _ruleList = _ruleList_ ? JSON.parse(_ruleList_) : [];
+  const [dataSource, setDataSource] = useState(data);
   const [words, setWords] = useState('');
 
   const [ruleList, setRuleList] = useState<ruleDTO[]>([]);
   useEffect(() => {
-    setRuleList([
-      {
-        andor: '',
-        condition: '',
-        name: '',
-        value: '',
-      },
-    ]);
+    let ruleList: any[] = [];
+    console.log(form);
+    if (_ruleList.id === element.id && form === _ruleList.formId) {
+      ruleList = _ruleList.ruleList;
+    } else {
+      ruleList = [
+        {
+          andor: '',
+          condition: '',
+          name: '',
+          value: '',
+        },
+      ];
+    }
+    setRuleList(ruleList);
   }, []);
   const [ruleWord, setRuleWord] = useState<any[]>([]);
   useEffect(() => {
     let temp = words;
     const arr = ruleWord.map((x, index) => {
-      return ` ${x.andor || ''} ${x.field || ''} ${x.condition || ''} ${
+      return ` ${x.andor || ''} ${x.name || ''} ${x.condition || ''} ${
         x.value || ''
       }`;
     });
@@ -56,22 +75,24 @@ export default function Ruler() {
     setRuleList(temp);
   };
   const feildChange = (value: string, index: any) => {
-    console.log(value);
     const arr = [...ruleWord];
     if (ruleWord[index]) {
       const temp: any = { ...ruleWord[index] };
-      temp.field = value;
+      temp.name = value;
       arr[index] = temp;
     } else {
       const temp: any = {};
-      temp.field = value;
+      temp.name = value;
       arr.push(temp);
     }
-
     setRuleWord(arr);
+    window.localStorage.setItem(
+      `${element.id + form}`,
+      JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
+    );
   };
   const conditionChange = (value: string, index: any) => {
-    console.log(value);
+    console.log(value, ruleWord[index]);
     const arr = [...ruleWord];
     if (ruleWord[index]) {
       const temp: any = { ...ruleWord[index] };
@@ -82,8 +103,11 @@ export default function Ruler() {
       temp.condition = value;
       arr.push(temp);
     }
-
     setRuleWord(arr);
+    window.localStorage.setItem(
+      `${element.id + form}`,
+      JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
+    );
   };
   const valueChange = (e: any, index: any) => {
     console.log(e.target.value);
@@ -98,6 +122,10 @@ export default function Ruler() {
       arr.push(temp);
     }
     setRuleWord(arr);
+    window.localStorage.setItem(
+      `${element.id + form}`,
+      JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
+    );
   };
   const andorChange = (value: string, index: any) => {
     const arr = [...ruleWord];
@@ -111,7 +139,12 @@ export default function Ruler() {
       arr.push(temp);
     }
     setRuleWord(arr);
+    window.localStorage.setItem(
+      `${element.id + form}`,
+      JSON.stringify({ id: element.id, formId: form, ruleList: arr }),
+    );
   };
+  const updataRuleValue = () => {};
   return (
     <>
       {ruleList.map((x, index) => (
@@ -135,9 +168,9 @@ export default function Ruler() {
               style={{ width: 80 }}
               onChange={(value) => feildChange(value, index)}
             >
-              <Option value="field1">{'field1'}</Option>
-              <Option value="field2">{'field2'}</Option>
-              <Option value="field3">{'field3'}</Option>
+              {dataSource.map((item) => {
+                return <Option value={item.name}>{item.title}</Option>;
+              })}
             </Select>
           </Col>
           <Col span={5}>

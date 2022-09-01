@@ -131,7 +131,7 @@ export default function IndexPage() {
       const _flow = { ...flowMsg };
       _flow.xml = result.xml;
       _flow.creatTime = moment().format('YYYY-MM-DD HH:mm:ss');
-      _flow.status = 'status';
+      _flow.status = 'disabled';
       _flow.updateTime = _flow.creatTime
         ? moment().format('YYYY-MM-DD HH:mm:ss')
         : '';

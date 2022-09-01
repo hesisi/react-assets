@@ -119,6 +119,11 @@ const munuDefault = [
     path: '/dyformManage/formCreate',
     meta: { showMenu: false, showHeader: true },
   },
+  {
+    name: '流程中心',
+    key: 'default-9',
+    path: '/activityCenter',
+  },
 ];
 
 export const munuDefaultTree = [
@@ -230,6 +235,12 @@ export const munuDefaultTree = [
         key: 'default-8',
         children: [],
         // meta: { showMenu: false, showHeader: true },
+      },
+      {
+        title: '流程中心',
+        key: 'default-9',
+        address: '/activityCenter',
+        children: [],
       },
       // {
       //   name: '首页',

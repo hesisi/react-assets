@@ -15,6 +15,7 @@ import { PreviewWidget } from '@/pages/Desinger/widgets';
 import { transformToTreeNode } from '@designable/formily-transformer';
 import { nanoid } from 'nanoid';
 import { cloneDeep } from 'lodash';
+import moment from 'moment';
 
 const { TabPane } = Tabs;
 export default function GroupUser({
@@ -128,8 +129,8 @@ export default function GroupUser({
             people: '李四',
             node: '审批人1',
             leaveCategory: '年假',
-            startTime: '',
-            endTime: '',
+            startTime: moment().format('YYYY-MM-DD'),
+            endTime: moment().add(7, 'days').format('YYYY-MM-DD'),
             leaveDays: 3,
           },
         ];

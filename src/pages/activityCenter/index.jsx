@@ -38,9 +38,11 @@ const data = [
 ];
 export default function IndexPage() {
   const formRef = useRef(null);
+
+  const [childFormCode, setChildFormCode] = useState(null);
   const [groupData, setGroupData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [groupId, setGroupId] = useState(null);
+  const [groupId, setGroupId] = useState(['shouye']);
   const [formData, setFormData] = useState({
     name: '',
   });
@@ -48,13 +50,9 @@ export default function IndexPage() {
   const currentId = useRef(null);
 
   useEffect(async () => {
-    const oldData = await localForage.getItem('userGroup');
-    if (!oldData) {
-      setGroupData(data);
-      localForage.setItem('userGroup', data);
-    } else {
-      setGroupData(oldData);
-    }
+    const goupData = JSON.parse(localStorage.getItem('processGroup') || []);
+    console.log(JSON.parse(localStorage.getItem('processGroup')), '52------');
+    setGroupData(goupData);
   }, []);
 
   /* 添加分组 */
@@ -123,6 +121,9 @@ export default function IndexPage() {
     setGroupId(id);
   };
 
+  const handleGroupChildClick = (item) => {
+    setChildFormCode(item);
+  };
   return (
     <div style={{ height: '100%', padding: 20, backgroundColor: '#f0f2f5' }}>
       <Layout className={'user-cont list-layout'}>
@@ -132,14 +133,14 @@ export default function IndexPage() {
             handleGroupClick={handleGroupClick}
             handleEdit={handleEdit}
             handleDelete={handleDelete}
+            handleGroupChildClick={handleGroupChildClick}
             handleAddGroup={handleAddGroup}
             groupId={groupId}
           />
         </Sider>
         <Content style={{ paddingLeft: 10 }}>
           {/* 用户列表 */}
-          <GroupUser groupId={groupId} />
-
+          <GroupUser groupId={groupId} childFormCode={childFormCode} />
           {/* 分组弹框 */}
           {/* 新建用户、选择用户弹框 */}
           <Modal

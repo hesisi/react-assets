@@ -1,3 +1,4 @@
+import { Collapse } from 'antd';
 import {
   InfoCircleOutlined,
   PlusCircleOutlined,
@@ -6,9 +7,11 @@ import {
 } from '@ant-design/icons';
 import React, { memo, useEffect, useState } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
+import { cloneDeep } from 'lodash';
 
 import './leftList.less';
 
+const { Panel } = Collapse;
 function UserLeftList(props) {
   const {
     data,
@@ -16,31 +19,94 @@ function UserLeftList(props) {
     handleEdit,
     handleDelete,
     handleAddGroup,
+    handleGroupChildClick,
     groupId,
     title = '用户分组管理',
   } = props;
   const [listData, setListData] = useState([]);
-  const [id, setId] = useState(null);
+  const [listChildData, setListChildData] = useState({});
+  const [id, setId] = useState('shouye');
+  const [childid, setCId] = useState(null);
+  const [activeKey, setActiveKey] = useState([]);
 
   useEffect(() => {
-    console.log(data, '18-----');
-    setListData(data);
-    setId(groupId);
+    const newArr = [
+      {
+        key: 'shouye',
+        typeName: '首页',
+      },
+    ];
+    const newData = data.map((item) => {
+      item['listChildData'] = [];
+      return item;
+    });
+    setListData(newArr.concat(newData));
   }, [data, groupId]);
 
+  const handleGClick = (id) => {
+    let childData = JSON.parse(localStorage.getItem('flowGroup') || []);
+    childData = childData.filter((item) => {
+      return id.includes(item.proessGroup + '');
+    });
+    const oldChildData = cloneDeep(listData).map((item) => {
+      if (item.key + '' === id[0] + '') {
+        return {
+          ...item,
+          listChildData: childData || [],
+        };
+      }
+      return item;
+    });
+    const oldChild = cloneDeep(listChildData);
+    oldChild[id[0]] = childData;
+    setListChildData(oldChild);
+    setListData(oldChildData);
+    setId(id[0]);
+    setCId(null);
+    handleGroupClick && handleGroupClick(id);
+    handleGroupChildClick && handleGroupChildClick(null);
+  };
+
+  const handleGroupCClick = (e, item) => {
+    e && e.stopPropagation();
+    setCId(item.id);
+    handleGroupChildClick && handleGroupChildClick(item);
+  };
+
   return (
-    <div className={'list-cont'}>
+    <div className="list-cont cont-center">
       <div className="list-cont-content">
         <Scrollbars>
-          {listData.map((x) => (
-            <div
-              className={id === x.id ? 'list-item active' : 'list-item normal'}
-              key={x.id}
-              onClick={() => handleGroupClick(x.id)}
-            >
-              {x.name}
-            </div>
-          ))}
+          <div>
+            {listData.map((x) => (
+              <div
+                onClick={() => handleGClick([x.key + ''])}
+                className={
+                  id === x.key + '' ? 'list-item active' : 'list-item normal'
+                }
+                key={x.key}
+              >
+                {x.typeName}
+                <div>
+                  {listChildData[x.key + '']
+                    ? listChildData[x.key + ''].map((item) => (
+                        <div
+                          className={
+                            childid === item.id
+                              ? 'list-item active'
+                              : 'list-item normal'
+                          }
+                          key={item.id}
+                          onClick={(e) => handleGroupCClick(e, item)}
+                        >
+                          {item.proessName}
+                        </div>
+                      ))
+                    : null}
+                </div>
+              </div>
+            ))}
+          </div>
         </Scrollbars>
       </div>
     </div>

@@ -5,13 +5,24 @@ export default function FieldTable(props: any) {
   const { form, type } = props;
   const _data_ = window.localStorage.getItem('formMap');
   const _data = _data_ ? JSON.parse(_data_) : [];
-  console.log('form', form);
-  const data: any[] =
-    _data == ''
-      ? []
-      : form == ''
-      ? []
-      : Object.values(_data[form]['formily-form-schema'].schema.properties);
+  console.log('form--->', form);
+  console.log(_data);
+  let data: any[] = [];
+  if (_data && form) {
+    if (_data[form]) {
+      // console.log(_data[form]['formily-form-schema'])
+      data = Object.values(
+        _data[form]['formily-form-schema'].schema.properties,
+      );
+    }
+  }
+  // const data: any[] =
+  //   _data == ''
+  //     ? []
+  //     : form == ''
+  //       ? []
+  //     : Object.values(_data[form]['formily-form-schema'].schema.properties);
+
   const [dataSource, setDataSource] = useState(data);
   useEffect(() => {
     let temp: any[] = [];

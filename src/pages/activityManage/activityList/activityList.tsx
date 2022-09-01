@@ -229,26 +229,23 @@ export default function Page() {
 
   // 检索
   const searchHandler = () => {
-    const { id, name, status } = formRef.current.getFieldsValue();
-    if (!id && !name && !status) {
+    const { name, status } = formRef.current.getFieldsValue();
+
+    if (!name && !status) {
       tableUpdate();
       return;
     }
 
     if (!flowData) return;
     const arr = JSON.parse(flowData).filter((e: any) => {
-      if (id && name) {
-        return e.id.indexOf(id) !== -1 && e.name.indexOf(name) !== -1;
-      } else if (id && status) {
-        return e.id.indexOf(id) !== -1 && e.status === status;
+      if (name) {
+        return e.name?.indexOf(name) !== -1;
+      } else if (status) {
+        return e.status === status;
       } else if (name && status) {
-        return e.name.indexOf(name) !== -1 && e.status === status;
+        return e.name?.indexOf(name) !== -1 && e.status === status;
       }
-      return (
-        e.id.indexOf(id) !== -1 ||
-        e.name.indexOf(name) !== -1 ||
-        e.status === status
-      );
+      return e.name?.indexOf(name) !== -1 || e.status === status;
     });
     setTableData(arr);
   };
@@ -298,52 +295,6 @@ export default function Page() {
         <Content className="list-content">
           <Row justify="start" className="list-row">
             <Col>
-              <Form
-                labelCol={{ span: 0 }}
-                wrapperCol={{ span: 24 }}
-                layout="inline"
-                ref={formRef}
-                className="default-form"
-              >
-                <Form.Item label="" name="name">
-                  <Input allowClear placeholder="请输入流程名称" />
-                </Form.Item>
-
-                <Form.Item label="" name="status">
-                  <Select allowClear placeholder="请选择流程状态">
-                    {selectList.map((e) => {
-                      return (
-                        <Select.Option value={e.value} key={e.value}>
-                          {e.label}
-                        </Select.Option>
-                      );
-                    })}
-                  </Select>
-                </Form.Item>
-              </Form>
-            </Col>
-
-            <Col>
-              <Space size={10}>
-                <Button
-                  icon={<SearchOutlined />}
-                  onClick={searchHandler}
-                  style={{ borderRadius: '5px' }}
-                  className="primary-btn"
-                >
-                  搜索
-                </Button>
-                <Button
-                  icon={<MinusCircleOutlined />}
-                  onClick={resetHandler}
-                  style={{ borderRadius: '5px' }}
-                  className="default-btn"
-                >
-                  清除
-                </Button>
-              </Space>
-            </Col>
-            <Col style={{ marginLeft: 'auto' }}>
               <Space size={10}>
                 <Button
                   icon={<PlusOutlined />}
@@ -360,6 +311,55 @@ export default function Page() {
                   删除流程
                 </Button>
               </Space>
+            </Col>
+            <Col style={{ marginLeft: 'auto' }}>
+              <Row justify="end">
+                <Col>
+                  <Form
+                    labelCol={{ span: 0 }}
+                    wrapperCol={{ span: 24 }}
+                    layout="inline"
+                    ref={formRef}
+                    className="default-form"
+                  >
+                    <Form.Item label="" name="name">
+                      <Input allowClear placeholder="请输入流程名称" />
+                    </Form.Item>
+
+                    <Form.Item label="" name="status">
+                      <Select allowClear placeholder="请选择流程状态">
+                        {selectList.map((e) => {
+                          return (
+                            <Select.Option value={e.value} key={e.value}>
+                              {e.label}
+                            </Select.Option>
+                          );
+                        })}
+                      </Select>
+                    </Form.Item>
+                  </Form>
+                </Col>
+                <Col>
+                  <Space size={10}>
+                    <Button
+                      icon={<SearchOutlined />}
+                      onClick={searchHandler}
+                      style={{ borderRadius: '5px' }}
+                      className="primary-btn"
+                    >
+                      搜索
+                    </Button>
+                    <Button
+                      icon={<MinusCircleOutlined />}
+                      onClick={resetHandler}
+                      style={{ borderRadius: '5px' }}
+                      className="default-btn"
+                    >
+                      清除
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
             </Col>
           </Row>
 

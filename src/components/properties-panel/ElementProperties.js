@@ -1,11 +1,13 @@
 import { Form, Input, Button } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 export default function ElementProperties(props) {
-  let { element, modeler } = props;
-
+  let { element, modeler, fromRef } = props;
   if (element.labelTarget) {
     element = element.labelTarget;
   }
+  useEffect(() => {
+    fromRef?.current.setFieldValue('name', element.businessObject.name || '');
+  }, [element]);
 
   function updateName(name) {
     const modeling = modeler.get('modeling');

@@ -355,7 +355,7 @@ export default function Page() {
                 <Button
                   icon={<DeleteOutlined />}
                   onClick={deleteHandler}
-                  className="primary-btn"
+                  className="default-btn"
                 >
                   删除流程
                 </Button>

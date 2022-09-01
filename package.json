@@ -34,12 +34,11 @@
     "copy-to-clipboard": "^3.3.2",
     "crypto": "^1.0.1",
     "echarts": "^5.3.3",
-    "element-react": "^1.4.34",
-    "element-theme-default": "^1.4.13",
     "events": "^3.3.0",
     "js-cookie": "^3.0.1",
     "localforage": "^1.10.0",
     "moment": "^2.29.4",
+    "postcss-px-to-viewport": "^1.1.1",
     "react": "17.x",
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "17.x",
@@ -47,6 +46,7 @@
     "react-hot-loader": "^4.13.0",
     "react-router-dom": "^6.3.0",
     "sortablejs": "^1.15.0",
+    "swiper": "^8.3.2",
     "umi": "^3.5.26"
   },
   "devDependencies": {

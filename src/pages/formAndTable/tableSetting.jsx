@@ -56,7 +56,7 @@ const tableSetting = (props) => {
   const formRef = useRef(null);
   const [index, setIndex] = useState(-1);
   const [icon, setIcon] = useState('');
-  const [iconPosition, setIconPosition] = useState('front');
+  // const [iconPosition, setIconPosition] = useState('front');
   const [iconList, setIconList] = useState(config.iconList);
 
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -454,10 +454,11 @@ const tableSetting = (props) => {
         if (e.id === selectBtnId) {
           e = { ...ele, id: selectBtnId };
         }
+        console.log('button操作', e);
         return e;
       });
       setButtons(btns);
-      setIconPosition(ele.position);
+      // setIconPosition(ele.position);
       btnFormReset();
     }
   };
@@ -732,7 +733,7 @@ const tableSetting = (props) => {
                         }}
                       >
                         {e.icon ? (
-                          iconPosition === 'front' ? (
+                          e.position === 'front' ? (
                             <Button
                               onClick={() => buttonSelect(e)}
                               className="add-btn"

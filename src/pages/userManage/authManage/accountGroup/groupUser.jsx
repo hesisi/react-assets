@@ -9,6 +9,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
 
+const { Search } = Input;
 export default function GroupUser({ groupId = null }) {
   const currentGroupId = useRef(null);
   const [dataSource, setDataSource] = useState([]);
@@ -201,7 +202,7 @@ export default function GroupUser({ groupId = null }) {
                 },
               ],
             },
-            operateStructure: [<Input placeholder="请输入用户名" />],
+            operateStructure: [<Search placeholder="请输入用户名" />],
           }}
         />
         {/* table */}

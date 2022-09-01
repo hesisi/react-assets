@@ -356,7 +356,7 @@ export default function GroupUser({
                 <div className="img-wrapper" style={{ color: '#faad14' }}>
                   <BarsOutlined />
                 </div>
-                <p>代办流程</p>
+                <p>待办流程</p>
                 <p>{totalData.toDo}</p>
               </div>
               <div className="list-category-item">

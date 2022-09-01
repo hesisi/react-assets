@@ -7,6 +7,7 @@ const { TextArea } = Input;
 export default function RoleInfo(props) {
   const formRef = useRef(null);
   const [form] = Form.useForm();
+  const { formValueChange, formValueSubmit, formResetCallback } = props;
 
   const onFormChange = (values) => {
     formValueChange && formValueChange(values);

@@ -39,6 +39,7 @@ const data = [
   { name: '李宁', id: getUUID() },
   { name: '贵人鸟', id: getUUID() },
 ];
+const { Search } = Input;
 export default function Account({ accountIdenty = 'user' }) {
   const formRef = useRef(null);
   const eidtIdenty = useRef(null);
@@ -281,7 +282,7 @@ export default function Account({ accountIdenty = 'user' }) {
 
   const creatSelct = (list = [], place = '') => {
     return (
-      <Select placeholder={`${place}`}>
+      <Select placeholder={place}>
         {list.map((x) => {
           return (
             <Option key={x.value || x.id} value={x.value || x.id}>
@@ -292,6 +293,11 @@ export default function Account({ accountIdenty = 'user' }) {
       </Select>
     );
   };
+
+  const handleUserSearch = (value) => {
+    console.log(value, '298-----');
+  };
+
   return (
     <div className="right-cont">
       <div className="header-u">
@@ -336,7 +342,9 @@ export default function Account({ accountIdenty = 'user' }) {
                 },
               ],
             },
-            operateStructure: [<Input placeholder="请输入关键字" />],
+            operateStructure: [
+              <Search placeholder="请输入关键字" onSearch={handleUserSearch} />,
+            ],
           }}
         />
         {/* table */}
@@ -402,6 +410,7 @@ export default function Account({ accountIdenty = 'user' }) {
               >
                 {userAddC ? (
                   <Form
+                    className="account-add default-form-radios"
                     ref={formRef}
                     initialValues={formData}
                     name="basic"

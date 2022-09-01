@@ -217,7 +217,11 @@ export default class PropertiesView extends Component {
                 <div className="group-tittle">
                   规则 <ExclamationCircleOutlined />
                 </div>
-                <Ruler></Ruler>
+                <Ruler
+                  form={flowMsg.targetForm}
+                  flowId={flowMsg.id}
+                  element={element}
+                ></Ruler>
               </div>
             )}
             {(element?.type === 'bpmn:StartEvent' ||

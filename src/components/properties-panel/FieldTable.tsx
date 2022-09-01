@@ -22,7 +22,6 @@ export default function FieldTable(props: any) {
     } else {
       temp = data;
     }
-
     setDataSource(temp);
   }, [form]);
 

@@ -62,8 +62,8 @@ export default function Page() {
   const columns: ColumnsType<DataType> = [
     {
       title: '流程名称',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'proessName',
+      key: 'proessName',
     },
     {
       title: '流程编号',

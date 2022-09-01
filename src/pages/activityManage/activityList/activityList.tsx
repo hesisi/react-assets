@@ -37,6 +37,7 @@ import type { ColumnsType } from 'antd/es/table';
 import Dialog from './Dialog';
 import '@/assets/style/layout.less';
 import { nanoid } from 'nanoid';
+import { key } from 'localforage';
 
 interface DataType {
   /**流程名称*/
@@ -59,11 +60,40 @@ export default function Page() {
   const [tableData, setTableData] = useState<DataType[]>([]);
   const formRef: any = useRef(null);
   const flowData = window.localStorage.getItem('flowGroup');
+  const _processGroup_ = window.localStorage.getItem('processGroup') || '';
+  const _processGroup =
+    _processGroup_ != ''
+      ? JSON.parse(_processGroup_)
+      : [
+          {
+            key: 1,
+            typeIndex: '1',
+            typeName: '默认分组',
+          },
+        ];
   const columns: ColumnsType<DataType> = [
     {
       title: '流程名称',
       dataIndex: 'proessName',
       key: 'proessName',
+    },
+    {
+      title: '分组',
+      dataIndex: 'proessGroup',
+      key: 'proessGroup',
+      render: (proessGroup) => {
+        return (
+          <span>
+            {
+              _processGroup[
+                _processGroup.findIndex((item: any) => {
+                  return item.typeIndex === proessGroup;
+                })
+              ].typeName
+            }
+          </span>
+        );
+      },
     },
     {
       title: '流程编号',

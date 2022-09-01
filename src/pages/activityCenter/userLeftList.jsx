@@ -83,11 +83,13 @@ function UserLeftList(props) {
               <div
                 onClick={() => handleGClick([x.key + ''])}
                 className={
-                  id === x.key + '' ? 'list-item active' : 'list-item normal'
+                  id === x.key + ''
+                    ? 'list-item active group'
+                    : 'list-item normal group'
                 }
                 key={x.key}
               >
-                {x.typeName}
+                <div className="group-wrapper">{x.typeName}</div>
                 <div>
                   {listChildData[x.key + '']
                     ? listChildData[x.key + ''].map((item) => (

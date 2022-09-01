@@ -3,6 +3,7 @@ import {
   PlusCircleOutlined,
   FormOutlined,
   DeleteOutlined,
+  CodeSandboxOutlined,
 } from '@ant-design/icons';
 import React, { memo, useEffect, useState } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
@@ -31,6 +32,9 @@ function UserLeftList(props) {
   return (
     <div className={'list-cont'}>
       <div className={'header-u'}>
+        <span className="header-icon">
+          <CodeSandboxOutlined />
+        </span>
         <h3 className={'title'}>{title}</h3>
         <InfoCircleOutlined />
         <a

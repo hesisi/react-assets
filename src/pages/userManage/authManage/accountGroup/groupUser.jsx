@@ -20,8 +20,14 @@ export default function GroupUser({ groupId = null }) {
   const columns = [
     {
       title: '序号',
-      dataIndex: 'sequence',
-      key: 'sequence',
+      dataIndex: 'index',
+      key: 'index',
+      align: 'center',
+      render: (_, record, index) => {
+        return <span>{index + 1}</span>;
+      },
+      width: 80,
+      fixed: 'left',
     },
     {
       title: '姓名',
@@ -139,6 +145,10 @@ export default function GroupUser({ groupId = null }) {
   };
 
   const handleBatchDelete = () => {
+    if (!selectedRowKeys?.length) {
+      message.warn('请选择一条数据');
+      return;
+    }
     handleDelete(selectedRowKeys);
   };
 
@@ -218,7 +228,7 @@ export default function GroupUser({ groupId = null }) {
         <Modal
           title="添加用户"
           destroyOnClose={true}
-          width={620}
+          width={800}
           visible={isModalVisible}
           onOk={handleOk}
           onCancel={() => {

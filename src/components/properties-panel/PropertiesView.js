@@ -150,8 +150,8 @@ export default class PropertiesView extends Component {
 
   render() {
     const { modeler, flowMsg, forms } = this.props;
-    console.log(flowMsg);
-    console.log(forms);
+    console.log('flowMsg', flowMsg);
+    console.log('forms', forms);
     const { selectedElements, element } = this.state;
     // console.log(element)
 
@@ -217,7 +217,11 @@ export default class PropertiesView extends Component {
                 <div className="group-tittle">
                   规则 <ExclamationCircleOutlined />
                 </div>
-                <Ruler></Ruler>
+                <Ruler
+                  form={flowMsg.targetForm}
+                  flowId={flowMsg.id}
+                  element={element}
+                ></Ruler>
               </div>
             )}
             {(element?.type === 'bpmn:StartEvent' ||
@@ -271,6 +275,7 @@ export default class PropertiesView extends Component {
                     <FieldTable
                       form={flowMsg.targetForm}
                       type={element?.type}
+                      flowId={flowMsg.id}
                     ></FieldTable>
                   </Col>
                 </Row>

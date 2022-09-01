@@ -7,7 +7,7 @@
  * @LastEditTime: 2022-08-05 17:14:29
  */
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Tabs, Radio } from 'antd';
+import { Tabs, Radio, message } from 'antd';
 import moment from 'moment';
 import {
   transformToSchema,
@@ -190,7 +190,10 @@ export default function (props) {
         <FormDesigner
           type={desingerType}
           getDesigner={getDesigner}
-          onSave={onSave}
+          onSave={() => {
+            onSave();
+            message.success('保存成功');
+          }}
         />
       ) : (
         <TableSetting formCode={formCode} />

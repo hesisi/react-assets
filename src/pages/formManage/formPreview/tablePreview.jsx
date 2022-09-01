@@ -9,6 +9,7 @@ import {
   Col,
   Divider,
   PageHeader,
+  Tag,
 } from 'antd';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './preview.less';
@@ -136,6 +137,7 @@ const tablePreview = (props) => {
       setButtons(data.buttonConfig);
       setTable(data.tableConfig);
       setTableCol(data.tableConfig, data.columns);
+      console.log('按钮', data.buttonConfig);
     }
 
     const tableList = JSON.parse(window.localStorage.getItem('tableList'));
@@ -252,18 +254,20 @@ const tablePreview = (props) => {
       }
     }
     const cols = colsArr.map((e) => {
+      // console.log('表头', e);
+
       if (e.filterEnable) {
         return {
           title: e.label,
-          dataIndex: e.id,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
-          ...getColumnSearchProps(e.id, e.label),
+          ...getColumnSearchProps(e.name || e.id, e.label),
         };
       } else {
         return {
           title: e.label,
-          dataIndex: e.id,
+          dataIndex: e.name || e.id,
           key: e.id,
           sorter: e.sorter || false,
         };
@@ -297,11 +301,13 @@ const tablePreview = (props) => {
     form.validate().then(() => {
       // 表单提交
       let arr = [...dataSource];
+
       if (index === -1) {
         arr.push({
           ...JSON.parse(JSON.stringify(form.values)),
           id: nanoid(),
         });
+        console.log('确认添加', arr);
       } else {
         // 编辑
         arr[index] = {
@@ -309,11 +315,13 @@ const tablePreview = (props) => {
           id: arr[index].id,
         };
       }
+
       setDataSource(arr);
       // 数据有异步问题，暂存localStorage
       // window.localStorage.setItem('dataSource', JSON.stringify(arr));
       // window.localStorage.setItem('tableList', JSON.stringify({ [`${formCode}`]: arr }))
-      saveFormList({ [`${formCode}`]: arr });
+      const obj = JSON.parse(window.localStorage.getItem('tableList')) ?? {};
+      saveFormList({ ...obj, [`${formCode}`]: arr });
       formCancel();
     });
   };
@@ -349,6 +357,11 @@ const tablePreview = (props) => {
   // 保存至缓存中
   const saveFormList = (data) => {
     data && localStorage.setItem('tableList', JSON.stringify(data));
+  };
+
+  const onSearch = (str) => {
+    const arr1 = table.filter((e) => e.searchEnable)?.map((e) => e.id);
+    console.log('检索', arr1, str);
   };
 
   return (
@@ -400,10 +413,32 @@ const tablePreview = (props) => {
               >
                 删除
               </Button>
+              {buttons &&
+                buttons.map((e) => {
+                  if (e.icon) {
+                    return e.position === 'front' ? (
+                      <Button className="default-btn">
+                        <Icon icon={e.icon} />
+                        {e.label}
+                      </Button>
+                    ) : (
+                      <Button className="default-btn">
+                        {e.label}
+                        <Icon icon={e.icon} />
+                      </Button>
+                    );
+                  }
+                  return <Button className="default-btn">{e.label}</Button>;
+                })}
             </Space>
           </Col>
           <Col>
-            <Search placeholder="请输入内容" className="default-search" />
+            <Search
+              placeholder="请输入内容"
+              className="default-search"
+              onSearch={onSearch}
+              allowClear
+            />
           </Col>
         </Row>
 

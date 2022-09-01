@@ -41,7 +41,7 @@ import { key } from 'localforage';
 
 interface DataType {
   /**流程名称*/
-  name: string;
+  proessName: string;
   id?: string | number;
   /**流程状态*/
   status?: string;
@@ -89,7 +89,7 @@ export default function Page() {
                 _processGroup.findIndex((item: any) => {
                   return item.typeIndex === proessGroup;
                 })
-              ].typeName
+              ]?.typeName
             }
           </span>
         );
@@ -268,14 +268,15 @@ export default function Page() {
 
     if (!flowData) return;
     const arr = JSON.parse(flowData).filter((e: any) => {
+      console.log(e);
       if (name) {
-        return e.name?.indexOf(name) !== -1;
+        return e.proessName?.indexOf(name) !== -1;
       } else if (status) {
         return e.status === status;
       } else if (name && status) {
-        return e.name?.indexOf(name) !== -1 && e.status === status;
+        return e.proessName?.indexOf(name) !== -1 && e.status === status;
       }
-      return e.name?.indexOf(name) !== -1 || e.status === status;
+      return e.proessName?.indexOf(name) !== -1 || e.status === status;
     });
     setTableData(arr);
   };

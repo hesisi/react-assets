@@ -9,6 +9,7 @@ import {
   Col,
   Divider,
   PageHeader,
+  Tag,
 } from 'antd';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './preview.less';
@@ -136,6 +137,7 @@ const tablePreview = (props) => {
       setButtons(data.buttonConfig);
       setTable(data.tableConfig);
       setTableCol(data.tableConfig, data.columns);
+      console.log('按钮', data.buttonConfig);
     }
 
     const tableList = JSON.parse(window.localStorage.getItem('tableList'));
@@ -411,6 +413,23 @@ const tablePreview = (props) => {
               >
                 删除
               </Button>
+              {buttons &&
+                buttons.map((e) => {
+                  if (e.icon) {
+                    return e.position === 'front' ? (
+                      <Button className="default-btn">
+                        <Icon icon={e.icon} />
+                        {e.label}
+                      </Button>
+                    ) : (
+                      <Button className="default-btn">
+                        {e.label}
+                        <Icon icon={e.icon} />
+                      </Button>
+                    );
+                  }
+                  return <Button className="default-btn">{e.label}</Button>;
+                })}
             </Space>
           </Col>
           <Col>

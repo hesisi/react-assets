@@ -56,7 +56,7 @@ const tableSetting = (props) => {
   const formRef = useRef(null);
   const [index, setIndex] = useState(-1);
   const [icon, setIcon] = useState('');
-  const [iconPosition, setIconPosition] = useState('front');
+  // const [iconPosition, setIconPosition] = useState('front');
   const [iconList, setIconList] = useState(config.iconList);
 
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -153,6 +153,7 @@ const tableSetting = (props) => {
   const tableEcho = (formInit, columnsInit) => {
     const tableConfig = columnsInit?.tableConfig;
     const columns = columnsInit?.columns;
+    const buttons = columnsInit?.buttonConfig;
     // if (JSON.stringify(formInit) !== JSON.stringify(tableConfig)) {
     const arr = [...formInit];
     console.log('===echo', formInit, tableConfig);
@@ -211,6 +212,8 @@ const tableSetting = (props) => {
     // }
 
     setTable(colsArr);
+    setButtons(buttons);
+
     // }
   };
 
@@ -454,10 +457,11 @@ const tableSetting = (props) => {
         if (e.id === selectBtnId) {
           e = { ...ele, id: selectBtnId };
         }
+        console.log('button操作', e);
         return e;
       });
       setButtons(btns);
-      setIconPosition(ele.position);
+      // setIconPosition(ele.position);
       btnFormReset();
     }
   };
@@ -732,7 +736,7 @@ const tableSetting = (props) => {
                         }}
                       >
                         {e.icon ? (
-                          iconPosition === 'front' ? (
+                          e.position === 'front' ? (
                             <Button
                               onClick={() => buttonSelect(e)}
                               className="add-btn"
@@ -804,6 +808,7 @@ const tableSetting = (props) => {
               <Collapse accordion style={{ background: '#fafafa' }}>
                 {table &&
                   table.map((e) => {
+                    console.log('操作面板', e);
                     return (
                       <Panel header={e.label} key={e.id}>
                         <Form initialValues={config.columnInit}>

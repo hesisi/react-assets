@@ -273,4 +273,23 @@ export default [
       },
     ],
   },
+  {
+    name: '流程中心',
+    path: '/activityCenter',
+    key: 'default-8',
+    component: '@/layouts/homeIndex/index',
+    meta: { showMenu: false, showHeader: true },
+    routes: [
+      {
+        path: '/activityCenter',
+        redirect: '/activityCenter/centerHome',
+      },
+      {
+        name: '首页',
+        path: '/activityCenter/centerHome',
+        component: '@/pages/activityCenter/index',
+        meta: { showMenu: false, showHeader: true },
+      },
+    ],
+  },
 ];

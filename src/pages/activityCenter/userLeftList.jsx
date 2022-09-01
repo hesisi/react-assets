@@ -46,7 +46,8 @@ function UserLeftList(props) {
   const handleGClick = (id) => {
     let childData = JSON.parse(localStorage.getItem('flowGroup') || []);
     childData = childData.filter((item) => {
-      return id.includes(item.proessGroup + '');
+      /* 仅展示启用的流程 */
+      return id.includes(item.proessGroup + '') && item.status === 'enable';
     });
     const oldChildData = cloneDeep(listData).map((item) => {
       if (item.key + '' === id[0] + '') {

@@ -417,18 +417,22 @@ const tablePreview = (props) => {
                 buttons.map((e) => {
                   if (e.icon) {
                     return e.position === 'front' ? (
-                      <Button className="default-btn">
+                      <Button className="default-btn" key={e.id}>
                         <Icon icon={e.icon} />
                         {e.label}
                       </Button>
                     ) : (
-                      <Button className="default-btn">
+                      <Button className="default-btn" key={e.id}>
                         {e.label}
                         <Icon icon={e.icon} />
                       </Button>
                     );
                   }
-                  return <Button className="default-btn">{e.label}</Button>;
+                  return (
+                    <Button className="default-btn" key={e.id}>
+                      {e.label}
+                    </Button>
+                  );
                 })}
             </Space>
           </Col>

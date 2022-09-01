@@ -553,6 +553,7 @@ const tableSetting = (props) => {
         (e) => {
           if (e.formCode === props.formCode) {
             e.formStatus = 'enable';
+            e.formUrl = url;
           }
           return e;
         },

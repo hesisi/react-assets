@@ -50,6 +50,9 @@ export default function IndexPage() {
   const currentId = useRef(null);
 
   useEffect(async () => {
+    if (!localStorage.getItem('processGroup')) {
+      return;
+    }
     const goupData = JSON.parse(localStorage.getItem('processGroup') || []);
     console.log(JSON.parse(localStorage.getItem('processGroup')), '52------');
     setGroupData(goupData);

@@ -812,7 +812,14 @@ const tableSetting = (props) => {
                     console.log('操作面板', e);
                     return (
                       <Panel header={e.label} key={e.id}>
-                        <Form initialValues={config.columnInit}>
+                        <Form
+                          initialValues={{
+                            isShow: e.isShow,
+                            sorter: e.sorter,
+                            searchEnable: e.searchEnable,
+                            filterEnable: e.filterEnable,
+                          }}
+                        >
                           <Form.Item label="在列表显示" name="isShow">
                             <Select
                               onChange={(ele) => selectChange(e, ele, 'isShow')}

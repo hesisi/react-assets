@@ -83,12 +83,16 @@ export default function Home(params) {
     setIsHome(window.localStorage.getItem('isHome'));
   }, []);
 
-  const changeHandler = (index) => {
-    setCurIndex(index);
+  const onSlideChange = (ele) => {
+    setCurIndex(ele.realIndex);
   };
 
   const enterHandler = (url) => {
     history.push(url);
+  };
+
+  const onClick = (ele) => {
+    console.log(ele);
   };
 
   return (
@@ -96,8 +100,13 @@ export default function Home(params) {
       <p className="home-title">欢迎进入Connectivity Asset</p>
       <div className="home-carousel">
         <Swiper
+          //  activeIndex={banner}
+          onSlideChange={onSlideChange}
+          onClick={onClick}
           key={banner.length}
-          pagination={true}
+          pagination={{
+            clickable: true, //设置是否可以点击
+          }}
           autoplay={{
             delay: 2500,
             disableOnInteraction: false,
@@ -105,21 +114,23 @@ export default function Home(params) {
           centeredSlides={true}
           loop={true} //设置循环轮播
           spaceBetween={-250} //设置堆叠轮播，item之间叠的距离
-          slidesPerView={6} //设置显示的数量
-          navigation={true} //modules上加了同时要设置为true，才显示
+          slidesPerView={5} //设置显示的数量
+          zoom={true}
+          navigation={true}
+          // grabCursor={true}
           modules={[Navigation, Pagination, EffectCreative, Autoplay]}
           effect={'creative'} //modules上加了同时要设置
           creativeEffect={{
             prev: {
               //这里是设置当前item的前一项的具体属性
               translate: [-230, 0, 0], //偏移量
-              scale: 0.8, //缩放量
+              scale: 0.9, //缩放量
               opacity: 1, //透明度
             },
             next: {
               //这里是设置当前item的后一项的具体属性，同上面
               translate: [230, 0, 0],
-              scale: 0.8,
+              scale: 0.9,
               opacity: 1,
             },
             limitProgress: 2, //显示五个堆叠的最重要的这个属性，后面依次以前面属性等比配置

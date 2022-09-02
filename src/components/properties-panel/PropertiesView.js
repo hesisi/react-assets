@@ -23,7 +23,6 @@ import { history } from 'umi';
 export default class PropertiesView extends Component {
   constructor(props) {
     super(props);
-    // console.log(props);
     this.state = {
       selectedElements: [],
       element: null,
@@ -76,7 +75,6 @@ export default class PropertiesView extends Component {
       ],
       rowSelection: {
         onSelect: (record, selected, selectedRows, nativeEvent) => {
-          console.log(record);
           this.setState({
             approver: record,
           });
@@ -114,7 +112,88 @@ export default class PropertiesView extends Component {
         });
       }
     });
+    /**监听节点变化*/
+    modeler.on('shape.changed', (e) => {
+      console.log('节点变化');
+      const { element } = e;
+      if (element?.type === 'bpmn:UserTask' || element?.type === 'bpmn:Task') {
+        // console.log(element)
+        this.updateApproverNode(element);
+      }
+    });
+    /**监听删除事件*/
+    modeler.on('shape.remove', (e) => {
+      console.log('删除节点');
+      const { element } = e;
+      this.delApproverNode(element);
+    });
+    /**监听添加节点*/
+    modeler.on('shape.added', (e) => {
+      console.log('创建节点');
+      // const { element } = e;
+      // if(element?.type==='bpmn:UserTask' || element?.type === 'bpmn:Task'){
+      //   this.addApproverNode(element)
+      // }
+    });
   }
+  /**添加审批人信息*/
+  addApproverNode = (e) => {
+    // console.log(e)
+    const { flowMsg } = this.props;
+    let arr = flowMsg.approverGroup || [];
+    arr.push({
+      id: e.id,
+      name: e.businessObject.name,
+      type: e.type,
+    });
+    flowMsg.approverGroup = arr;
+    // console.log(flowMsg)
+    this.updateFlowMsg(flowMsg);
+  };
+  /**更新审批人信息*/
+  updateApproverNode = (e) => {
+    const { flowMsg } = this.props;
+    let arr = flowMsg.approverGroup || [];
+    if (arr.length == 0) {
+      this.addApproverNode(e);
+    } else if (arr.findIndex((x) => x?.id === e.id) === -1) {
+      this.addApproverNode(e);
+    } else {
+      const newarr = arr.map((x) => {
+        if (x?.id === e.id) {
+          let temp = { ...x };
+          temp.name = e.businessObject.name;
+          temp.type = e.type;
+          return temp;
+        }
+        return x;
+      });
+      flowMsg.approverGroup = newarr;
+      this.updateFlowMsg(flowMsg);
+    }
+  };
+  /**删除审批人节点*/
+  delApproverNode = (e) => {
+    const { flowMsg } = this.props;
+    let arr = flowMsg.approverGroup || [];
+
+    let temp = arr.map((x) => {
+      if (x?.id === e.id) {
+        return null;
+      } else {
+        return x;
+      }
+    });
+    /**这一步是为了修复只有一个审批人的时候更改节点类型产生的bug*/
+    if (temp.length === 1 && temp[0] == null) {
+      temp = [];
+    } else {
+      temp = temp.filter((x) => x != null);
+    }
+    flowMsg.approverGroup = temp;
+    this.updateFlowMsg(flowMsg);
+  };
+
   creatForm = () => {
     history.push('/formManage/formList');
   };
@@ -148,13 +227,16 @@ export default class PropertiesView extends Component {
       isModalVisible: true,
     });
   };
+  setTargetForm = (data) => {
+    const { flowMsg } = this.props;
+    flowMsg.targetFormSet = data;
+    this.updateFlowMsg(flowMsg);
+  };
 
   render() {
     const { modeler, flowMsg, forms } = this.props;
-    // console.log(flowMsg);
-    console.log(forms);
+
     const { selectedElements, element } = this.state;
-    // console.log(element)
 
     return (
       <div className={'panel-content'}>
@@ -171,7 +253,11 @@ export default class PropertiesView extends Component {
               </div>
               {selectedElements.length > 0 ? null : (
                 <Form.Item label="流程名称" name="name">
-                  <Input value={flowMsg?.name} allowClear disabled />
+                  <Input
+                    defaultValue={flowMsg?.proessName}
+                    allowClear
+                    disabled
+                  />
                 </Form.Item>
                 // <fieldset>
                 //   <label>流程名称</label>
@@ -218,6 +304,11 @@ export default class PropertiesView extends Component {
                 <Approver
                   addApprover={this.addApprover}
                   approver={flowMsg?.approver}
+                  forms={forms}
+                  flowMsg={flowMsg}
+                  updateFlowMsg={this.updateFlowMsg}
+                  element={element}
+                  fromRef={this.formRef}
                 ></Approver>
               </div>
             )}
@@ -287,6 +378,8 @@ export default class PropertiesView extends Component {
                       form={flowMsg.targetForm}
                       type={element?.type}
                       flowId={flowMsg.id}
+                      setTargetForm={this.setTargetForm}
+                      targetFormSet={flowMsg.targetFormSet}
                     ></FieldTable>
                   </Col>
                 </Row>

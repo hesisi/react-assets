@@ -92,7 +92,7 @@ export default function Home(params) {
   };
 
   return (
-    <div className="home-container" style={{ height: 'calc(100vh - 65px)' }}>
+    <div className="home-container">
       <p className="home-title">欢迎进入Connectivity Asset</p>
       <div className="home-carousel">
         <Swiper

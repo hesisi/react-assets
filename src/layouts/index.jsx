@@ -154,12 +154,7 @@ const CommonLayout = (props) => {
           </Space>
         </div>
       </Header>
-      <Content
-        style={{
-          height: 'calc(100vh - 64px)',
-          backgroundColor: '#f0f2f5',
-        }}
-      >
+      <Content className="layout-content">
         <Layout
           className={Styles['site-layout-background']}
           style={{

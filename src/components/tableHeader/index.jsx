@@ -51,7 +51,10 @@ export default function TableHeader({
         className: 'default-form-radios',
       };
   return (
-    <div className="table-search-wrapper" style={{ minHeight: '52px' }}>
+    <div
+      className="table-search-wrapper default-form-radios"
+      style={{ minHeight: '52px' }}
+    >
       <Form {...formProps}>
         {formStructure.map((item) => {
           return (

@@ -23,6 +23,7 @@ export default function GroupUser({
   childFormCode = {},
 }) {
   const formRef = useRef(null);
+  const formRefS = useRef(null);
   const currentGroupId = useRef(null);
   const currentFormCode = useRef(null);
   const originSource = useRef(null);
@@ -36,6 +37,7 @@ export default function GroupUser({
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedUserRowKeys, setSelectedUserRowKeys] = useState([]);
   const [formTree, setFormTree] = useState(null);
+  const [formTreeShenpi, setFormTreeShenpi] = useState(null);
   const [totalData, setTotalData] = useState({
     created: 0,
     toDo: 0,
@@ -194,9 +196,19 @@ export default function GroupUser({
   const handleShenPi = (item) => {
     curentClickItem.current = item;
     const formilyData = getShenpiForm();
-    setFormTree(transformToTreeNode(formilyData['formily-form-schema']));
+    setFormTreeShenpi(transformToTreeNode(formilyData['formily-form-schema']));
     setActiveIdenty('审批');
     setIsModalVisible(true);
+    setTimeout(() => {
+      const form = formRef?.current?.form;
+      // const formRefS = formRefS?.current?.form;
+      if (form) {
+        form.setValues(item);
+      }
+      // if (formRefS) {
+      //   form.setValues();
+      // }
+    }, 0);
   };
 
   // 确认添加
@@ -443,7 +455,21 @@ export default function GroupUser({
           okText={activeIdenty === '新建' ? '确认' : '通过'}
         >
           <div className="user-wrapper">
-            <PreviewWidget key="form" tree={formTree} ref={formRef} />
+            {activeIdenty !== '新建' ? (
+              <div className="shenqingren">申请信息:</div>
+            ) : null}
+            <PreviewWidget key="formS" tree={formTree} ref={formRef} />
+
+            {activeIdenty !== '新建' ? (
+              <>
+                <div className="shenqingren">审批:</div>
+                <PreviewWidget
+                  key="formS"
+                  tree={formTreeShenpi}
+                  ref={formRefS}
+                />
+              </>
+            ) : null}
           </div>
         </Modal>
       </div>

@@ -120,7 +120,7 @@ export default function Home(params) {
             },
             next: {
               //这里是设置当前item的后一项的具体属性，同上面
-              translate: [250, 0, 0],
+              translate: [230, 0, 0],
               scale: 0.8,
               opacity: 1,
               // shadow: true,

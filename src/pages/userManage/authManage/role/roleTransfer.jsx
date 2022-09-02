@@ -1,8 +1,9 @@
 import { Transfer, Tree, Input } from 'antd';
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import localForage from 'localforage';
 import { cloneDeep } from 'lodash';
 
-const RoleTransfer = ({ transIdenty = '' }) => {
+const RoleTransfer = ({ transIdenty = '', groupItem }) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const treeC = useRef(null);
   const treeDirection = useRef(null);
@@ -265,9 +266,34 @@ const RoleTransfer = ({ transIdenty = '' }) => {
     );
   };
 
-  const onChange = (keys) => {
+  const onChange = async (keys) => {
     setTargetKeys(keys);
+
+    console.log(keys, '271----');
+
+    /* 保存在本地 */
+    const userInfo = await localForage.getItem('userSystemInfo');
+    if (transIdenty === '人员') {
+      userInfo[groupItem.id]['roleUser'] = keys;
+    }
+
+    if (transIdenty === '功能') {
+      userInfo[groupItem.id]['roleFunction'] = keys;
+    }
+
+    localForage.setItem('userSystemInfo', userInfo);
   };
+
+  useEffect(async () => {
+    const userInfo = await localForage.getItem('userSystemInfo');
+    console.log(userInfo, '289-----');
+    if (transIdenty === '人员') {
+      setTargetKeys(userInfo?.[groupItem.id]?.roleUser || []);
+    }
+    if (transIdenty === '功能') {
+      setTargetKeys(userInfo?.[groupItem.id]?.roleFunction || []);
+    }
+  }, [groupItem]);
 
   return (
     <TreeTransfer

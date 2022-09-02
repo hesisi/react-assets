@@ -1,0 +1,62 @@
+.flowCenterTablePrew {
+  width: 100%;
+  height: 100%;
+  .ant-table-wrapper {
+    padding: 0 !important;
+  }
+  // /*里面的代码可以根据自己需求去进行更改*/
+  /* 设置滚动条的样式 */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  /* 滚动槽 */
+  ::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+  }
+  /* 滚动条滑块 */
+  ::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.1);
+    -webkit-box-shadow: inset006pxrgba(0, 0, 0, 0.5);
+  }
+  ::-webkit-scrollbar-thumb:window-inactive {
+    background: #0d6bff;
+  }
+}
+.flowCenterTablePrew {
+  .form-preview {
+    width: 100%;
+  }
+
+  .table-preview__table,
+  .form-preview__box {
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .form-preview__box {
+    padding: 65px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .ant-formily-item-label {
+      font-family: 'PingFang Regular';
+      font-size: 18px;
+      color: #333333;
+      letter-spacing: 0;
+      font-weight: 400;
+      margin-bottom: 10px;
+    }
+  }
+
+  .form-preview__title {
+    text-align: center;
+    font-family: 'PingFang Regular';
+    font-size: 20px;
+    color: #0d6bff;
+    letter-spacing: 0;
+    font-weight: 600;
+  }
+}

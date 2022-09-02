@@ -16,12 +16,14 @@ import { transformToTreeNode } from '@designable/formily-transformer';
 import { nanoid } from 'nanoid';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
+import TablePreview from './tablePreview';
 
 const { TabPane } = Tabs;
 export default function GroupUser({
   groupId = ['shouye'],
   childFormCode = {},
 }) {
+  const tableRef = useRef(null);
   const formRef = useRef(null);
   const formRefS = useRef(null);
   const currentGroupId = useRef(null);
@@ -37,6 +39,7 @@ export default function GroupUser({
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedUserRowKeys, setSelectedUserRowKeys] = useState([]);
   const [formTree, setFormTree] = useState(null);
+  const [formCode, setFormCode] = useState(null);
   const [formTreeShenpi, setFormTreeShenpi] = useState(null);
   const [totalData, setTotalData] = useState({
     created: 0,
@@ -47,32 +50,23 @@ export default function GroupUser({
   const columns = [
     {
       title: '申请单号',
-      dataIndex: 'number',
-      key: 'number',
+      dataIndex: 'oddNumbers',
+      key: 'oddNumbers',
     },
     {
       title: '申请人',
-      dataIndex: 'people',
-      key: 'people',
+      dataIndex: 'applyPeople',
+      key: 'applyPeople',
     },
     {
       title: '流程节点',
-      dataIndex: 'node',
-      key: 'node',
-      render: (text, record) => {
-        return activeKey === '2' ? (
-          <a onClick={() => handleShenPi(record)} style={{ cursor: 'pointer' }}>
-            {text}
-          </a>
-        ) : (
-          text
-        );
-      },
+      dataIndex: 'applyNode',
+      key: 'applyNode',
     },
     {
       title: '休假类型',
-      dataIndex: 'leaveCategory',
-      key: 'leaveCategory',
+      dataIndex: 'applyType',
+      key: 'applyType',
     },
     {
       title: '开始日期',
@@ -86,8 +80,8 @@ export default function GroupUser({
     },
     {
       title: '请假天数',
-      dataIndex: 'leaveDays',
-      key: 'leaveDays',
+      dataIndex: 'applyDays',
+      key: 'applyDays',
     },
   ];
 
@@ -96,6 +90,7 @@ export default function GroupUser({
     currentFormCode.current = targetFormCode;
     const formData = JSON.parse(localStorage.getItem('formMap') || []);
     const formilyData = formData[targetFormCode];
+    setFormCode(targetFormCode || null);
     return formilyData;
   };
 
@@ -108,38 +103,13 @@ export default function GroupUser({
   /* 初始化 */
   useEffect(async () => {
     let tableSource = await localForage.getItem('flowCreateMap');
-
     if (childFormCode) {
       if (groupId?.[0] !== 'shouye') {
         const formilyData = getCreateForm();
-        originSource.current =
-          tableSource?.[childFormCode.id]?.['created'] || [];
-        setDataSource(tableSource?.[childFormCode.id]?.['created'] || []);
-        setTodoSource(tableSource?.[childFormCode.id]?.['toDo'] || []);
-        setDataDoneSource(tableSource?.[childFormCode.id]?.['done'] || []);
-
-        if (!tableSource) {
-          tableSource = {};
-        }
-        if (!tableSource?.[childFormCode.id]) {
-          tableSource[childFormCode.id] = {};
-        }
-        tableSource[childFormCode.id]['toDo'] = [
-          {
-            id: nanoid(),
-            number: 1,
-            people: '李四',
-            node: '审批人1',
-            leaveCategory: '年假',
-            startTime: moment().format('YYYY-MM-DD'),
-            endTime: moment().add(7, 'days').format('YYYY-MM-DD'),
-            leaveDays: 3,
-          },
-        ];
-        localForage.setItem('flowCreateMap', tableSource);
         if (formilyData) {
           setFormTree(transformToTreeNode(formilyData['formily-form-schema']));
         }
+        setActiveKey('1');
       }
     } else {
       if (!groupId || groupId?.[0] === 'shouye') {
@@ -167,20 +137,6 @@ export default function GroupUser({
     }
   }, [groupId, childFormCode]);
 
-  const onSelectChange = (newSelectedRowKeys) => {
-    setSelectedRowKeys(newSelectedRowKeys);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const rowUserSelection = {
-    selectedUserRowKeys,
-    onChange: setSelectedUserRowKeys,
-  };
-
   /* 用户添加， 选择用户 */
   const handleAccountAdd = async () => {
     if (!childFormCode) {
@@ -191,10 +147,31 @@ export default function GroupUser({
     setFormTree(transformToTreeNode(formilyData['formily-form-schema']));
     setActiveIdenty('新建');
     setIsModalVisible(true);
+    setTimeout(() => {
+      const form = formRef?.current?.form;
+      // const formRefS = formRefS?.current?.form;
+      if (form) {
+        /* formily api */
+        // form.setPattern('disabled');
+
+        /* 控制formItem 的显示隐藏 */
+        form.setFieldState('oddNumbers', (state) => {
+          state.visible = false;
+          // state.disabled = true;
+        });
+        form.setFieldState('applyNode', (state) => {
+          state.visible = false;
+          // state.disabled = true;
+        });
+      }
+      // if (formRefS) {
+      //   form.setValues();
+      // }
+    }, 0);
   };
 
   const handleShenPi = (item) => {
-    curentClickItem.current = item;
+    // curentClickItem.current = item;
     const formilyData = getShenpiForm();
     setFormTreeShenpi(transformToTreeNode(formilyData['formily-form-schema']));
     setActiveIdenty('审批');
@@ -203,7 +180,22 @@ export default function GroupUser({
       const form = formRef?.current?.form;
       // const formRefS = formRefS?.current?.form;
       if (form) {
-        form.setValues(item);
+        form.setValues({
+          ...item,
+        });
+
+        /* formily api */
+        form.setPattern('disabled');
+
+        /* 控制formItem 的显示隐藏 */
+        if (Object.keys(item)?.length) {
+          Object.keys(item).forEach((itemK) => {
+            form.setFieldState(`${itemK}`, (state) => {
+              // state.visible = false;
+              state.disabled = true;
+            });
+          });
+        }
       }
       // if (formRefS) {
       //   form.setValues();
@@ -215,96 +207,25 @@ export default function GroupUser({
   const handleOk = async () => {
     const form = formRef.current.form;
     form.validate().then(async () => {
-      let originData = await localForage.getItem('flowCreateMap');
-      originData = cloneDeep(originData || {});
-      console.log(originData, '2199----');
-      if (!originData[childFormCode.id]) {
-        originData[childFormCode.id] = {};
-      }
-      if (!originData[childFormCode.id]['created']) {
-        originData[childFormCode.id]['created'] = [];
-      }
-      if (!originData[childFormCode.id]['toDo']) {
-        originData[childFormCode.id]['toDo'] = [];
-      }
-      if (!originData[childFormCode.id]['done']) {
-        originData[childFormCode.id]['done'] = [];
-      }
-      if (!Array.isArray(originData[childFormCode.id]['done'])) {
-        originData[childFormCode.id]['done'] = [];
-      }
-      console.log(originData, '214----');
       if (activeKey === '2') {
-        const todoData = cloneDeep(dataToDoSource);
-        let piItem = {};
-        const arr = [];
-        todoData.forEach((item) => {
-          if (item.id === curentClickItem.current.id) {
-            piItem = item;
-          } else {
-            arr.push(item);
-          }
-        });
-        console.log(piItem, '223-----');
-        console.log(originData, '224----');
-        console.log(childFormCode, '225----');
-        originData[childFormCode.id]['toDo'] = originData[childFormCode.id][
-          'toDo'
-        ].filter((item) => item.id !== curentClickItem.current.id);
-        console.log(originData, '228----');
-        originData[childFormCode.id]['done'] = originData[childFormCode.id][
-          'done'
-        ].concat([{ ...piItem, node: '结束' }]);
-        setTodoSource(arr); // 减一条
-        setDataDoneSource(
-          cloneDeep(dataDoneSource).concat([{ ...piItem, node: '结束' }]),
-        ); // 加一条
-
-        localForage.setItem('flowCreateMap', originData);
-        setDataSource(arr);
+        if (tableRef && tableRef.current) {
+          console.log(tableRef.current, '291----');
+          tableRef.current.formOk(form.values);
+        }
         message.success('审批成功');
         setIsModalVisible(false);
         return;
       }
 
+      if (tableRef && tableRef.current) {
+        console.log(tableRef.current, '291----');
+        tableRef.current.formOk(form.values);
+      }
       // 表单提交
-      let arr = [...dataSource];
-      arr.push({
-        ...JSON.parse(JSON.stringify(form.values)),
-        id: nanoid(),
-        node: '开始',
-        number: arr.length + 1,
-      });
-
-      // const tableDataFq = originData[childFormCode.id] || {};
-      // const tableDataFqArr = tableDataFq['created'] || []; // done toDo created
-
-      originData[childFormCode.id]['created'] = arr;
-      localForage.setItem('flowCreateMap', originData);
-      originSource.current = arr;
-      setDataSource(arr);
       message.success('添加成功');
       setActiveKey('1');
       setIsModalVisible(false);
     });
-  };
-
-  const handleBatchDelete = () => {
-    handleDelete(selectedRowKeys);
-  };
-
-  const handleDelete = async (idArr = []) => {
-    if (!currentGroupId?.current) {
-      message.error('请先选择分组');
-      return;
-    }
-    const initUserData = await localForage.getItem('groupUserList');
-    initUserData[currentGroupId.current] = initUserData[
-      currentGroupId.current
-    ].filter((item) => !idArr.includes(item.id));
-    localForage.setItem('groupUserList', initUserData);
-    setDataSource(initUserData[currentGroupId.current]);
-    message.success('删除成功');
   };
 
   const onTabChange = async (key) => {
@@ -322,31 +243,8 @@ export default function GroupUser({
         return;
       }
     } else {
-      const tableSource = await localForage.getItem('flowCreateMap');
-      if (key === '1') {
-        setDataSource(tableSource?.[childFormCode.id]?.['created'] || []);
-        setActiveKey(key);
-        return;
-      }
-      if (key === '2') {
-        const data = tableSource?.[childFormCode.id]?.['toDo'] || [];
-        setTodoSource(data);
-        setDataSource(data);
-        setActiveKey(key);
-        return;
-      }
-      if (key === '3') {
-        console.log(tableSource, '314----');
-        const data = tableSource?.[childFormCode.id]?.['done']
-          ? Array.isArray(tableSource?.[childFormCode.id]?.['done'])
-            ? tableSource?.[childFormCode.id]?.['done']
-            : []
-          : [];
-        setDataDoneSource(data);
-        setDataSource(data);
-        setActiveKey(key);
-        return;
-      }
+      tableRef.current.tabChange(key);
+      setActiveKey(key);
     }
   };
 
@@ -417,26 +315,41 @@ export default function GroupUser({
               <TabPane tab="待办" key="2" />
               <TabPane tab="已办" key="3" />
             </Tabs>
-
             {/* table */}
-            <Table
-              // rowSelection={{
-              //   type: 'checkbox',
-              //   ...rowSelection,
-              // }}
-              style={{ marginTop: 20 }}
-              dataSource={dataSource}
-              columns={columns}
-              // loading={loading}
-              scroll={{ y: 400 }}
-              // pagination={{
-              //   total,
-              //   showSizeChanger: true,
-              //   // showQuickJumper: true,
-              //   onChange: handlePageChange,
-              // }}
-              rowKey={(record) => record.id}
-            />
+            {groupId && groupId[0] === 'shouye' ? (
+              <Table
+                // rowSelection={{
+                //   type: 'checkbox',
+                //   ...rowSelection,
+                // }}
+                style={{ marginTop: 20 }}
+                dataSource={dataSource}
+                columns={columns}
+                // loading={loading}
+                scroll={{ y: 400 }}
+                // pagination={{
+                //   total,
+                //   showSizeChanger: true,
+                //   // showQuickJumper: true,
+                //   onChange: handlePageChange,
+                // }}
+                rowKey={(record) => record.id}
+              />
+            ) : null}
+
+            {groupId && groupId[0] !== 'shouye' && childFormCode && formCode ? (
+              <TablePreview
+                ref={tableRef}
+                handleShenPiP={handleShenPi}
+                childFormCode={childFormCode}
+                activeKey={activeKey}
+                formCode={formCode}
+                showOperate={false}
+                showTableHeader={false}
+                showPageTitle={false}
+                tablePreviewClassName="flowCenterTablePrew"
+              />
+            ) : null}
           </>
         )}
 

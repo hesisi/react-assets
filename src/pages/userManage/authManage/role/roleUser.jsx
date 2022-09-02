@@ -5,7 +5,7 @@ import { useRef } from 'react';
 import RoleTransfer from './roleTransfer';
 
 const { TextArea } = Input;
-export default function RoleUser(props) {
+export default function RoleUser({ groupItem }) {
   const formRef = useRef(null);
   const [form] = Form.useForm();
 
@@ -33,7 +33,7 @@ export default function RoleUser(props) {
   };
   return (
     <div className="table-search-wrapper">
-      <RoleTransfer transIdenty="人员" />
+      <RoleTransfer transIdenty="人员" groupItem={groupItem} />
       {/* <Form {...formProps}>
         <Form.Item label="" name="roleUser" key="roleName">
 

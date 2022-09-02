@@ -33,6 +33,7 @@ export default function IndexPage() {
   const [systemData, setSystemData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [groupId, setGroupId] = useState(null);
+  const [groupItem, setGroupItem] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
   });
@@ -61,17 +62,38 @@ export default function IndexPage() {
   useEffect(async () => {
     const oldData = await localForage.getItem('userSystem');
     if (!oldData) {
-      setSystemData(data);
+      const sysItem = {};
+      data.forEach((item) => {
+        sysItem[item.id] = {
+          ...item,
+          roleDescrib: '',
+          roleUser: [],
+          roleFunction: [],
+        };
+      });
+      localForage.setItem('userSystemInfo', sysItem);
       localForage.setItem('userSystem', data);
+      setSystemData(data);
     } else {
+      // const sysItem = {};
+      // oldData.forEach((item) => {
+      //   sysItem[item.id] = {
+      //     ...item,
+      //     roleDescrib: '',
+      //     roleUser: [],
+      //     roleFunction: [],
+      //   };
+      // });
+      // localForage.setItem('userSystemInfo', sysItem);
       setSystemData(oldData);
     }
   }, []);
 
   const onChange = () => {};
 
-  const handleGroupClick = (id) => {
-    setGroupId(id);
+  const handleGroupClick = (item) => {
+    setGroupItem(item);
+    setGroupId(item.id);
   };
 
   const handleEdit = async (id) => {
@@ -88,7 +110,14 @@ export default function IndexPage() {
     const currentUser = cloneDeep(systemData).filter(
       (item) => !idArr.includes(item.id),
     );
+    let oldData = await localForage.getItem('userSystemInfo');
+    idArr.forEach((idItem) => {
+      if (oldData?.idItem) {
+        delete oldData.idItem;
+      }
+    });
     setSystemData(currentUser);
+    localForage.setItem('userSystemInfo', oldData);
     localForage.setItem('userSystem', currentUser);
     message.success('删除成功');
   };
@@ -99,14 +128,17 @@ export default function IndexPage() {
     setIsModalVisible(true);
   };
 
-  const handleOk = () => {
+  const handleOk = async () => {
     formRef.current
       .validateFields()
-      .then((values) => {
+      .then(async (values) => {
         let oldSource = cloneDeep(systemData);
+        const sysItem = await localForage.getItem('userSystemInfo');
+        let oldItem = {};
         if (eidtIdenty.current) {
           oldSource = oldSource.map((item) => {
             if (item.id === currentId.current) {
+              oldItem = item;
               return {
                 ...item,
                 ...values,
@@ -114,16 +146,29 @@ export default function IndexPage() {
             }
             return item;
           });
+          sysItem[currentId.current].name = values.name;
         } else {
           const userItem = {
             ...values,
             id: getUUID(),
           };
           oldSource.push(userItem);
+          sysItem[userItem.id] = {
+            id: userItem.id,
+            name: values.name,
+            roleDescrib: '',
+            roleUser: [],
+            roleFunction: [],
+          };
         }
         setSystemData(oldSource);
+        localForage.setItem('userSystemInfo', sysItem);
         localForage.setItem('userSystem', oldSource);
         message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
+        if (eidtIdenty.current) {
+          setGroupItem(null);
+          setGroupItem({ ...oldItem, ...values });
+        }
         currentId.current = null;
         eidtIdenty.current = false;
         setFormData({
@@ -132,11 +177,21 @@ export default function IndexPage() {
         setIsModalVisible(false);
       })
       .catch((reason) => {
-        console.log(reason, '135----');
         message.warning('请检查');
       });
   };
 
+  const editItemHandle = (newItem = {}) => {
+    let oldSource = cloneDeep(systemData);
+    oldSource = oldSource.map((item) => {
+      if (item.id === newItem.id) {
+        return newItem;
+      }
+      return item;
+    });
+    setSystemData(oldSource);
+    localForage.setItem('userSystem', oldSource);
+  };
   return (
     <div style={{ height: '100%', padding: 20, backgroundColor: '#f0f2f5' }}>
       <Layout className={'user-cont list-layout'}>
@@ -154,21 +209,34 @@ export default function IndexPage() {
         <Content style={{ paddingLeft: 10 }}>
           <div className="right-cont">
             {/* tabs show */}
-            <Tabs
-              defaultActiveKey="1"
-              onChange={onChange}
-              className="role-tabs"
-            >
-              <TabPane tab="角色信息" key="1">
-                <RoleInfo />
-              </TabPane>
-              <TabPane tab="角色用户" key="2">
-                <RoleUser />
-              </TabPane>
-              <TabPane tab="功能权限" key="3">
-                <RoleFunction />
-              </TabPane>
-            </Tabs>
+            {groupId ? (
+              <Tabs
+                defaultActiveKey="1"
+                onChange={onChange}
+                className="role-tabs"
+              >
+                <TabPane tab="角色信息" key="1">
+                  <RoleInfo
+                    groupItem={groupItem}
+                    editItemHandle={editItemHandle}
+                  />
+                </TabPane>
+                <TabPane tab="角色用户" key="2">
+                  <RoleUser
+                    groupItem={groupItem}
+                    // editItemHandle={editItemHandle}
+                  />
+                </TabPane>
+                <TabPane tab="功能权限" key="3">
+                  <RoleFunction
+                    groupItem={groupItem}
+                    // editItemHandle={editItemHandle}
+                  />
+                </TabPane>
+              </Tabs>
+            ) : (
+              <div>请选择一个角色</div>
+            )}
           </div>
         </Content>
       </Layout>

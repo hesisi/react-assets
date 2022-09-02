@@ -15,12 +15,6 @@ import {
   Col,
 } from 'antd';
 const { Header, Footer, Sider, Content } = Layout;
-import {
-  InfoCircleOutlined,
-  PlusCircleOutlined,
-  FormOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons';
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';

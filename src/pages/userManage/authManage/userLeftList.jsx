@@ -50,7 +50,7 @@ function UserLeftList(props) {
             <div
               className={id === x.id ? 'list-item active' : 'list-item normal'}
               key={x.id}
-              onClick={() => handleGroupClick(x.id)}
+              onClick={() => handleGroupClick(x)}
             >
               {x.name}
               <span className="groupOperate">

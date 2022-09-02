@@ -5,7 +5,7 @@ import RoleTransfer from './roleTransfer';
 import { useRef } from 'react';
 
 const { TextArea } = Input;
-export default function RoleFunction(props) {
+export default function RoleFunction({ groupItem }) {
   const formRef = useRef(null);
   const [form] = Form.useForm();
 
@@ -33,7 +33,7 @@ export default function RoleFunction(props) {
   };
   return (
     <div className="table-search-wrapper">
-      <RoleTransfer transIdenty="功能" />
+      <RoleTransfer transIdenty="功能" groupItem={groupItem} />
     </div>
   );
 }

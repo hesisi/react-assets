@@ -1,10 +1,12 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import { SearchOutlined, MinusCircleOutlined } from '@ant-design/icons';
-
-import { useRef } from 'react';
+import { cloneDeep } from 'lodash';
+import { useRef, useEffect } from 'react';
+import localForage from 'localforage';
 
 const { TextArea } = Input;
 export default function RoleInfo(props) {
+  const { groupItem, editItemHandle } = props;
   const formRef = useRef(null);
   const [form] = Form.useForm();
   const { formValueChange, formValueSubmit, formResetCallback } = props;
@@ -22,6 +24,30 @@ export default function RoleInfo(props) {
     formResetCallback && formResetCallback();
   };
 
+  const handleSaveInfo = () => {
+    formRef.current.validateFields().then(async (values) => {
+      const { name, roleDescrib } = values;
+      const userOldInfo = (await localForage.getItem('userSystemInfo')) || {};
+      userOldInfo[groupItem.id] = {
+        ...userOldInfo[groupItem.id],
+        name,
+        roleDescrib,
+      };
+      editItemHandle && editItemHandle({ ...groupItem, name, roleDescrib });
+      localForage.setItem('userSystemInfo', userOldInfo);
+      message.success('保存成功');
+    });
+  };
+
+  useEffect(async () => {
+    if (formRef?.current && groupItem) {
+      formRef.current.setFieldsValue({
+        name: groupItem.name || '',
+        roleDescrib: groupItem.roleDescrib || '',
+      });
+    }
+  }, [groupItem]);
+
   const formProps = {
     ref: formRef,
     form,
@@ -35,8 +61,8 @@ export default function RoleInfo(props) {
       <Form {...formProps} labelCol={{ span: 4 }} wrapperCol={{ span: 18 }}>
         <Form.Item
           label="角色名称"
-          name="roleName"
-          key="roleName"
+          name="name"
+          key="name"
           rules={[{ required: true, message: '请输入角色名称' }]}
         >
           <Input placeholder="请输入角色名称" />
@@ -49,6 +75,7 @@ export default function RoleInfo(props) {
             type="primary"
             icon={<SearchOutlined />}
             htmlType="submit"
+            onClick={handleSaveInfo}
             style={{ marginRight: '10px' }}
           >
             保存

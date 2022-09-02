@@ -94,7 +94,12 @@ const tablePreview = React.forwardRef((props, ref) => {
 
     const initTodoData = {};
     initDataIndex.forEach((item, index) => {
-      initTodoData[item] = temp['applyLeave']?.[item] || '';
+      if (item === 'applyNode') {
+        console.log(childFormCode, '98----');
+        initTodoData[item] = childFormCode?.approver.name || '';
+      } else {
+        initTodoData[item] = temp['applyLeave']?.[item] || '';
+      }
     });
 
     originData[childFormCode.id]['toDo'] = [initTodoData];

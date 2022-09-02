@@ -17,6 +17,7 @@ import { nanoid } from 'nanoid';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import TablePreview from './tablePreview';
+import { temp } from './temple';
 
 const { TabPane } = Tabs;
 export default function GroupUser({
@@ -88,16 +89,18 @@ export default function GroupUser({
   const getCreateForm = () => {
     const targetFormCode = childFormCode.targetForm;
     currentFormCode.current = targetFormCode;
-    const formData = JSON.parse(localStorage.getItem('formMap') || []);
+    const formData = JSON.parse(localStorage.getItem('formMap') || {});
     const formilyData = formData[targetFormCode];
     setFormCode(targetFormCode || null);
     return formilyData;
   };
 
   const getShenpiForm = () => {
+    const targetFormCode = childFormCode.approverGroup[0].approverForm;
     const formData = JSON.parse(localStorage.getItem('formMap') || {});
+    const formilyData = formData[targetFormCode];
     /* 假数据 暂定取formMap的最后一条数据 需要在表单管理新建审批表单并保证新建的审批表单是最新创建的*/
-    return Object.values(formData)?.[Object.values(formData).length - 1];
+    return formilyData;
   };
 
   /* 初始化 */
@@ -148,26 +151,63 @@ export default function GroupUser({
     setActiveIdenty('新建');
     setIsModalVisible(true);
     setTimeout(() => {
-      const form = formRef?.current?.form;
-      // const formRefS = formRefS?.current?.form;
-      if (form) {
-        /* formily api */
-        // form.setPattern('disabled');
-
-        /* 控制formItem 的显示隐藏 */
-        form.setFieldState('oddNumbers', (state) => {
-          state.visible = false;
-          // state.disabled = true;
-        });
-        form.setFieldState('applyNode', (state) => {
-          state.visible = false;
-          // state.disabled = true;
-        });
-      }
-      // if (formRefS) {
-      //   form.setValues();
-      // }
+      handleAddFormAuthority();
     }, 0);
+  };
+
+  const authorityRuleControl = (ruleItems = [], formDom = null) => {
+    const formItemSettingDisTrue = [];
+    const formItemSettingDisFalse = [];
+    const formItemSettingVisFalse = [];
+    ruleItems.forEach((item) => {
+      if (item.edit === 'readOnly') {
+        formItemSettingDisTrue.push(item.name);
+      }
+      if (item.edit === 'edit') {
+        // 编辑
+        formItemSettingDisFalse.push(item.name);
+      }
+      if (item.edit === 'hide') {
+        // 隐藏
+        formItemSettingVisFalse.push(item.name);
+      }
+    });
+    if (formDom) {
+      formItemSettingDisTrue.forEach((item) => {
+        formDom.setFieldState(`${item}`, (state) => {
+          state.disabled = true;
+        });
+      });
+      formItemSettingDisFalse.forEach((item) => {
+        formDom.setFieldState(`${item}`, (state) => {
+          state.disabled = false;
+        });
+      });
+      formItemSettingVisFalse.forEach((item) => {
+        formDom.setFieldState(`${item}`, (state) => {
+          state.visible = false;
+        });
+      });
+    }
+  };
+
+  /* 申请表单显隐控制 */
+  const handleAddFormAuthority = () => {
+    const form = formRef?.current?.form;
+    const formSetting = childFormCode?.targetFormSet?.formField || [];
+    if (form) {
+      /* 控制formItem 的显示隐藏 */
+      if (!formSetting?.length) {
+        const unVisible = ['oddNumbers', 'applyNode'];
+        unVisible.forEach((item) => {
+          form.setFieldState(`${item}`, (state) => {
+            state.visible = false;
+          });
+        });
+        return;
+      }
+      authorityRuleControl(formSetting, form);
+    }
   };
 
   const handleShenPi = (item) => {
@@ -178,13 +218,11 @@ export default function GroupUser({
     setIsModalVisible(true);
     setTimeout(() => {
       const form = formRef?.current?.form;
-      // const formRefS = formRefS?.current?.form;
       if (form) {
         form.setValues({
           ...item,
         });
 
-        /* formily api */
         form.setPattern('disabled');
 
         /* 控制formItem 的显示隐藏 */
@@ -197,10 +235,23 @@ export default function GroupUser({
           });
         }
       }
-      // if (formRefS) {
-      //   form.setValues();
-      // }
     }, 0);
+    setTimeout(() => {
+      /* 控制审批人的显隐 */
+      handleShenPiFormAuthority();
+    }, 0);
+  };
+
+  const handleShenPiFormAuthority = () => {
+    const formS = formRefS?.current?.form;
+    const formSetting =
+      childFormCode?.approverGroup?.[0]?.formSetting?.formField || [];
+    if (formS) {
+      formS.setValues({
+        approvePeople: childFormCode?.approver?.name || '',
+      });
+      authorityRuleControl(formSetting, formS);
+    }
   };
 
   // 确认添加
@@ -377,7 +428,7 @@ export default function GroupUser({
               <>
                 <div className="shenqingren">审批:</div>
                 <PreviewWidget
-                  key="formS"
+                  key="formSh"
                   tree={formTreeShenpi}
                   ref={formRefS}
                 />

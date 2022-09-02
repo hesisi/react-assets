@@ -10,4 +10,8 @@ export const temp = {
     endTime: moment().add(7, 'days').format('YYYY-MM-DD'),
     applyDays: '40',
   },
+  approver: {
+    approvePeople: '',
+    approveDes: '',
+  },
 };

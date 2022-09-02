@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, EffectCreative } from 'swiper';
+import { Navigation, Pagination, EffectCreative, Autoplay } from 'swiper';
 import 'swiper/swiper.min.css';
 import 'swiper/modules/navigation/navigation.min.css';
 import 'swiper/modules/pagination/pagination.min.css';
@@ -96,19 +96,20 @@ export default function Home(params) {
       <p className="home-title">欢迎进入Connectivity Asset</p>
       <div className="home-carousel">
         <Swiper
+          key={banner.length}
           pagination={{
             dynamicBullets: true, //设置小圆点是否要两头小，中间最大
             clickable: true, //设置是否可以点击
           }}
           autoplay={{
-            delay: 2000,
+            delay: 2500,
+            disableOnInteraction: false,
           }}
           loop={true} //设置循环轮播
           spaceBetween={-250} //设置堆叠轮播，item之间叠的距离
           slidesPerView={6} //设置显示的数量
           navigation={true} //modules上加了同时要设置为true，才显示
-          modules={[Navigation, Pagination, EffectCreative]}
-          grabCursor={true}
+          modules={[Navigation, Pagination, EffectCreative, Autoplay]}
           effect={'creative'} //modules上加了同时要设置
           creativeEffect={{
             prev: {

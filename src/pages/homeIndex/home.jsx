@@ -97,14 +97,12 @@ export default function Home(params) {
       <div className="home-carousel">
         <Swiper
           key={banner.length}
-          pagination={{
-            dynamicBullets: true, //设置小圆点是否要两头小，中间最大
-            clickable: true, //设置是否可以点击
-          }}
+          pagination={true}
           autoplay={{
             delay: 2500,
             disableOnInteraction: false,
           }}
+          centeredSlides={true}
           loop={true} //设置循环轮播
           spaceBetween={-250} //设置堆叠轮播，item之间叠的距离
           slidesPerView={6} //设置显示的数量
@@ -114,17 +112,15 @@ export default function Home(params) {
           creativeEffect={{
             prev: {
               //这里是设置当前item的前一项的具体属性
-              translate: [-250, 0, 0], //偏移量
+              translate: [-230, 0, 0], //偏移量
               scale: 0.8, //缩放量
               opacity: 1, //透明度
-              // shadow: true,
             },
             next: {
               //这里是设置当前item的后一项的具体属性，同上面
               translate: [230, 0, 0],
               scale: 0.8,
               opacity: 1,
-              // shadow: true,
             },
             limitProgress: 2, //显示五个堆叠的最重要的这个属性，后面依次以前面属性等比配置
           }}

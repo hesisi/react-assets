@@ -1,18 +1,9 @@
 import { Form, Input, Button, Select, Checkbox, Table, Col, Row } from 'antd';
 const { Option } = Select;
 import { PlusCircleOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FieldTable from '@/components/properties-panel/FieldTable';
 export default function Approver(props: any) {
-  const data = [
-    {
-      key: '1',
-      fieldName: '审批意见',
-      edit: false,
-      readOnly: false,
-      hide: false,
-    },
-  ];
   const approverList = [
     {
       key: 11222,
@@ -31,53 +22,77 @@ export default function Approver(props: any) {
       creatTime: '2022-8-26',
     },
   ];
-  const { addApprover, approver } = props;
-  console.log(approver);
-  const [dataSource, setDataSource] = useState(data);
+  const {
+    addApprover,
+    approver,
+    flowMsg,
+    forms,
+    updateFlowMsg,
+    element,
+    fromRef,
+  } = props;
 
-  const onChange = (e: any, record: any) => {
-    console.log(e);
-    console.log(record);
-    console.log(`checked = ${e.target.checked}`);
-    const temp = dataSource.map((x) => {
-      if (x.fieldName === record.name) {
-        x.edit = !x.edit;
-      }
-      return x;
-    });
-    setDataSource(temp);
+  const approverNode = flowMsg?.approverGroup.find(
+    (x: any) => x.id === element.id,
+  );
+  // console.log('-----------------getnode')
+  console.log(approverNode);
+
+  const [nodeMsg, setNodeMsg] = useState(approverNode);
+
+  const [approverForm, setApproverForm] = useState(approverNode.approverForm);
+
+  useEffect(() => {
+    console.log('改变节点');
+    fromRef?.current.setFieldValue(
+      'sameApprove',
+      approverNode.sameApprove || '',
+    );
+    fromRef?.current.setFieldValue('noApprove', approverNode.noApprove || '');
+    fromRef?.current.setFieldValue('appForm', approverNode.approverForm || '');
+    setNodeMsg(approverNode);
+    setApproverForm(approverNode.approverForm);
+  }, [element]);
+
+  const updateNode = (data: any) => {
+    const list = flowMsg?.approverGroup || [];
+    if (list.length > 0) {
+      const temp = list.map((x: any) => {
+        if (x.id === data.id) {
+          return data;
+        }
+        return x;
+      });
+      flowMsg.approverGroup = temp;
+      updateFlowMsg(flowMsg);
+    }
   };
-  const columns = [
-    {
-      title: '字段名称',
-      dataIndex: 'fieldName',
-      key: 'fieldName',
-    },
-    {
-      title: '可编辑',
-      dataIndex: 'edit',
-      key: 'edit',
-      render: (_: any, record: any) => {
-        return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
-      },
-    },
-    {
-      title: '仅可见',
-      dataIndex: 'readOnly',
-      key: 'readOnly',
-      render: (_: any, record: any) => {
-        return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
-      },
-    },
-    {
-      title: '隐藏',
-      dataIndex: 'disable',
-      key: 'disable',
-      render: (_: any, record: any) => {
-        return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
-      },
-    },
-  ];
+  const appFormChange = (value: any) => {
+    const temp = { ...nodeMsg };
+    temp.approverForm = value;
+    setNodeMsg(temp);
+    updateNode(temp);
+    setApproverForm(value);
+  };
+  const handleJump = (value: any) => {
+    const temp = { ...nodeMsg };
+    temp.sameApprove = value;
+    setNodeMsg(temp);
+    updateNode(temp);
+  };
+  const handleNone = (value: any) => {
+    const temp = { ...nodeMsg };
+    temp.noApprove = value;
+    setNodeMsg(temp);
+    updateNode(temp);
+  };
+  const setTargetForm = (data: any) => {
+    const temp = { ...nodeMsg };
+    temp.formSetting = data;
+    setNodeMsg(temp);
+    updateNode(temp);
+  };
+
   return (
     <>
       <Form.Item label="审批人">
@@ -101,22 +116,43 @@ export default function Approver(props: any) {
         </Button>
       </Form.Item>
       <Form.Item label="相同人" name="sameApprove">
-        <Select defaultValue={'jump'} style={{ width: 120 }}>
+        <Select
+          value={nodeMsg.sameApprove}
+          style={{ width: 120 }}
+          onChange={handleJump}
+        >
           <Option value="jump">跳过相同审批人</Option>
           <Option value="none">仍需审批</Option>
         </Select>
       </Form.Item>
       <Form.Item label="无审批人" name="noApprove">
-        <Select defaultValue={'jump'} style={{ width: 120 }}>
+        <Select
+          value={nodeMsg.noApprove}
+          style={{ width: 120 }}
+          onChange={handleNone}
+        >
           <Option value="jump">跳过此步骤</Option>
           <Option value="none">拦截提示</Option>
         </Select>
       </Form.Item>
       <Form.Item label="审批表单">
-        <Form.Item name="targetForm" noStyle>
-          <Select style={{ width: 120 }}>
-            <Option value="form1">请假</Option>
-            <Option value="form2">报销</Option>
+        <Form.Item name="appForm" noStyle>
+          <Select
+            style={{ width: 120 }}
+            onChange={(value) => {
+              appFormChange(value);
+            }}
+            value={nodeMsg.approverForm}
+          >
+            {forms.map((item: any) => {
+              return (
+                item.formStatus === 'enable' && (
+                  <Option value={item.formCode} key={item.formCode}>
+                    {item.formName}
+                  </Option>
+                )
+              );
+            })}
           </Select>
         </Form.Item>
         <Button style={{ marginLeft: 10 }} icon={<PlusCircleOutlined />}>
@@ -135,12 +171,12 @@ export default function Approver(props: any) {
           字段权限：
         </Col>
         <Col span={24}>
-          <Table
-            pagination={false}
-            dataSource={dataSource}
-            columns={columns}
-            style={{ marginTop: 10 }}
-          />
+          <FieldTable
+            form={nodeMsg.approverForm}
+            flowId={flowMsg.id}
+            setTargetForm={setTargetForm}
+            targetFormSet={nodeMsg.formSetting}
+          ></FieldTable>
         </Col>
       </Row>
     </>

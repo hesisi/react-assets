@@ -2,27 +2,31 @@ import { Space, Table, Checkbox, Radio } from 'antd';
 import { useState, useEffect } from 'react';
 
 export default function FieldTable(props: any) {
-  const { form, type, flowId } = props;
-  const _data_ = window.localStorage.getItem('formMap');
-  const _data = _data_ ? JSON.parse(_data_) : [];
+  const { form, targetFormSet, flowId, setTargetForm } = props;
+  // console.log('----------------->')
+  // console.log(targetFormSet)
+  // console.log(form)
+  const formMap = window.localStorage.getItem('formMap');
+  const formMapJSON = formMap ? JSON.parse(formMap) : null;
   const _radioList_ = window.localStorage.getItem(`${form + flowId}`);
   const _radioList = _radioList_ ? JSON.parse(_radioList_) : [];
-  console.log('form', form);
-  const data: any[] =
-    _data == ''
-      ? []
-      : form == undefined
-      ? []
-      : Object.values(_data[form]['formily-form-schema'].schema.properties);
-  const [dataSource, setDataSource] = useState(data);
+
+  /**获取选择的form表单字段*/
+  let data: any[] = [];
+  if (formMapJSON && form) {
+    data = Object.values(
+      formMapJSON[form]['formily-form-schema'].schema.properties,
+    );
+  }
+
+  const [dataSource, setDataSource] = useState<any[]>([]);
+
   useEffect(() => {
-    let temp: any[] = [];
-    if (_radioList.formId === form) {
-      temp = _radioList.temp;
+    if (targetFormSet) {
+      setDataSource(targetFormSet.formField);
     } else {
-      temp = data;
+      setDataSource(data);
     }
-    setDataSource(temp);
   }, [form]);
 
   const onChange = (e: any, record: any) => {
@@ -34,11 +38,17 @@ export default function FieldTable(props: any) {
       return x;
     });
     setDataSource(temp);
-    console.log(dataSource);
-    window.localStorage.setItem(
-      `${form + flowId}`,
-      JSON.stringify({ flowId: flowId, formId: form, temp: temp }),
-    );
+    // console.log(temp);
+    /**保存表单设置*/
+    const formSetting = {
+      formCode: form,
+      formField: temp,
+    };
+    setTargetForm(formSetting);
+    // window.localStorage.setItem(
+    //   `${form + flowId}`,
+    //   JSON.stringify({ flowId: flowId, formId: form, temp: temp }),
+    // );
   };
   const columns = [
     {
@@ -47,11 +57,11 @@ export default function FieldTable(props: any) {
       key: 'x-designable-id',
     },
     {
-      title: '可编辑',
+      title: '权限',
       dataIndex: 'edit',
       key: 'edit',
       render: (_: any, record: any) => {
-        console.log('record------------', record);
+        // console.log('record------------', record);
         return (
           // <Checkbox
           //   // checked={type === 'bpmn:StartEvent'}
@@ -75,27 +85,6 @@ export default function FieldTable(props: any) {
         );
       },
     },
-    // {
-    //   title: '仅可见',
-    //   dataIndex: 'readOnly',
-    //   key: 'readOnly',
-    //   render: (_: any, record: any) => {
-    //     return (
-    //       <Checkbox
-    //         // checked={type === 'bpmn:UserTask' || type === 'bpmn:Task'}
-    //         onChange={(e) => onChange(e, record)}
-    //       ></Checkbox>
-    //     );
-    //   },
-    // },
-    // {
-    //   title: '隐藏',
-    //   dataIndex: 'hide',
-    //   key: 'hide',
-    //   render: (_: any, record: any) => {
-    //     return <Checkbox onChange={(e) => onChange(e, record)}></Checkbox>;
-    //   },
-    // },
   ];
 
   return (

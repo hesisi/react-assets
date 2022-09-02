@@ -77,6 +77,7 @@ export default function IndexPage() {
     } else {
       _flow = null;
     }
+    console.log(_flow);
     flow = _flow;
     setFlowMsg(_flow);
   };
@@ -85,7 +86,7 @@ export default function IndexPage() {
     const group = _flowGroup ? JSON.parse(_flowGroup) : [];
     const _formList = window.localStorage.getItem('formList');
     const forms = _formList ? JSON.parse(_formList) : [];
-    // console.log(group)
+    console.log(group);
     setGroup(group);
     getFlow(group);
     // setFlow(_flow ? JSON.parse(_flow) : null);
@@ -180,7 +181,7 @@ export default function IndexPage() {
               返回
             </Link>
           </Col>
-          <Col span={8}>{flowMsg?.name}</Col>
+          <Col span={8}>{flowMsg?.proessName}</Col>
           <Col span={8} style={{ textAlign: 'right' }}>
             <Button
               icon={<SaveOutlined />}

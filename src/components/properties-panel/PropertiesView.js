@@ -152,7 +152,7 @@ export default class PropertiesView extends Component {
   render() {
     const { modeler, flowMsg, forms } = this.props;
     // console.log(flowMsg);
-    console.log(forms);
+    console.log(flowMsg);
     const { selectedElements, element } = this.state;
     // console.log(element)
 
@@ -171,7 +171,11 @@ export default class PropertiesView extends Component {
               </div>
               {selectedElements.length > 0 ? null : (
                 <Form.Item label="流程名称" name="name">
-                  <Input value={flowMsg?.name} allowClear disabled />
+                  <Input
+                    defaultValue={flowMsg?.proessName}
+                    allowClear
+                    disabled
+                  />
                 </Form.Item>
                 // <fieldset>
                 //   <label>流程名称</label>

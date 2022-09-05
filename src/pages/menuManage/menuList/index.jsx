@@ -22,6 +22,7 @@ import { cloneDeep } from 'lodash';
 const back = require('@/assets/icons/back2.svg');
 
 export default function IndexPage() {
+  const formRef = useRef(null);
   const [config, setConfig] = useState(null); // 配置面板相关
   const [submitFlag, setSubmitFlag] = useState(false); // 提交标识
   const [tree, setTree] = useState([]); // 结点数
@@ -74,6 +75,22 @@ export default function IndexPage() {
   };
 
   const previewSave = () => {
+    if (!formRef?.current) {
+      saveMenuLoad();
+      return;
+    }
+    formRef.current
+      ?.validateFields()
+      .then(() => {
+        saveMenuLoad();
+      })
+      .catch(() => {
+        message.warning('请先检查当前菜单信息配置是否正确!');
+        return;
+      });
+  };
+
+  const saveMenuLoad = () => {
     if (!(tree?.[0]?.children && tree?.[0].children.length)) {
       message.warning('请先配置菜单!');
       return;
@@ -192,6 +209,7 @@ export default function IndexPage() {
               <div className="col-wrapper col-info">
                 <span className="menu-config__info">菜单信息</span>
                 <ConfigPanel
+                  formRef={formRef}
                   configSubmit={(values, iconSelect, iconIndex) =>
                     configSubmit(values, iconSelect, iconIndex)
                   }

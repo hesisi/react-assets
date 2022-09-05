@@ -29,6 +29,7 @@ import {
   DeleteOutlined,
   EditOutlined,
 } from '@ant-design/icons';
+import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 import { history } from 'umi';
 
 const { Content } = Layout;
@@ -106,6 +107,10 @@ export default function Page() {
       dataIndex: 'remarks',
       key: 'remarks',
       align: 'center',
+      width: 200,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '创建时间',
@@ -400,6 +405,7 @@ export default function Page() {
             dataSource={tableData}
             rowKey={(record: any) => record.id}
             style={{ marginTop: '20px' }}
+            scroll={{ x: '100%' }}
             bordered={false}
             className="default-table"
           />

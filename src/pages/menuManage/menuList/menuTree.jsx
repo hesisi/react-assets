@@ -1,17 +1,22 @@
-import React, { memo, useState, useRef, useEffect } from 'react';
-import { Tree, Tooltip, Input } from 'antd';
+import React, { memo, useState, useRef, useEffect, Popconfirm } from 'react';
+import { Tree, Tooltip, Input, Modal } from 'antd';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { munuDefaultTree } from '../../../../config/routesDy';
 import { list } from './iconBox';
 import { cloneDeep } from 'lodash';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 
 import { getUUID } from '@/utils/utils';
 import localForage from 'localforage';
 
 const { TreeNode } = Tree;
 const { Search } = Input;
-
+const { confirm } = Modal;
 const defaultTreeParaent = munuDefaultTree;
 let curerntTree = defaultTreeParaent;
 
@@ -164,49 +169,76 @@ function menuTree(props) {
   //添加按钮弹出添加Modal
   const handleOperateSub = (e, node, operateIdenty) => {
     e && e.stopPropagation();
-    if (!node) {
-      return;
-    }
 
-    const newNode =
-      operateIdenty === 'add'
-        ? {
-            title:
-              node.title === 'Root Node'
-                ? `Parent-${node.children.length + 1}`
-                : `${node.title}-${node.children.length + 1}`,
-            key: getUUID(),
-            children: [],
-            oper: 'add',
-          }
-        : {};
-
-    const newTreeDataOper = operateTrreNode(
-      cloneDeep(treeData),
-      operateIdenty,
-      newNode,
-      node.key,
-    );
-    if (operateIdenty === 'add') {
-      defaultTrreData.current.push(newNode);
-    }
     if (operateIdenty === 'delete') {
-      defaultTrreData.current = defaultTrreData.current.filter(
-        (item) => item.key !== node.key,
-      );
-    }
+      confirm({
+        title: '确认删除该菜单项吗',
+        icon: <ExclamationCircleOutlined />,
+        content: '',
+        okText: '确认',
+        cancelText: '取消',
+        onOk() {
+          if (!node) {
+            return;
+          }
+          const newTreeDataOper = operateTrreNode(
+            cloneDeep(treeData),
+            operateIdenty,
+            {},
+            node.key,
+          );
+          defaultTrreData.current = defaultTrreData.current.filter(
+            (item) => item.key !== node.key,
+          );
+          curerntTree = newTreeDataOper;
+          setTreeData(newTreeDataOper);
+          props.setTree(newTreeDataOper);
+          setOperType(operateIdenty);
+        },
+        onCancel() {},
+      });
+    } else {
+      const newNode =
+        operateIdenty === 'add'
+          ? {
+              title:
+                node.title === 'Root Node'
+                  ? `Parent-${node.children.length + 1}`
+                  : `${node.title}-${node.children.length + 1}`,
+              key: getUUID(),
+              children: [],
+              oper: 'add',
+            }
+          : {};
 
-    curerntTree = newTreeDataOper;
-    setTreeData(newTreeDataOper);
-    props.setTree(newTreeDataOper);
-    setOperType(operateIdenty);
-    if (operateIdenty === 'add') {
-      const oldExpandKeys = cloneDeep(expandedKeys);
-      if (oldExpandKeys.includes(node.key)) {
-        return;
+      const newTreeDataOper = operateTrreNode(
+        cloneDeep(treeData),
+        operateIdenty,
+        newNode,
+        node.key,
+      );
+
+      if (operateIdenty === 'add') {
+        defaultTrreData.current.push(newNode);
       }
-      oldExpandKeys.push(node.key);
-      setExpandedKeys(oldExpandKeys);
+      if (operateIdenty === 'delete') {
+        defaultTrreData.current = defaultTrreData.current.filter(
+          (item) => item.key !== node.key,
+        );
+      }
+
+      curerntTree = newTreeDataOper;
+      setTreeData(newTreeDataOper);
+      props.setTree(newTreeDataOper);
+      setOperType(operateIdenty);
+      if (operateIdenty === 'add') {
+        const oldExpandKeys = cloneDeep(expandedKeys);
+        if (oldExpandKeys.includes(node.key)) {
+          return;
+        }
+        oldExpandKeys.push(node.key);
+        setExpandedKeys(oldExpandKeys);
+      }
     }
   };
 

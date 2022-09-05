@@ -44,6 +44,7 @@ function UserLeftList(props) {
   }, [data, groupId]);
 
   const handleGClick = (id) => {
+    console.log(id, '47------');
     let childData = localStorage.getItem('flowGroup')
       ? JSON.parse(localStorage.getItem('flowGroup'))
       : [];
@@ -58,9 +59,14 @@ function UserLeftList(props) {
           listChildData: childData || [],
         };
       }
-      return item;
+      return {
+        ...item,
+      };
     });
-    const oldChild = cloneDeep(listChildData);
+
+    console.log(oldChildData, '68------');
+    // let oldChild = cloneDeep(listChildData);
+    let oldChild = [];
     oldChild[id[0]] = childData;
     setListChildData(oldChild);
     setListData(oldChildData);

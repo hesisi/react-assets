@@ -12,6 +12,7 @@ import localForage from 'localforage';
 const { Search } = Input;
 export default function GroupUser({ groupId = null }) {
   const currentGroupId = useRef(null);
+  const currentGoupeData = useRef(null);
   const [dataSource, setDataSource] = useState([]);
   const [dataUserSource, setDataUserSource] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -47,8 +48,14 @@ export default function GroupUser({ groupId = null }) {
     },
     {
       title: '组别',
-      dataIndex: 'userGroup',
-      key: 'userGroup',
+      dataIndex: 'cate',
+      key: 'cate',
+      render: (text) => {
+        const item = currentGoupeData.current.filter(
+          (itemF) => itemF.id === text,
+        );
+        return <span>{item?.[0] ? item[0].name : ''}</span>;
+      },
     },
     {
       title: '创建时间',
@@ -80,8 +87,10 @@ export default function GroupUser({ groupId = null }) {
   useEffect(async () => {
     if (groupId) {
       const initUserData = await localForage.getItem('groupUserList');
+      const userGroup = await localForage.getItem('userGroup');
       currentGroupId.current = groupId;
       const currentDource = initUserData?.[currentGroupId.current] || [];
+      currentGoupeData.current = userGroup;
       setDataSource(currentDource);
     }
   }, [groupId]);

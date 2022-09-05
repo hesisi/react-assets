@@ -119,8 +119,8 @@ export default function IndexPage() {
     message.success('删除成功');
   };
 
-  const handleGroupClick = (id) => {
-    setGroupId(id);
+  const handleGroupClick = (item) => {
+    setGroupId(item.id);
   };
 
   return (

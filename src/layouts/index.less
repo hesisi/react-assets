@@ -50,3 +50,13 @@
   color: #0d6bff;
   font-weight: 600;
 }
+.ant-table-cell {
+  & > span {
+    max-width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+}

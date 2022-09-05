@@ -2,12 +2,13 @@ import { Form, Input, Button, Select, message } from 'antd';
 import './index.less';
 import IconBox from './iconBox';
 import { UploadOutlined, PlusOutlined, EditOutlined } from '@ant-design/icons';
-import React, { useState, createRef, useEffect } from 'react';
+import React, { useState, createRef, useEffect, useRef } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 import { Space } from '@formily/antd';
 import { list } from './iconBox';
 
 export default function configPanel(props) {
+  const { formRef } = props;
   const [visible, setVisible] = useState(false);
 
   const [iconSelect, setIconSelect] = useState(null);
@@ -43,19 +44,24 @@ export default function configPanel(props) {
     setVisible(false);
   }, [props.formData]);
 
-  const onFinish = (values) => {
-    // 表单提交
-    props.configSubmit(
-      { ...props.formData.formValue, ...values, isEdit },
-      iconSelect,
-      iconIndex,
-    );
-    // form.resetFields();
-    // setIconSelect(null);
-    // setIconIndex(-1);
-    message.success('菜单配置成功!');
-    setIsEdit(false);
-    setIsShowEdit(false);
+  const onFinish = () => {
+    formRef.current
+      ?.validateFields()
+      .then((values) => {
+        // 表单提交
+        props.configSubmit(
+          { ...props.formData.formValue, ...values, isEdit },
+          iconSelect,
+          iconIndex,
+        );
+        // form.resetFields();
+        // setIconSelect(null);
+        // setIconIndex(-1);
+        message.success('菜单配置成功!');
+        setIsEdit(false);
+        setIsShowEdit(false);
+      })
+      .catch((errorInfo) => {});
   };
 
   return (
@@ -64,10 +70,12 @@ export default function configPanel(props) {
         {visible ? (
           <Form
             name="basic"
+            ref={formRef}
+            // onValuesChange={onFormChange}
             // labelCol={{ span: 4 }}
             layout="vertical"
             className="config-panel__form"
-            onFinish={(v) => onFinish(v)}
+            // onFinish={(v) => onFinish(v)}
             initialValues={{
               menuname: '',
               address: '',
@@ -126,7 +134,7 @@ export default function configPanel(props) {
               wrapperCol={{ offset: 0, span: 24 }}
               className="form-button"
             >
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" onClick={() => onFinish()}>
                 确定
               </Button>
             </Form.Item>

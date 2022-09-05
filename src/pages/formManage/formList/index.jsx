@@ -70,6 +70,7 @@ export default function FormList() {
   const [formInfo, setFormInfo] = useState(initFormInfo);
   const history = useHistory();
   const formRef = useRef(null);
+  const formRefNew = useRef(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
 
   const [urlVisible, setUrlVisible] = useState(false);
@@ -253,45 +254,50 @@ export default function FormList() {
   };
 
   const handleOk = () => {
-    let item = null;
-    const currentTime = moment().format(timeFormat);
-    if (operateType === 'add') {
-      item = {
-        formName: formInfo.formName,
-        formDesc: formInfo.formDesc,
-        formCode: getUUID(),
-        createTime: currentTime,
-        updateTime: currentTime,
-        formStatus: 'disabled',
-        formUrl: '',
-      };
+    formRefNew.current
+      ?.validateFields()
+      .then(() => {
+        let item = null;
+        const currentTime = moment().format(timeFormat);
+        if (operateType === 'add') {
+          item = {
+            formName: formInfo.formName,
+            formDesc: formInfo.formDesc,
+            formCode: getUUID(),
+            createTime: currentTime,
+            updateTime: currentTime,
+            formStatus: 'disabled',
+            formUrl: '',
+          };
 
-      const data = cloneDeep(dataSource);
-      data.unshift(item);
-      setDataSource(data);
-      saveFormList(data);
-    } else {
-      item = {
-        formStatus: 'enable',
-        ...formInfo,
-        updateTime: currentTime,
-      };
-      const data =
-        dataSource &&
-        dataSource.map((i) => {
-          if (i.formCode === formInfo.formCode) {
-            i = item;
-          }
-          return i;
-        });
-      setDataSource(data);
-      saveFormList(data);
-    }
+          const data = cloneDeep(dataSource);
+          data.unshift(item);
+          setDataSource(data);
+          saveFormList(data);
+        } else {
+          item = {
+            formStatus: 'enable',
+            ...formInfo,
+            updateTime: currentTime,
+          };
+          const data =
+            dataSource &&
+            dataSource.map((i) => {
+              if (i.formCode === formInfo.formCode) {
+                i = item;
+              }
+              return i;
+            });
+          setDataSource(data);
+          saveFormList(data);
+        }
 
-    setVisible(false);
-    setFormInfo(initFormInfo); // 清空
+        setVisible(false);
+        setFormInfo(initFormInfo); // 清空
 
-    history.push(`/formManage/formAndTable?formCode=${item.formCode}`);
+        history.push(`/formManage/formAndTable?formCode=${item.formCode}`);
+      })
+      .catch(() => {});
   };
 
   // 取消表单
@@ -478,8 +484,19 @@ export default function FormList() {
         cancelText="取消"
         okText="确认"
       >
-        <Form layout="vertical">
-          <Form.Item label="表单名称">
+        <Form layout="vertical" ref={formRefNew} name="basic">
+          <Form.Item
+            label="表单名称"
+            name="formName"
+            rules={[
+              { required: true, message: '请输入表单名称!' },
+              {
+                type: 'string',
+                whitespace: true,
+                message: '请输入流程名称',
+              },
+            ]}
+          >
             <Input
               value={formInfo.formName}
               onChange={(e) =>

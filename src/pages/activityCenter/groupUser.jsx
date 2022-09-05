@@ -116,6 +116,7 @@ export default function GroupUser({
       }
     } else {
       if (!groupId || groupId?.[0] === 'shouye') {
+        console.log(activeKey, '119----');
         const totalTableSource = Object.values(tableSource || []);
         const totoalNum = [0, 0, 0];
         const totoalSource = [[], [], []];
@@ -136,6 +137,7 @@ export default function GroupUser({
         setDataSource(totoalSource[0]);
         setTodoSource(totoalSource[1]);
         setDataDoneSource(totoalSource[2]);
+        setActiveKey('1');
       }
     }
   }, [groupId, childFormCode]);
@@ -215,7 +217,11 @@ export default function GroupUser({
   const handleShenPi = (item) => {
     // curentClickItem.current = item;
     const formilyData = getShenpiForm();
-    setFormTreeShenpi(transformToTreeNode(formilyData['formily-form-schema']));
+    if (formilyData) {
+      setFormTreeShenpi(
+        transformToTreeNode(formilyData['formily-form-schema']),
+      );
+    }
     setActiveIdenty('审批');
     setIsModalVisible(true);
     setTimeout(() => {
@@ -283,6 +289,7 @@ export default function GroupUser({
 
   const onTabChange = async (key) => {
     if (groupId && groupId[0] === 'shouye') {
+      setActiveKey(key);
       if (key === '1') {
         setDataSource(cloneDeep(originSource?.current || []));
         return;
@@ -304,7 +311,7 @@ export default function GroupUser({
   };
 
   return (
-    <div className="right-cont">
+    <div className="right-cont" style={{ overflow: 'auto' }}>
       <div style={{ padding: 10 }}>
         {/* table header */}
         {groupId ? (
@@ -365,7 +372,11 @@ export default function GroupUser({
           )
         ) : (
           <>
-            <Tabs defaultActiveKey="1" onChange={onTabChange}>
+            <Tabs
+              defaultActiveKey="1"
+              activeKey={activeKey}
+              onChange={onTabChange}
+            >
               <TabPane tab="我发起的" key="1" />
               <TabPane tab="待办" key="2" />
               <TabPane tab="已办" key="3" />

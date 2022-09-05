@@ -1,6 +1,21 @@
-import { Form, Input, Button, Select, Checkbox, Table, Col, Row } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  Checkbox,
+  Table,
+  Col,
+  Row,
+  Space,
+  Modal,
+} from 'antd';
 const { Option } = Select;
-import { PlusCircleOutlined } from '@ant-design/icons';
+import {
+  MinusCircleOutlined,
+  PlusCircleOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import React, { useEffect, useState } from 'react';
 import FieldTable from '@/components/properties-panel/FieldTable';
 export default function Approver(props: any) {
@@ -22,38 +37,82 @@ export default function Approver(props: any) {
       creatTime: '2022-8-26',
     },
   ];
-  const {
-    addApprover,
-    approver,
-    flowMsg,
-    forms,
-    updateFlowMsg,
-    element,
-    fromRef,
-  } = props;
+  const { flowMsg, forms, updateFlowMsg, element, fromRef } = props;
+  const dataSource: any[] = [
+    {
+      key: 12345,
+      id: 12345,
+      name: '张三',
+      tel: 18823452222,
+      email: 'xxx@email.com',
+      creatTime: '2022-8-26',
+    },
+    {
+      key: 20082,
+      id: 20082,
+      name: 'jansen',
+      tel: 1882345111,
+      email: 'xxx@email.com',
+      creatTime: '2022-8-26',
+    },
+  ];
+  const columns = [
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
+      title: '姓名',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: '电话',
+      dataIndex: 'tel',
+      key: 'tel',
+    },
+    {
+      title: '邮箱',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'creatTime',
+      key: 'creatTime',
+    },
+  ];
 
   const approverNode = flowMsg?.approverGroup.find(
     (x: any) => x.id === element.id,
   );
   // console.log('-----------------getnode')
-  console.log(approverNode);
+  // console.log(approverNode);
+
+  const [selectApprover, setSelectApprover] = useState<any>(null);
+
+  const [selectApproverId, setSelectApproverId] = useState([]);
 
   const [nodeMsg, setNodeMsg] = useState(approverNode);
 
   const [approverForm, setApproverForm] = useState(approverNode.approverForm);
 
   useEffect(() => {
-    console.log('改变节点');
+    // console.log('改变节点');
     fromRef?.current.setFieldValue(
       'sameApprove',
       approverNode.sameApprove || '',
     );
     fromRef?.current.setFieldValue('noApprove', approverNode.noApprove || '');
     fromRef?.current.setFieldValue('appForm', approverNode.approverForm || '');
+    fromRef?.current.setFieldValue('approver', approverNode.approver?.id || '');
+
     setNodeMsg(approverNode);
     setApproverForm(approverNode.approverForm);
   }, [element]);
 
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const updateNode = (data: any) => {
     const list = flowMsg?.approverGroup || [];
     if (list.length > 0) {
@@ -93,11 +152,45 @@ export default function Approver(props: any) {
     updateNode(temp);
   };
 
+  const rowSelection: any = {
+    onSelect: (selectedRowKeys: React.Key[]) => {
+      // console.log(selectedRowKeys)
+      setSelectApprover(selectedRowKeys);
+    },
+    selectedRowKeys: selectApproverId,
+    onChange: (selectedRowKeys: []) => {
+      // console.log(selectedRowKeys)
+      setSelectApproverId([...selectedRowKeys]);
+    },
+  };
+  /**dialog events*/
+  const handleOk = () => {
+    const temp = { ...nodeMsg };
+    temp.approver = selectApprover;
+    temp.approverId = selectApproverId;
+    setNodeMsg(temp);
+    updateNode(temp);
+    setIsModalVisible(false);
+    fromRef?.current.setFieldValue('approver', temp.approver?.id || '');
+  };
+  const handleCancle = () => {
+    setIsModalVisible(false);
+  };
+  const openSelectApprover = () => {
+    setSelectApproverId(nodeMsg.approverId || []);
+    setIsModalVisible(true);
+  };
+
+  // @ts-ignore
   return (
     <>
       <Form.Item label="审批人">
         <Form.Item name="approver" noStyle>
-          <Select value={approver?.id} style={{ width: 120 }} disabled>
+          <Select
+            defaultValue={nodeMsg.approver?.id || ''}
+            style={{ width: 120 }}
+            disabled
+          >
             {approverList.map((x) => {
               return (
                 <Option key={x.id} value={x.id}>
@@ -110,7 +203,7 @@ export default function Approver(props: any) {
         <Button
           type={'primary'}
           style={{ marginLeft: 10 }}
-          onClick={() => addApprover()}
+          onClick={openSelectApprover}
         >
           选择审批人
         </Button>
@@ -179,6 +272,53 @@ export default function Approver(props: any) {
           ></FieldTable>
         </Col>
       </Row>
+      <Modal
+        title="选择审批人"
+        width={620}
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancle}
+      >
+        <Row justify="start" className="list-row" style={{ marginTop: 20 }}>
+          <Col span={16}>
+            <Form
+              labelCol={{ span: 0 }}
+              wrapperCol={{ span: 24 }}
+              layout="inline"
+            >
+              <Form.Item label="ID" name="ID" style={{ width: '80%' }}>
+                <Input allowClear placeholder="请输入用户ID/用户名" />
+              </Form.Item>
+            </Form>
+          </Col>
+          <Col span={8} style={{ textAlign: 'right' }}>
+            <Space size={10}>
+              <Button
+                type="primary"
+                icon={<SearchOutlined />}
+                style={{ borderRadius: '5px' }}
+              >
+                搜索
+              </Button>
+              <Button
+                icon={<MinusCircleOutlined />}
+                style={{ borderRadius: '5px' }}
+              >
+                清除
+              </Button>
+            </Space>
+          </Col>
+        </Row>
+        <Table
+          rowSelection={{
+            type: 'radio',
+            ...rowSelection,
+          }}
+          style={{ marginTop: 20 }}
+          dataSource={dataSource}
+          columns={columns}
+        />
+      </Modal>
     </>
   );
 }

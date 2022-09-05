@@ -27,59 +27,6 @@ export default class PropertiesView extends Component {
       selectedElements: [],
       element: null,
       targetForm: '',
-      isModalVisible: false,
-      dataSource: [
-        {
-          key: 11222,
-          id: 12345,
-          name: '张三',
-          tel: 18823452222,
-          email: 'xxx@email.com',
-          creatTime: '2022-8-26',
-        },
-        {
-          key: 12344,
-          id: 20082,
-          name: 'jansen',
-          tel: 1882345111,
-          email: 'xxx@email.com',
-          creatTime: '2022-8-26',
-        },
-      ],
-      columns: [
-        {
-          title: 'ID',
-          dataIndex: 'id',
-          key: 'id',
-        },
-        {
-          title: '姓名',
-          dataIndex: 'name',
-          key: 'name',
-        },
-        {
-          title: '电话',
-          dataIndex: 'tel',
-          key: 'tel',
-        },
-        {
-          title: '邮箱',
-          dataIndex: 'email',
-          key: 'email',
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'creatTime',
-          key: 'creatTime',
-        },
-      ],
-      rowSelection: {
-        onSelect: (record, selected, selectedRows, nativeEvent) => {
-          this.setState({
-            approver: record,
-          });
-        },
-      },
       approver: null,
     };
     this.formRef = React.createRef();
@@ -209,24 +156,24 @@ export default class PropertiesView extends Component {
   updateFlowMsg = (data) => {
     this.props.setFlowMsg(data);
   };
-  handleOk = () => {
-    const { flowMsg } = this.props;
-    flowMsg.approver = this.state.approver;
-    this.updateFlowMsg(flowMsg);
-    this.setState({
-      isModalVisible: false,
-    });
-  };
-  handleCancle = () => {
-    this.setState({
-      isModalVisible: false,
-    });
-  };
-  addApprover = () => {
-    this.setState({
-      isModalVisible: true,
-    });
-  };
+  // handleOk = () => {
+  //   const { flowMsg } = this.props;
+  //   flowMsg.approver = this.state.approver;
+  //   this.updateFlowMsg(flowMsg);
+  //   this.setState({
+  //     isModalVisible: false,
+  //   });
+  // };
+  // handleCancle = () => {
+  //   this.setState({
+  //     isModalVisible: false,
+  //   });
+  // };
+  // addApprover = () => {
+  //   this.setState({
+  //     isModalVisible: true,
+  //   });
+  // };
   setTargetForm = (data) => {
     const { flowMsg } = this.props;
     flowMsg.targetFormSet = data;
@@ -302,8 +249,6 @@ export default class PropertiesView extends Component {
                   审批人 <ExclamationCircleOutlined />
                 </div>
                 <Approver
-                  addApprover={this.addApprover}
-                  approver={flowMsg?.approver}
                   forms={forms}
                   flowMsg={flowMsg}
                   updateFlowMsg={this.updateFlowMsg}

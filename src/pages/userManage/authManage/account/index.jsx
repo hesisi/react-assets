@@ -28,6 +28,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
 import { getUUID } from '@/utils/utils';
+import { REGEXP_MAIL, REGEXP_YD_PHONE } from '@/utils/validate';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 
@@ -42,6 +43,7 @@ const data = [
 const { Search } = Input;
 export default function Account({ accountIdenty = 'user' }) {
   const formRef = useRef(null);
+  const [form] = Form.useForm();
   const eidtIdenty = useRef(null);
   const currentId = useRef(null);
   const goupArr = useRef(null);
@@ -51,11 +53,11 @@ export default function Account({ accountIdenty = 'user' }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
-    sex: '',
+    sex: undefined,
     tel: '',
     email: '',
-    work: '',
-    cate: '',
+    work: undefined,
+    cate: undefined,
   });
 
   const workList = [
@@ -230,11 +232,11 @@ export default function Account({ accountIdenty = 'user' }) {
         eidtIdenty.current = false;
         setFormData({
           name: '',
-          sex: '',
+          sex: undefined,
           tel: '',
           email: '',
-          work: '',
-          cate: '',
+          work: undefined,
+          cate: undefined,
         });
         setIsModalVisible(false);
       })
@@ -247,16 +249,15 @@ export default function Account({ accountIdenty = 'user' }) {
     currentId.current = id;
     eidtIdenty.current = true;
     const currentUser = cloneDeep(dataSource).filter((item) => item.id === id);
-    console.log(currentUser?.[0], '233-----');
     if (currentUser?.[0]) {
       setFormData(
         currentUser?.[0] || {
           name: '',
-          sex: '',
+          sex: undefined,
           tel: '',
           email: '',
-          work: '',
-          cate: '',
+          work: undefined,
+          cate: undefined,
         },
       );
     }
@@ -298,6 +299,7 @@ export default function Account({ accountIdenty = 'user' }) {
     console.log(value, '298-----');
   };
 
+  const onFinish = () => {};
   return (
     <div className="right-cont">
       <div className="header-u">
@@ -412,8 +414,9 @@ export default function Account({ accountIdenty = 'user' }) {
                   <Form
                     className="account-add default-form-radios"
                     ref={formRef}
+                    // form={form}
                     initialValues={formData}
-                    name="basic"
+                    // name="basic"
                     autoComplete="off"
                     layout="vertical"
                     wrapperCol={{ span: 22 }}
@@ -442,12 +445,30 @@ export default function Account({ accountIdenty = 'user' }) {
                     </Row>
                     <Row>
                       <Col span={12}>
-                        <Form.Item label="电话" name="tel">
+                        <Form.Item
+                          label="电话"
+                          name="tel"
+                          rules={[
+                            {
+                              pattern: REGEXP_YD_PHONE,
+                              message: '电话格式不正确!',
+                            },
+                          ]}
+                        >
                           <Input placeholder={'请输入电话'} />
                         </Form.Item>
                       </Col>
                       <Col span={12}>
-                        <Form.Item label="邮箱" name="email">
+                        <Form.Item
+                          label="邮箱"
+                          name="email"
+                          rules={[
+                            {
+                              pattern: REGEXP_MAIL,
+                              message: '邮箱格式不正确!',
+                            },
+                          ]}
+                        >
                           <Input placeholder={'请输入邮箱'} />
                         </Form.Item>
                       </Col>

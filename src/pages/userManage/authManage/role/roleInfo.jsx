@@ -70,7 +70,7 @@ export default function RoleInfo(props) {
         <Form.Item label="角色描述" name="roleDescrib" key="roleDescrib">
           <TextArea placeholder="请输入角色描述" />
         </Form.Item>
-        <Form.Item label=" ">
+        <Form.Item label=" " className="no-item-label">
           <Button
             type="primary"
             icon={<SearchOutlined />}

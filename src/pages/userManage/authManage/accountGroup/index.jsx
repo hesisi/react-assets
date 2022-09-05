@@ -124,7 +124,13 @@ export default function IndexPage() {
   };
 
   return (
-    <div style={{ height: '100%', padding: 20, backgroundColor: '#f0f2f5' }}>
+    <div
+      style={{
+        height: '100%',
+        padding: '0 20px 20px 20px',
+        backgroundColor: '#f0f2f5',
+      }}
+    >
       <Layout className={'user-cont list-layout'}>
         <Sider className={'user-sider'} width={300}>
           <UserLeftList

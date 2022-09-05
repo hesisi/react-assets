@@ -194,23 +194,34 @@ const CommonLayout = (props) => {
               <Breadcrumb
                 style={{
                   background: '#f0f2f5',
-                  padding: '20px 30px',
+                  padding: '18px 30px 8px 30px',
                   borderBottom: '4px solid #f0f0f0',
-                  color: '#333333',
-                  fontSize: '16px',
-                  fontWeight: 600,
+                  color: '#555657',
+                  fontSize: '14px',
+                  fontWeight: 400,
                   fontFamily: 'PingFangSC-Semibold',
                 }}
               >
                 {meta.breadcrumb.map((e, i) => {
-                  return <Breadcrumb.Item key={i}>{e.label}</Breadcrumb.Item>;
+                  return (
+                    <Breadcrumb.Item
+                      key={i}
+                      className={e.active ? 'active-bread' : ''}
+                    >
+                      {e.label}
+                    </Breadcrumb.Item>
+                  );
                 })}
               </Breadcrumb>
             ) : (
               <></>
             )}
             <div
-              className={Styles.contentWrapper}
+              className={
+                meta && meta.breadcrumb
+                  ? Styles.contentWrappeB
+                  : Styles.contentWrapper
+              }
               style={{ background: '#f0f2f5' }}
             >
               {props.children}

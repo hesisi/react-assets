@@ -168,8 +168,8 @@ export default function GroupUser({ groupId = null }) {
   };
 
   return (
-    <div className="right-cont">
-      <div style={{ padding: 10 }}>
+    <div className="right-cont user-layout">
+      <div style={{ padding: '10px 0' }}>
         {/* table header */}
         <TableHeader
           formData={{
@@ -181,6 +181,7 @@ export default function GroupUser({ groupId = null }) {
                     return (
                       <Button
                         icon={<PlusOutlined />}
+                        type="primary"
                         onClick={() => handleAccountAdd()}
                       >
                         添加用户

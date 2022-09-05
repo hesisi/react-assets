@@ -22,12 +22,12 @@ const munuDefault = [
     path: '/userManage',
     key: 'default-3',
   },
-  {
-    name: '权限管理',
-    icon: React.createElement(LaptopOutlined),
-    path: '/userManage/authManage',
-    key: 'default-3-1',
-  },
+  // {
+  //   name: '权限管理',
+  //   icon: React.createElement(LaptopOutlined),
+  //   path: '/userManage/authManage',
+  //   key: 'default-3-1',
+  // },
   {
     name: '用户管理',
     path: '/userManage/authManage/account',
@@ -150,30 +150,30 @@ export const munuDefaultTree = [
         address: '/userManage',
         key: 'default-3',
         children: [
+          // {
+          //   title: '权限管理',
+          //   address: '/userManage/authManage',
+          //   key: 'default-3-1',
+          //   children: [
+          //   ],
+          // },
           {
-            title: '权限管理',
-            address: '/userManage/authManage',
-            key: 'default-3-1',
-            children: [
-              {
-                title: '用户管理',
-                address: '/userManage/authManage/account',
-                key: 'default-3-1-1',
-                children: [],
-              },
-              {
-                title: '分组管理',
-                address: '/userManage/authManage/accountGroup',
-                key: 'default-3-1-2',
-                children: [],
-              },
-              {
-                title: '角色管理',
-                address: '/userManage/authManage/role',
-                key: 'default-3-1-3',
-                children: [],
-              },
-            ],
+            title: '用户管理',
+            address: '/userManage/authManage/account',
+            key: 'default-3-1-1',
+            children: [],
+          },
+          {
+            title: '分组管理',
+            address: '/userManage/authManage/accountGroup',
+            key: 'default-3-1-2',
+            children: [],
+          },
+          {
+            title: '角色权限管理',
+            address: '/userManage/authManage/role',
+            key: 'default-3-1-3',
+            children: [],
           },
           // {
           //   title: '组织管理',

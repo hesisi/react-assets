@@ -301,206 +301,214 @@ export default function Account({ accountIdenty = 'user' }) {
 
   const onFinish = () => {};
   return (
-    <div className="right-cont">
-      <div className="header-u">
-        <h3 className={'title'}>用户列表</h3>
-        <InfoCircleOutlined />
-      </div>
-      <div style={{ padding: 10 }}>
-        {/* table header */}
-        <TableHeader
-          formData={{
-            formButton: {
-              showButton: true,
-              ButtonStructure: [
-                {
-                  itemDom: () => {
-                    return (
-                      <Button
-                        icon={<PlusOutlined />}
-                        onClick={() => handleAccountAdd()}
-                      >
-                        {accountIdenty === 'user' ? '新建用户' : '选择用户'}
-                      </Button>
-                    );
+    <div
+      style={{
+        height: '100%',
+        padding: '0 20px 20px 20px',
+        backgroundColor: '#f0f2f5',
+      }}
+    >
+      <div className="right-cont user-layout">
+        <div style={{ padding: '10px 0' }}>
+          {/* table header */}
+          <TableHeader
+            formData={{
+              formButton: {
+                showButton: true,
+                ButtonStructure: [
+                  {
+                    itemDom: () => {
+                      return (
+                        <Button
+                          icon={<PlusOutlined />}
+                          type="primary"
+                          onClick={() => handleAccountAdd()}
+                        >
+                          {accountIdenty === 'user' ? '新建用户' : '选择用户'}
+                        </Button>
+                      );
+                    },
                   },
-                },
-                {
-                  itemDom: () => {
-                    return (
-                      <Button
-                        onClick={() => handleBatchDelete()}
-                        icon={<DeleteOutlined />}
-                      >
-                        删除用户
-                      </Button>
-                    );
+                  {
+                    itemDom: () => {
+                      return (
+                        <Button
+                          onClick={() => handleBatchDelete()}
+                          icon={<DeleteOutlined />}
+                        >
+                          删除用户
+                        </Button>
+                      );
+                    },
                   },
-                },
-                {
-                  itemDom: () => {
-                    return <Button icon={<PlusOutlined />}>批量分组</Button>;
+                  {
+                    itemDom: () => {
+                      return <Button icon={<PlusOutlined />}>批量分组</Button>;
+                    },
                   },
-                },
+                ],
+              },
+              operateStructure: [
+                <Search
+                  placeholder="请输入关键字"
+                  onSearch={handleUserSearch}
+                />,
               ],
-            },
-            operateStructure: [
-              <Search placeholder="请输入关键字" onSearch={handleUserSearch} />,
-            ],
-          }}
-        />
-        {/* table */}
-        <Table
-          rowSelection={{
-            type: 'checkbox',
-            ...rowSelection,
-          }}
-          style={{ marginTop: 20 }}
-          dataSource={dataSource}
-          columns={columns}
-          // loading={loading}
-          scroll={{ y: 400 }}
-          // pagination={{
-          //   total,
-          //   showSizeChanger: true,
-          //   // showQuickJumper: true,
-          //   onChange: handlePageChange,
-          // }}
-          rowKey={(record) => record.id}
-        />
+            }}
+          />
+          {/* table */}
+          <Table
+            rowSelection={{
+              type: 'checkbox',
+              ...rowSelection,
+            }}
+            style={{ marginTop: 20 }}
+            dataSource={dataSource}
+            columns={columns}
+            // loading={loading}
+            scroll={{ y: 400 }}
+            // pagination={{
+            //   total,
+            //   showSizeChanger: true,
+            //   // showQuickJumper: true,
+            //   onChange: handlePageChange,
+            // }}
+            rowKey={(record) => record.id}
+          />
 
-        {/* 新建用户、选择用户弹框 */}
-        <Modal
-          title={eidtIdenty.current ? '编辑用户' : '新增用户'}
-          width={620}
-          visible={isModalVisible}
-          onOk={handleOk}
-          destroyOnClose={true}
-          onCancel={() => {
-            currentId.current = null;
-            eidtIdenty.current = false;
-            setIsModalVisible(false);
-          }}
-          className="default-modal"
-          cancelText="取消"
-          okText="确认"
-        >
-          <div className="user-wrapper">
-            <div className="user-add-wrapper">
-              {eidtIdenty.current ? null : (
-                <span>
-                  <span
-                    className={userAddC ? 'active' : 'normal'}
-                    onClick={() => handleAddC(true)}
-                  >
-                    单个用户
-                  </span>{' '}
-                  /
-                  <span
-                    className={!userAddC ? 'active' : 'normal'}
-                    onClick={() => handleAddC(false)}
-                  >
-                    批量添加
+          {/* 新建用户、选择用户弹框 */}
+          <Modal
+            title={eidtIdenty.current ? '编辑用户' : '新增用户'}
+            width={620}
+            visible={isModalVisible}
+            onOk={handleOk}
+            destroyOnClose={true}
+            onCancel={() => {
+              currentId.current = null;
+              eidtIdenty.current = false;
+              setIsModalVisible(false);
+            }}
+            className="default-modal"
+            cancelText="取消"
+            okText="确认"
+          >
+            <div className="user-wrapper">
+              <div className="user-add-wrapper">
+                {eidtIdenty.current ? null : (
+                  <span>
+                    <span
+                      className={userAddC ? 'active' : 'normal'}
+                      onClick={() => handleAddC(true)}
+                    >
+                      单个用户
+                    </span>{' '}
+                    /
+                    <span
+                      className={!userAddC ? 'active' : 'normal'}
+                      onClick={() => handleAddC(false)}
+                    >
+                      批量添加
+                    </span>
                   </span>
-                </span>
-              )}
-              <div
-                className="user-add-content"
-                style={{
-                  paddingTop: '12px',
-                }}
-              >
-                {userAddC ? (
-                  <Form
-                    className="account-add default-form-radios"
-                    ref={formRef}
-                    // form={form}
-                    initialValues={formData}
-                    // name="basic"
-                    autoComplete="off"
-                    layout="vertical"
-                    wrapperCol={{ span: 22 }}
-                  >
-                    <Row>
-                      <Col span={12}>
-                        <Form.Item
-                          label="姓名"
-                          name="name"
-                          rules={[{ required: true, message: '请输入姓名!' }]}
-                        >
-                          <Input placeholder={'请输入姓名'} />
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item label="性别" name="sex">
-                          {creatSelct(
-                            [
-                              { value: '1', label: '男' },
-                              { value: '2', label: '女' },
-                            ],
-                            '请选择性别',
-                          )}
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={12}>
-                        <Form.Item
-                          label="电话"
-                          name="tel"
-                          rules={[
-                            {
-                              pattern: REGEXP_YD_PHONE,
-                              message: '电话格式不正确!',
-                            },
-                          ]}
-                        >
-                          <Input placeholder={'请输入电话'} />
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item
-                          label="邮箱"
-                          name="email"
-                          rules={[
-                            {
-                              pattern: REGEXP_MAIL,
-                              message: '邮箱格式不正确!',
-                            },
-                          ]}
-                        >
-                          <Input placeholder={'请输入邮箱'} />
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col span={12}>
-                        <Form.Item label="岗位" name="work">
-                          {creatSelct(workList, '请选择岗位')}
-                        </Form.Item>
-                      </Col>
-                      <Col span={12}>
-                        <Form.Item label="组别" name="cate">
-                          {creatSelct(goupArr.current || [], '请选择组别')}
-                        </Form.Item>
-                      </Col>
-                    </Row>
-                  </Form>
-                ) : (
-                  <Dragger {...props}>
-                    <p className="ant-upload-drag-icon">
-                      <InboxOutlined />
-                    </p>
-                    <p className="ant-upload-text">
-                      点击或将文件拖拽到这里上传
-                    </p>
-                    <p className="ant-upload-hint">最大文件大小限制为20MB</p>
-                  </Dragger>
                 )}
+                <div
+                  className="user-add-content"
+                  style={{
+                    paddingTop: '12px',
+                  }}
+                >
+                  {userAddC ? (
+                    <Form
+                      className="account-add default-form-radios"
+                      ref={formRef}
+                      // form={form}
+                      initialValues={formData}
+                      // name="basic"
+                      autoComplete="off"
+                      layout="vertical"
+                      wrapperCol={{ span: 22 }}
+                    >
+                      <Row>
+                        <Col span={12}>
+                          <Form.Item
+                            label="姓名"
+                            name="name"
+                            rules={[{ required: true, message: '请输入姓名!' }]}
+                          >
+                            <Input placeholder={'请输入姓名'} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label="性别" name="sex">
+                            {creatSelct(
+                              [
+                                { value: '1', label: '男' },
+                                { value: '2', label: '女' },
+                              ],
+                              '请选择性别',
+                            )}
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={12}>
+                          <Form.Item
+                            label="电话"
+                            name="tel"
+                            rules={[
+                              {
+                                pattern: REGEXP_YD_PHONE,
+                                message: '电话格式不正确!',
+                              },
+                            ]}
+                          >
+                            <Input placeholder={'请输入电话'} />
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item
+                            label="邮箱"
+                            name="email"
+                            rules={[
+                              {
+                                pattern: REGEXP_MAIL,
+                                message: '邮箱格式不正确!',
+                              },
+                            ]}
+                          >
+                            <Input placeholder={'请输入邮箱'} />
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col span={12}>
+                          <Form.Item label="岗位" name="work">
+                            {creatSelct(workList, '请选择岗位')}
+                          </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                          <Form.Item label="组别" name="cate">
+                            {creatSelct(goupArr.current || [], '请选择组别')}
+                          </Form.Item>
+                        </Col>
+                      </Row>
+                    </Form>
+                  ) : (
+                    <Dragger {...props}>
+                      <p className="ant-upload-drag-icon">
+                        <InboxOutlined />
+                      </p>
+                      <p className="ant-upload-text">
+                        点击或将文件拖拽到这里上传
+                      </p>
+                      <p className="ant-upload-hint">最大文件大小限制为20MB</p>
+                    </Dragger>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </Modal>
+          </Modal>
+        </div>
       </div>
     </div>
   );

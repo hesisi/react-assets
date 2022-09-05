@@ -147,7 +147,9 @@ export default function GroupUser({
       return;
     }
     const formilyData = getCreateForm();
-    setFormTree(transformToTreeNode(formilyData['formily-form-schema']));
+    if (formilyData?.['formily-form-schema']) {
+      setFormTree(transformToTreeNode(formilyData['formily-form-schema']));
+    }
     setActiveIdenty('新建');
     setIsModalVisible(true);
     setTimeout(() => {
@@ -294,7 +296,9 @@ export default function GroupUser({
         return;
       }
     } else {
-      tableRef.current.tabChange(key);
+      if (tableRef && tableRef.current) {
+        tableRef.current.tabChange(key);
+      }
       setActiveKey(key);
     }
   };

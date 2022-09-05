@@ -44,7 +44,9 @@ function UserLeftList(props) {
   }, [data, groupId]);
 
   const handleGClick = (id) => {
-    let childData = JSON.parse(localStorage.getItem('flowGroup') || []);
+    let childData = localStorage.getItem('flowGroup')
+      ? JSON.parse(localStorage.getItem('flowGroup'))
+      : [];
     childData = childData.filter((item) => {
       /* 仅展示启用的流程 */
       return id.includes(item.proessGroup + '') && item.status === 'enable';

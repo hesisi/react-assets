@@ -36,15 +36,36 @@
 .user-message {
   margin-left: auto;
   position: relative;
-
   .user-detail {
     color: #fff;
   }
-
+  .bell_tips {
+    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    & p {
+      width: 12px;
+      height: 12px;
+      display: flex;
+      box-sizing: content-box;
+      padding: 4px;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background-color: red;
+      position: relative;
+      top: -2px;
+      left: -10px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+  }
   .messages {
     width: 400px;
-    padding-top: 10px;
-    height: 800px;
+    padding: 10px;
+    height: calc(100vh - 200px);
     position: absolute;
     top: 70px;
     animation: moveDown 1s ease-in-out;
@@ -84,6 +105,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        color: #333;
         &:hover {
           box-shadow: 0 0 5px 2px rgba(0, 0, 0, 0.3);
           background-color: #fafafa;

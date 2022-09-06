@@ -359,7 +359,7 @@ function menuTree(props) {
               <Search
                 placeholder="请输入菜单名字"
                 onChange={handleTreeChange}
-                style={{ width: 300, marginBottom: '10px' }}
+                style={{ width: 252, marginBottom: '10px' }}
               />
             </div>
           </div>

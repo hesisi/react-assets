@@ -29,6 +29,7 @@ import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
 import { getUUID } from '@/utils/utils';
 import { REGEXP_MAIL, REGEXP_YD_PHONE } from '@/utils/validate';
+import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 
@@ -87,16 +88,28 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
+      width: 120,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '电话',
       dataIndex: 'tel',
       key: 'tel',
+      width: 160,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
+      width: 160,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '组别',
@@ -115,6 +128,10 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '创建时间',
       dataIndex: 'creatTime',
       key: 'creatTime',
+      width: '14%',
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '操作',
@@ -202,14 +219,37 @@ export default function Account({ accountIdenty = 'user' }) {
     setUserAddC(identy);
   };
 
+  /* 一个人挂一个分组下面 */
+  const editGroupInfo = async (groupId, userItem) => {
+    const initUserData = (await localForage.getItem('groupUserList')) || {};
+    const newUserData = cloneDeep(initUserData);
+    let copyDataKeys = Object.keys(newUserData);
+    copyDataKeys.forEach((item) => {
+      newUserData[item] = newUserData[item].filter(
+        (itemC) => itemC.id !== userItem.id,
+      );
+    });
+    if (groupId) {
+      newUserData[groupId] = newUserData?.[groupId]
+        ? newUserData[groupId].push(userItem)
+        : [userItem];
+    }
+    localForage.setItem('groupUserList', newUserData);
+  };
+
   const handleOk = () => {
     formRef.current
       .validateFields()
       .then((values) => {
         let oldSource = cloneDeep(dataSource);
+        let currentItem = null;
         if (eidtIdenty.current) {
           oldSource = oldSource.map((item) => {
             if (item.id === currentId.current) {
+              currentItem = {
+                ...item,
+                ...values,
+              };
               return {
                 ...item,
                 ...values,
@@ -223,7 +263,11 @@ export default function Account({ accountIdenty = 'user' }) {
             id: getUUID(),
             creatTime: moment(`${new Date()}`).format('YYYY-MM-DD HH:mm:ss'),
           };
+          currentItem = userItem;
           oldSource.push(userItem);
+        }
+        if (currentItem) {
+          editGroupInfo(values.cate, currentItem);
         }
         setDataSource(oldSource);
         localForage.setItem('userList', oldSource);
@@ -300,6 +344,12 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const onFinish = () => {};
+
+  const handlePageChange = (num, pageSize) => {
+    // setPageNum(num);
+    // setPageSize(pageSize);
+  };
+
   return (
     <div
       style={{
@@ -366,7 +416,7 @@ export default function Account({ accountIdenty = 'user' }) {
             dataSource={dataSource}
             columns={columns}
             // loading={loading}
-            scroll={{ y: 400 }}
+            scroll={{ y: 340, x: '100%' }}
             // pagination={{
             //   total,
             //   showSizeChanger: true,
@@ -374,6 +424,12 @@ export default function Account({ accountIdenty = 'user' }) {
             //   onChange: handlePageChange,
             // }}
             rowKey={(record) => record.id}
+            pagination={{
+              total: dataSource?.length || 0,
+              showSizeChanger: true,
+              // showQuickJumper: true,
+              onChange: handlePageChange,
+            }}
           />
 
           {/* 新建用户、选择用户弹框 */}

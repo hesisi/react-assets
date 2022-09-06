@@ -65,25 +65,25 @@ export default function GroupUser({
       key: 'applyNode',
     },
     {
-      title: '休假类型',
-      dataIndex: 'applyType',
-      key: 'applyType',
+      title: '类型',
+      dataIndex: 'groupType',
+      key: 'groupType',
     },
-    {
-      title: '开始日期',
-      dataIndex: 'startTime',
-      key: 'startTime',
-    },
-    {
-      title: '结束日期',
-      dataIndex: 'endTime',
-      key: 'endTime',
-    },
-    {
-      title: '请假天数',
-      dataIndex: 'applyDays',
-      key: 'applyDays',
-    },
+    // {
+    //   title: '开始日期',
+    //   dataIndex: 'startTime',
+    //   key: 'startTime',
+    // },
+    // {
+    //   title: '结束日期',
+    //   dataIndex: 'endTime',
+    //   key: 'endTime',
+    // },
+    // {
+    //   title: '请假天数',
+    //   dataIndex: 'applyDays',
+    //   key: 'applyDays',
+    // },
   ];
 
   const getCreateForm = () => {
@@ -349,6 +349,7 @@ export default function GroupUser({
                       itemDom: () => {
                         return (
                           <Button
+                            type="primary"
                             icon={<PlusOutlined />}
                             onClick={() => handleAccountAdd()}
                           >
@@ -378,8 +379,8 @@ export default function GroupUser({
               onChange={onTabChange}
             >
               <TabPane tab="我发起的" key="1" />
-              <TabPane tab="待办" key="2" />
-              <TabPane tab="已办" key="3" />
+              <TabPane tab="我的待办" key="2" />
+              <TabPane tab="我的已办" key="3" />
             </Tabs>
             {/* table */}
             {groupId && groupId[0] === 'shouye' ? (
@@ -393,12 +394,11 @@ export default function GroupUser({
                 columns={columns}
                 // loading={loading}
                 scroll={{ y: 400 }}
-                // pagination={{
-                //   total,
-                //   showSizeChanger: true,
-                //   // showQuickJumper: true,
-                //   onChange: handlePageChange,
-                // }}
+                pagination={{
+                  total: dataSource?.length || 0,
+                  showSizeChanger: true,
+                  // onChange: handlePageChange,
+                }}
                 rowKey={(record) => record.id}
               />
             ) : null}

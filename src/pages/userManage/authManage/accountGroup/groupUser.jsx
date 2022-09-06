@@ -8,6 +8,7 @@ import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
 import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
+import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 
 const { Search } = Input;
 export default function GroupUser({ groupId = null }) {
@@ -35,11 +36,19 @@ export default function GroupUser({ groupId = null }) {
       title: '姓名',
       dataIndex: 'name',
       key: 'name',
+      width: 140,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '电话',
       dataIndex: 'tel',
       key: 'tel',
+      width: 120,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '邮箱',
@@ -51,9 +60,9 @@ export default function GroupUser({ groupId = null }) {
       dataIndex: 'cate',
       key: 'cate',
       render: (text) => {
-        const item = currentGoupeData.current.filter(
-          (itemF) => itemF.id === text,
-        );
+        const item = currentGoupeData?.current
+          ? currentGoupeData.current.filter((itemF) => itemF.id === text)
+          : [];
         return <span>{item?.[0] ? item[0].name : ''}</span>;
       },
     },
@@ -61,6 +70,10 @@ export default function GroupUser({ groupId = null }) {
       title: '创建时间',
       dataIndex: 'creatTime',
       key: 'creatTime',
+      width: 120,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '操作',
@@ -87,6 +100,8 @@ export default function GroupUser({ groupId = null }) {
   useEffect(async () => {
     if (groupId) {
       const initUserData = await localForage.getItem('groupUserList');
+      console.log(initUserData, '90------');
+      console.log(currentGroupId.current, '91------');
       const userGroup = await localForage.getItem('userGroup');
       currentGroupId.current = groupId;
       const currentDource = initUserData?.[currentGroupId.current] || [];
@@ -122,7 +137,9 @@ export default function GroupUser({ groupId = null }) {
     });
     let initUserListData = (await localForage.getItem('userList')) || [];
     initUserListData = initUserListData.filter(
-      (item) => !currentDourceId.includes(item.id),
+      (item) =>
+        !currentDourceId.includes(item.id) &&
+        ((item?.cate && item?.cate === currentGroupId.current) || !item?.cate),
     );
     setDataUserSource(initUserListData || []);
     setIsModalVisible(true);
@@ -268,13 +285,13 @@ export default function GroupUser({ groupId = null }) {
               dataSource={dataUserSource}
               columns={columns.filter((item) => item.key !== 'action')}
               // loading={loading}
-              scroll={{ y: 400 }}
-              // pagination={{
-              //   total,
-              //   showSizeChanger: true,
-              //   // showQuickJumper: true,
-              //   onChange: handlePageChange,
-              // }}
+              scroll={{ y: 340, x: '100%' }}
+              pagination={{
+                total: dataUserSource?.length || 0,
+                showSizeChanger: true,
+                // showQuickJumper: true,
+                // onChange: handlePageChange,
+              }}
               rowKey={(record) => record.id}
             />
           </div>

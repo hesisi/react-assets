@@ -76,10 +76,13 @@ function UserLeftList(props) {
     handleGroupChildClick && handleGroupChildClick(null);
   };
 
-  const handleGroupCClick = (e, item) => {
+  const handleGroupCClick = (e, item, parent) => {
     e && e.stopPropagation();
     setCId(item.id);
-    handleGroupChildClick && handleGroupChildClick(item);
+    handleGroupChildClick &&
+      handleGroupChildClick(
+        item ? { ...item, groupType: parent?.typeName || '' } : item,
+      );
   };
 
   return (
@@ -108,7 +111,7 @@ function UserLeftList(props) {
                               : 'list-item normal'
                           }
                           key={item.id}
-                          onClick={(e) => handleGroupCClick(e, item)}
+                          onClick={(e) => handleGroupCClick(e, item, x)}
                         >
                           {item.proessName}
                         </div>

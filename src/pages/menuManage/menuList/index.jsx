@@ -6,7 +6,7 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-06-15 11:05:37
  */
-import { Button, Col, Row, message } from 'antd';
+import { Button, Col, Row, message, Layout } from 'antd';
 import { EyeOutlined, FileDoneOutlined, LeftOutlined } from '@ant-design/icons';
 import './index.less';
 import ConfigPanel from './configPanel';
@@ -20,7 +20,7 @@ import { list } from './iconBox';
 import { cloneDeep } from 'lodash';
 
 const back = require('@/assets/icons/back2.svg');
-
+const { Header, Footer, Sider, Content } = Layout;
 export default function IndexPage() {
   const formRef = useRef(null);
   const configPanelRef = useRef(null);
@@ -189,11 +189,9 @@ export default function IndexPage() {
             </Button>
           </Col>
         </Row>
-
         <div className="menu-config">
-          <Row wrap>
-            {/* 标题部分 */}
-            <Col span={6} className="menu-left">
+          <Layout className={'user-cont list-layout'}>
+            <Sider className={' menu-left'} width={300}>
               <div className="col-wrapper">
                 <div className="menu-config__tree">
                   <span>菜单架构</span>
@@ -206,10 +204,15 @@ export default function IndexPage() {
                   submitFlag={submitFlag}
                 />
               </div>
-            </Col>
-            <Col span={18}>
+            </Sider>
+            <Content style={{ height: '100%' }}>
               <div className="col-wrapper col-info">
-                <span className="menu-config__info">菜单信息</span>
+                <span
+                  className="menu-config__info"
+                  style={{ marginLeft: '25px' }}
+                >
+                  菜单信息
+                </span>
                 <ConfigPanel
                   formRef={formRef}
                   ref={configPanelRef}
@@ -219,8 +222,16 @@ export default function IndexPage() {
                   formData={formData}
                 />
               </div>
+            </Content>
+            {/* <Row wrap>
+            <Col span={6} className="menu-left" style={{ width: '300px' }}>
+
             </Col>
-          </Row>
+            <Col span={18}>
+
+            </Col>
+          </Row> */}
+          </Layout>
         </div>
       </div>
     </div>

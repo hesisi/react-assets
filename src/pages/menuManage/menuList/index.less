@@ -22,12 +22,21 @@
   vertical-align: middle;
   height: calc(100% - 58px);
   background: #fff;
+  .col-wrapper {
+    height: 100%;
+    width: 100%;
+    background: #fff;
+    padding-top: 14px;
+    border: 1px solid rgba(225, 229, 236, 1);
+    border-radius: 10px;
+  }
   .ant-row {
     height: 100%;
-    .menu-left {
-      padding-right: 10px;
-      height: 100%;
-    }
+  }
+  .menu-left {
+    padding-right: 10px;
+    height: 100%;
+    background: #f6f8fb;
   }
   .row-content {
     height: calc(100% - 52px);
@@ -42,14 +51,6 @@
     line-height: 30px;
     border-bottom: 0;
     background: #f6f8fb;
-    .col-wrapper {
-      height: 100%;
-      width: 100%;
-      background: #fff;
-      padding-top: 8px;
-      border: 1px solid rgba(225, 229, 236, 1);
-      border-radius: 10px;
-    }
   }
   .ant-col:nth-child(2n + 2),
   .ant-col:nth-child(n + 1) {
@@ -160,7 +161,7 @@
     content: '';
     position: absolute;
     left: 0;
-    top: 7px;
+    top: 4px;
     width: 16px;
     height: 16px;
     background: url('../../../assets/icons/u710.svg') no-repeat center/100%;
@@ -189,10 +190,13 @@
   padding-left: 18px;
   padding-right: 50px;
 }
+.menu-config-wrapper {
+  padding-left: 25px;
+}
 .menu-tree-wrapper {
   padding-right: 20px;
-  height: calc(100% - 38px);
-  padding-top: 8px;
+  height: calc(100% - 30px);
+  padding-top: 14px;
 }
 
 .menu-tree-wrapper-content {

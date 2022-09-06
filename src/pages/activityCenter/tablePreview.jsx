@@ -95,16 +95,19 @@ const tablePreview = React.forwardRef((props, ref) => {
     const initTodoData = {};
     initDataIndex.forEach((item, index) => {
       if (item === 'applyNode') {
-        console.log(childFormCode, '98----');
         initTodoData[item] =
-          childFormCode?.approverGroup?.[0]?.approver?.name || '';
+          childFormCode?.approverGroup?.[0]?.approver?.name || '张总';
       } else {
-        initTodoData[item] = temp['applyLeave']?.[item] || '';
+        initTodoData[item] = temp['applyLeave']?.[item] || 'xxxxx';
       }
     });
 
-    originData[childFormCode.id]['toDo'] = [initTodoData];
-    todoSource.current = [initTodoData];
+    originData[childFormCode.id]['toDo'] = [
+      { ...initTodoData, groupType: childFormCode.groupType },
+    ];
+    todoSource.current = [
+      { ...initTodoData, groupType: childFormCode.groupType },
+    ];
     localForage.setItem('flowCreateMap', originData);
     if (activeKey.current === '1') {
       setDataSource(originData[childFormCode.id]['created']);
@@ -357,6 +360,7 @@ const tablePreview = React.forwardRef((props, ref) => {
         id: nanoid(),
         applyNode: '开始',
         oddNumbers: arr.length + 1,
+        groupType: childFormCode.groupType,
       });
       originData[childFormCode.id]['created'] = arr;
       localForage.setItem('flowCreateMap', originData);
@@ -381,11 +385,13 @@ const tablePreview = React.forwardRef((props, ref) => {
     console.log(originData, '228----');
     originData[childFormCode.id]['done'] = originData[childFormCode.id][
       'done'
-    ].concat([{ ...piItem, applyNode: '结束' }]);
+    ].concat([
+      { ...piItem, applyNode: '结束', groupType: childFormCode.groupType },
+    ]);
 
     todoSource.current = arr;
     doneSource.current = cloneDeep(doneSource?.current || []).concat([
-      { ...piItem, applyNode: '结束' },
+      { ...piItem, applyNode: '结束', groupType: childFormCode.groupType },
     ]);
     localForage.setItem('flowCreateMap', originData);
     setDataSource(arr);

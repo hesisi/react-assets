@@ -9,16 +9,21 @@
 import { Breadcrumb, Layout, Menu, Avatar, Col, Row, Space } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link } from 'umi';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import routes from '../../config/routes';
 import { dealMenuList } from '../../config/routesDy';
 import Styles from './index.less';
 import logo from '@/assets/icons/logo.png';
 import {
   UserOutlined,
+  CarryOutOutlined,
   QuestionCircleOutlined,
   BellOutlined,
+  SolutionOutlined,
   DownOutlined,
+  RightOutlined,
+  InsuranceOutlined,
+  AccountBookOutlined,
 } from '@ant-design/icons';
 import './index.less';
 
@@ -71,7 +76,37 @@ const getMetaInfoByPath = (routesData, path, result = []) => {
 
 const CommonLayout = (props) => {
   const selectKey = `/${props.location.pathname?.split('/')[1]}`;
-
+  const [isShowMessage, setIsShowMessage] = useState(false);
+  const [messageList, setMessageList] = useState([
+    {
+      icon: <AccountBookOutlined />,
+      types: '6月话费报销',
+      titles: '您提交的报销审批已完成',
+      status: '已通过',
+      time: '2022-7-04 14:03:21',
+    },
+    {
+      icon: <SolutionOutlined />,
+      types: '年假申请',
+      titles: '王磊正在申请年假',
+      status: '待审批',
+      time: '2022-9-06 15:03:21',
+    },
+    {
+      icon: <CarryOutOutlined />,
+      types: '事假申请',
+      titles: '您提交的事假申请已经完成',
+      status: '已完成',
+      time: '2022-9-05 12:05:56',
+    },
+    {
+      icon: <InsuranceOutlined />,
+      types: '年假申请',
+      titles: '您提交的年假申请已经提交',
+      status: '已提交',
+      time: '2022-9-06 14:14:56',
+    },
+  ]);
   const activePath = props.location.pathname;
   const curretnItem = newRoutes?.filter((item) => {
     return item.address === props.pathPrefix;
@@ -120,7 +155,10 @@ const CommonLayout = (props) => {
       getMetaInfoByPath(routes, path, [])[0];
     return metaInfo;
   });
-
+  const showMessages = () => {
+    let flag = !isShowMessage;
+    setIsShowMessage(flag);
+  };
   return (
     <Layout>
       <Header
@@ -139,11 +177,71 @@ const CommonLayout = (props) => {
           className={Styles['menu']}
         />
         <div className="user-message">
+          {/* 消息提醒 */}
+          {isShowMessage ? (
+            <div className="messages">
+              <div className="message_header">
+                <span>全部标记为已读</span>
+                <div>
+                  查看全部 <RightOutlined />
+                </div>
+              </div>
+              <div className="message_content">
+                {messageList.map((item) => {
+                  return (
+                    <div className="message_item">
+                      <div className="icon_container">
+                        <div>{item.icon}</div>
+                      </div>
+                      <div className="item">
+                        <span>{item.titles}</span>
+                        <div>
+                          <span>{item.types}</span>{' '}
+                          <span>
+                            {item.status ? (
+                              <a
+                                href="#"
+                                className="circle"
+                                style={{
+                                  backgroundColor:
+                                    item.status === '已完成'
+                                      ? 'green'
+                                      : 'yellow',
+                                }}
+                              ></a>
+                            ) : null}
+                            {item.status}
+                          </span>{' '}
+                        </div>
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            color: 'rgb(170,170,170)',
+                          }}
+                        >
+                          {item.time}
+                        </span>
+                      </div>
+                      <RightOutlined />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
           <Space size={30}>
             <QuestionCircleOutlined
               style={{ color: '#ffffff', fontSize: '16px' }}
             />
-            <BellOutlined style={{ color: '#ffffff', fontSize: '16px' }} />
+            <BellOutlined
+              onClick={showMessages}
+              style={{
+                color: '#ffffff',
+                fontWeight: '600',
+                fontSize: '16px',
+                cursor: 'pointer',
+              }}
+            />
             <div className={'user-detail'}>
               <Space size={10}>
                 <Avatar src="https://joeschmoe.io/api/v1/random" />

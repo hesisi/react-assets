@@ -194,7 +194,7 @@ const CommonLayout = (props) => {
                         <div>{item.icon}</div>
                       </div>
                       <div className="item">
-                        <span>{item.titles}</span>
+                        <span className="items_title">{item.titles}</span>
                         <div>
                           <span>{item.types}</span>{' '}
                           <span>

@@ -15,6 +15,23 @@ const { TabPane } = Tabs;
 import './contentSetting.less';
 const contentSetting = forwardRef((props, ref) => {
   const [form] = Form.useForm();
+  const [bgColor, setBgColor] = useState('fafafa');
+  const [colColor, setColColor] = useState('ffffff');
+  const onChangeColor = (e, type) => {
+    if (type === 'bg') {
+      props.setProperty({
+        ...props.property,
+        bg: e.target.value,
+      });
+      setBgColor(e.target.value.split('#')[1]);
+    } else {
+      props.setProperty({
+        ...props.property,
+        colGapColor: e.target.value,
+      });
+      setColColor(e.target.value.split('#')[1]);
+    }
+  };
   const onChange = (e, type) => {
     switch (type) {
       case 'colGap':
@@ -28,12 +45,14 @@ const contentSetting = forwardRef((props, ref) => {
           ...props.property,
           bg: `#${e.target.value}`,
         });
+        setBgColor(e.target.value.split('#')[1]);
         break;
       case 'colGapColor':
         props.setProperty({
           ...props.property,
           colGapColor: `#${e.target.value}`,
         });
+        setColColor(e.target.value.split('#')[1]);
         break;
       case 'radius':
         props.setProperty({
@@ -172,7 +191,6 @@ const contentSetting = forwardRef((props, ref) => {
   const handleCancel = (data) => {
     setIsModalVisible(data);
   };
-
   return (
     <div className="sider">
       <Modal
@@ -822,13 +840,32 @@ const contentSetting = forwardRef((props, ref) => {
 
             <Form.Item label="间隙色" name="colGapColor">
               <Input
-                onChange={(e) => onChange(e, 'colGapColor')}
+                onChange={(e) => onChangeColor(e, 'colGapColor')}
+                style={{ width: '15%', padding: '0px' }}
+                type="color"
+                value={`#${colColor}`}
+              />
+              <Input
+                style={{ width: '84%' }}
                 addonBefore="#"
+                value={colColor}
+                onChange={(e) => onChange(e, 'colGapColor')}
               />
             </Form.Item>
 
             <Form.Item label="背景色" name="bg">
-              <Input onChange={(e) => onChange(e, 'bg')} addonBefore="#" />
+              <Input
+                onChange={(e) => onChangeColor(e, 'bg')}
+                style={{ width: '15%', padding: '0px' }}
+                type="color"
+                value={`#${bgColor}`}
+              />
+              <Input
+                style={{ width: '84%' }}
+                value={bgColor}
+                addonBefore="#"
+                onChange={(e) => onChange(e, 'bg')}
+              />
             </Form.Item>
 
             <Form.Item label="圆角" name="radius">

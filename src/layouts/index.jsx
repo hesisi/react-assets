@@ -8,7 +8,7 @@
  */
 import { Breadcrumb, Layout, Menu, Avatar, Col, Row, Space } from 'antd';
 import { withRouter } from 'react-router-dom';
-import { Link } from 'umi';
+import { Link, history } from 'umi';
 import React, { useMemo, useState, useEffect } from 'react';
 import routes from '../../config/routes';
 import { dealMenuList } from '../../config/routesDy';
@@ -159,6 +159,9 @@ const CommonLayout = (props) => {
     let flag = !isShowMessage;
     setIsShowMessage(flag);
   };
+  const goToMessageCenter = () => {
+    history.push({ pathname: '/notificationCenter/notificationList' });
+  };
   return (
     <Layout>
       <Header
@@ -189,7 +192,7 @@ const CommonLayout = (props) => {
               <div className="message_content">
                 {messageList.map((item) => {
                   return (
-                    <div className="message_item">
+                    <div className="message_item" onClick={goToMessageCenter}>
                       <div className="icon_container">
                         <div>{item.icon}</div>
                       </div>
@@ -233,15 +236,19 @@ const CommonLayout = (props) => {
             <QuestionCircleOutlined
               style={{ color: '#ffffff', fontSize: '16px' }}
             />
-            <BellOutlined
-              onClick={showMessages}
-              style={{
-                color: '#ffffff',
-                fontWeight: '600',
-                fontSize: '16px',
-                cursor: 'pointer',
-              }}
-            />
+            <span className="bell_tips" onClick={showMessages}>
+              <BellOutlined
+                style={{
+                  color: '#ffffff',
+                  fontWeight: '600',
+                  fontSize: '16px',
+                  cursor: 'pointer',
+                }}
+              />
+              <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
+              {/* <p>99+</p> */}
+            </span>
+
             <div className={'user-detail'}>
               <Space size={10}>
                 <Avatar src="https://joeschmoe.io/api/v1/random" />

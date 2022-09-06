@@ -150,7 +150,7 @@ export default function IndexPage() {
           {/* 新建用户、选择用户弹框 */}
           <Modal
             title={eidtIdenty.current ? '编辑分组' : '新增分组'}
-            width={620}
+            width={520}
             visible={isModalVisible}
             destroyOnClose={true}
             onOk={handleOk}
@@ -174,11 +174,11 @@ export default function IndexPage() {
                     initialValues={formData}
                     name="basic"
                     autoComplete="off"
-                    layout="vertical"
+                    // layout="vertical"
                     wrapperCol={{ span: 22 }}
                   >
                     <Row>
-                      <Col span={12}>
+                      <Col span={20}>
                         <Form.Item
                           label="分组名称"
                           name="name"

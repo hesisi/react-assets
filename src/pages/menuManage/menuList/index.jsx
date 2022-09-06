@@ -23,6 +23,7 @@ const back = require('@/assets/icons/back2.svg');
 
 export default function IndexPage() {
   const formRef = useRef(null);
+  const configPanelRef = useRef(null);
   const [config, setConfig] = useState(null); // 配置面板相关
   const [submitFlag, setSubmitFlag] = useState(false); // 提交标识
   const [tree, setTree] = useState([]); // 结点数
@@ -81,7 +82,8 @@ export default function IndexPage() {
     }
     formRef.current
       ?.validateFields()
-      .then(() => {
+      .then((values) => {
+        configPanelRef.current.onFinish(values);
         saveMenuLoad();
       })
       .catch(() => {
@@ -191,7 +193,7 @@ export default function IndexPage() {
         <div className="menu-config">
           <Row wrap>
             {/* 标题部分 */}
-            <Col span={8} className="menu-left">
+            <Col span={6} className="menu-left">
               <div className="col-wrapper">
                 <div className="menu-config__tree">
                   <span>菜单架构</span>
@@ -205,11 +207,12 @@ export default function IndexPage() {
                 />
               </div>
             </Col>
-            <Col span={16}>
+            <Col span={18}>
               <div className="col-wrapper col-info">
                 <span className="menu-config__info">菜单信息</span>
                 <ConfigPanel
                   formRef={formRef}
+                  ref={configPanelRef}
                   configSubmit={(values, iconSelect, iconIndex) =>
                     configSubmit(values, iconSelect, iconIndex)
                   }

@@ -230,7 +230,7 @@ export default function NotificationCenter(props) {
       key: 'messageStatus',
       align: 'center',
       render: (text) => {
-        return text === 1 ? '1已读' : '未读';
+        return text === 1 ? '已读' : '未读';
       },
     },
     {

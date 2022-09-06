@@ -112,7 +112,8 @@ export default function Dialog(props: any) {
         >
           <Select
             // defaultValue={processGroup[0].typeIndex}
-            style={{ width: 150 }}
+            placeholder="请选择流程分组"
+            style={{ width: 440 }}
           >
             {processGroup.map((item: any) => {
               return (

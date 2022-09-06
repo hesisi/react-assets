@@ -7,7 +7,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import { Space } from '@formily/antd';
 import { list } from './iconBox';
 
-export default function configPanel(props) {
+const configPanel = React.forwardRef((props, ref) => {
   const { formRef } = props;
   const [visible, setVisible] = useState(false);
 
@@ -44,25 +44,26 @@ export default function configPanel(props) {
     setVisible(false);
   }, [props.formData]);
 
-  const onFinish = () => {
-    formRef.current
-      ?.validateFields()
-      .then((values) => {
-        // 表单提交
-        props.configSubmit(
-          { ...props.formData.formValue, ...values, isEdit },
-          iconSelect,
-          iconIndex,
-        );
-        // form.resetFields();
-        // setIconSelect(null);
-        // setIconIndex(-1);
-        message.success('菜单配置成功!');
-        setIsEdit(false);
-        setIsShowEdit(false);
-      })
-      .catch((errorInfo) => {});
+  const onFinish = (values = {}) => {
+    props.configSubmit(
+      { ...props.formData.formValue, ...values, isEdit },
+      iconSelect,
+      iconIndex,
+    );
+    // form.resetFields();
+    // setIconSelect(null);
+    // setIconIndex(-1);
+
+    // message.success('菜单配置成功!');
+    setIsEdit(false);
+    setIsShowEdit(false);
   };
+
+  React.useImperativeHandle(ref, () => {
+    return {
+      onFinish,
+    };
+  });
 
   return (
     <div className="menu-config-wrapper">
@@ -130,14 +131,14 @@ export default function configPanel(props) {
               </>
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               wrapperCol={{ offset: 0, span: 24 }}
               className="form-button"
             >
               <Button type="primary" onClick={() => onFinish()}>
                 确定
               </Button>
-            </Form.Item>
+            </Form.Item> */}
           </Form>
         ) : (
           <div>
@@ -149,4 +150,6 @@ export default function configPanel(props) {
       </Scrollbars>
     </div>
   );
-}
+});
+
+export default configPanel;

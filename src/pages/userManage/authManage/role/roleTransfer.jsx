@@ -3,58 +3,75 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import localForage from 'localforage';
 import { cloneDeep } from 'lodash';
 
-const RoleTransfer = ({ transIdenty = '', groupItem }) => {
+const RoleTransfer = ({ transIdenty = '', groupItem, treeUserData = [] }) => {
   const [targetKeys, setTargetKeys] = useState([]);
   const treeC = useRef(null);
   const treeDirection = useRef(null);
   treeDirection.current = 'left';
-  treeC.current =
-    transIdenty === '人员'
-      ? [
-          {
-            key: '0-0',
-            title: 'nick',
-            children: [
-              { key: '0-0-0', title: '张三' },
-              { key: '0-0-1', title: '李四' },
-            ],
-          },
-          {
-            key: '0-1',
-            title: '0-1',
-            children: [
-              { key: '0-1-0', title: '0-1-0' },
-              { key: '0-1-1', title: '0-1-1' },
-            ],
-          },
-          { key: '0-2', title: '0-2' },
-        ]
-      : [
-          {
-            key: '0-0',
-            title: '系统管理',
-            children: [
-              { key: '0-0-0', title: '用户管理' },
-              {
-                key: '0-0-1',
-                title: '角色管理',
-                children: [
-                  { key: '0-0-1-0', title: '角色信息' },
-                  { key: '0-0-1-1', title: '角色用户' },
-                  { key: '0-0-1-2', title: '功能权限' },
-                ],
-              },
-              { key: '0-0-2', title: '菜单权限' },
-            ],
-          },
-          {
-            key: '0-1',
-            title: '品牌监控',
-          },
-          { key: '0-2', title: '人物画像' },
-          { key: '0-3', title: '竞品分析' },
-        ];
+
+  const initUserData = () => {
+    const UserData = JSON.parse(localStorage.getItem('userTreeData'));
+    const UserTreeData = UserData || [];
+    return UserTreeData;
+  };
+  /* 初始功能数据 */
+  const initFunctionData = () => {
+    const functionData = JSON.parse(localStorage.getItem('munuListTreeData'));
+    const functionTreeData = functionData?.[0]?.children || [];
+    return functionTreeData;
+  };
+
+  treeC.current = transIdenty === '人员' ? initUserData() : initFunctionData();
+  // transIdenty === '人员'
+  //   ? [
+  //       {
+  //         key: '0-0',
+  //         title: 'nick',
+  //         children: [
+  //           { key: '0-0-0', title: '张三' },
+  //           { key: '0-0-1', title: '李四' },
+  //         ],
+  //       },
+  //       {
+  //         key: '0-1',
+  //         title: '0-1',
+  //         children: [
+  //           { key: '0-1-0', title: '0-1-0' },
+  //           { key: '0-1-1', title: '0-1-1' },
+  //         ],
+  //       },
+  //       { key: '0-2', title: '0-2' },
+  //     ]
+  //   : [
+  //       {
+  //         key: '0-0',
+  //         title: '系统管理',
+  //         children: [
+  //           { key: '0-0-0', title: '用户管理' },
+  //           {
+  //             key: '0-0-1',
+  //             title: '角色管理',
+  //             children: [
+  //               { key: '0-0-1-0', title: '角色信息' },
+  //               { key: '0-0-1-1', title: '角色用户' },
+  //               { key: '0-0-1-2', title: '功能权限' },
+  //             ],
+  //           },
+  //           { key: '0-0-2', title: '菜单权限' },
+  //         ],
+  //       },
+  //       {
+  //         key: '0-1',
+  //         title: '品牌监控',
+  //       },
+  //       { key: '0-2', title: '人物画像' },
+  //       { key: '0-3', title: '竞品分析' },
+  //     ];
+
+  // transIdenty === '人员' && initUserData();
+
   const [treeData, setTreeData] = useState(treeC.current);
+
   const TreeTransfer = ({
     dataSource,
     dataSourceRight,
@@ -286,8 +303,8 @@ const RoleTransfer = ({ transIdenty = '', groupItem }) => {
 
   useEffect(async () => {
     const userInfo = await localForage.getItem('userSystemInfo');
-    console.log(userInfo, '289-----');
     if (transIdenty === '人员') {
+      // initUserData();
       setTargetKeys(userInfo?.[groupItem.id]?.roleUser || []);
     }
     if (transIdenty === '功能') {

@@ -46,6 +46,7 @@ import {
 } from '@ant-design/icons';
 import '@/assets/style/layout.less';
 import copy from 'copy-to-clipboard';
+import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 
 const { TextArea } = Input;
 
@@ -140,6 +141,10 @@ export default function FormList() {
       dataIndex: 'formCode',
       key: 'formCode',
       align: 'center',
+      width: 200,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '创建时间',
@@ -168,8 +173,12 @@ export default function FormList() {
       dataIndex: 'formUrl',
       key: 'formUrl',
       align: 'center',
+      width: 200,
       render: (_, { formStatus, formUrl }, index) => {
-        return formStatus === 'disabled' ? '' : formUrl;
+        return (
+          // formStatus === 'disabled' ? '' :
+          <EllipsisTooltip title={formUrl} />
+        );
       },
     },
     {
@@ -468,6 +477,7 @@ export default function FormList() {
             rowKey={(record) => record.formCode}
             rowSelection={rowSelection}
             sticky={true}
+            scroll={{ x: '100%' }}
             className="default-table"
           />
         </Content>

@@ -30,6 +30,7 @@ export default function IndexPage() {
   const formRef = useRef(null);
   const eidtIdenty = useRef(null);
   const currentId = useRef(null);
+  const userTree = useRef(null);
   const [systemData, setSystemData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [groupId, setGroupId] = useState(null);
@@ -91,7 +92,33 @@ export default function IndexPage() {
 
   const onChange = () => {};
 
+  /* 初始人员数据 */
+  const initUserData = async () => {
+    const initUserData = await localForage.getItem('groupUserList');
+    const userGroup = await localForage.getItem('userGroup');
+    const peopleInitData = [];
+    userGroup.forEach((item) => {
+      const childData = {
+        ...item,
+        title: item.name,
+        key: item.id,
+      };
+      if (initUserData?.[item.id]?.length) {
+        childData['children'] = initUserData?.[item.id].map((item) => {
+          return {
+            ...item,
+            title: item.name,
+            key: item.id,
+          };
+        });
+      }
+      peopleInitData.push(childData);
+    });
+    localStorage.setItem('userTreeData', JSON.stringify(peopleInitData));
+  };
+
   const handleGroupClick = (item) => {
+    initUserData();
     setGroupItem(item);
     setGroupId(item.id);
   };
@@ -239,6 +266,9 @@ export default function IndexPage() {
                     // editItemHandle={editItemHandle}
                   />
                 </TabPane>
+                <TabPane tab="数据权限" key="4">
+                  <div>数据权限</div>
+                </TabPane>
               </Tabs>
             ) : (
               <div>请选择一个角色</div>
@@ -250,7 +280,7 @@ export default function IndexPage() {
       {/* 新建用户、选择用户弹框 */}
       <Modal
         title={eidtIdenty.current ? '编辑角色' : '新增角色'}
-        width={620}
+        width={520}
         visible={isModalVisible}
         destroyOnClose={true}
         onOk={handleOk}
@@ -274,11 +304,10 @@ export default function IndexPage() {
                 initialValues={formData}
                 name="basic"
                 autoComplete="off"
-                layout="vertical"
                 wrapperCol={{ span: 22 }}
               >
                 <Row>
-                  <Col span={12}>
+                  <Col span={20}>
                     <Form.Item
                       label="角色名称"
                       name="name"

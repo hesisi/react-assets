@@ -101,6 +101,9 @@ export default function Page() {
       dataIndex: 'id',
       key: 'id',
       align: 'center',
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '备注',

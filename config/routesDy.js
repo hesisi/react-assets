@@ -128,7 +128,7 @@ const munuDefault = [
 
 export const munuDefaultTree = [
   {
-    title: 'Root Node',
+    title: '全部菜单',
     key: '00-top',
     children: [
       {

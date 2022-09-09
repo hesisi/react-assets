@@ -4,6 +4,8 @@ import { cloneDeep } from 'lodash';
 import { useRef, useEffect } from 'react';
 import localForage from 'localforage';
 
+import { updateRoleInfo } from '@/services/userManager.';
+
 const { TextArea } = Input;
 export default function RoleInfo(props) {
   const { groupItem, editItemHandle } = props;
@@ -27,14 +29,19 @@ export default function RoleInfo(props) {
   const handleSaveInfo = () => {
     formRef.current.validateFields().then(async (values) => {
       const { name, roleDescrib } = values;
-      const userOldInfo = (await localForage.getItem('userSystemInfo')) || {};
-      userOldInfo[groupItem.id] = {
-        ...userOldInfo[groupItem.id],
+      const upResult = updateRoleInfo({
+        ...groupItem,
         name,
-        roleDescrib,
-      };
-      editItemHandle && editItemHandle({ ...groupItem, name, roleDescrib });
-      localForage.setItem('userSystemInfo', userOldInfo);
+        desc: roleDescrib,
+      });
+      // const userOldInfo = (await localForage.getItem('userSystemInfo')) || {};
+      // userOldInfo[groupItem.id] = {
+      //   ...userOldInfo[groupItem.id],
+      //   name,
+      //   roleDescrib,
+      // };{ ...groupItem, name, roleDescrib }
+      editItemHandle && editItemHandle();
+      // localForage.setItem('userSystemInfo', userOldInfo);
       message.success('保存成功');
     });
   };
@@ -43,7 +50,7 @@ export default function RoleInfo(props) {
     if (formRef?.current && groupItem) {
       formRef.current.setFieldsValue({
         name: groupItem.name || '',
-        roleDescrib: groupItem.roleDescrib || '',
+        roleDescrib: groupItem.desc || '',
       });
     }
   }, [groupItem]);

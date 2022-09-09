@@ -155,10 +155,7 @@ export default function Account({ accountIdenty = 'user' }) {
             </span>
             删除
           </span>
-          <span
-            className="table-button"
-            onClick={() => handleDelete([record.id])}
-          >
+          <span className="table-button">
             <span style={{ marginRight: '5px' }}>
               <ReloadOutlined />
             </span>
@@ -440,6 +437,14 @@ export default function Account({ accountIdenty = 'user' }) {
             onOk={handleOk}
             destroyOnClose={true}
             onCancel={() => {
+              setFormData({
+                name: '',
+                sex: undefined,
+                tel: '',
+                email: '',
+                work: undefined,
+                cate: undefined,
+              });
               currentId.current = null;
               eidtIdenty.current = false;
               setIsModalVisible(false);

@@ -17,6 +17,7 @@ const tablePreview = React.forwardRef((props, ref) => {
     showTableHeader = true,
     showOperate = true,
     childFormCode = {},
+    formCode,
     handleShenPiP,
   } = props;
   const [table, setTable] = useState([]); // 从内存获取的表格
@@ -39,9 +40,9 @@ const tablePreview = React.forwardRef((props, ref) => {
 
   const formRef = useRef(null);
   const tableRef = useRef(null);
-  const formCode = useMemo(() => {
-    return props.location?.query?.formCode || props.formCode;
-  });
+  // const formCode = useMemo(() => {
+  //   return props.location?.query?.formCode || props.formCode;
+  // });
 
   /*  初始化 */
   useEffect(() => {
@@ -72,7 +73,7 @@ const tablePreview = React.forwardRef((props, ref) => {
     activeKey.current = '1';
     /* 初始表格数据 */
     initTableLocal(initDataIndex);
-  }, []);
+  }, [formCode, childFormCode]);
 
   /* 初始表格本地数据 */
   const initTableLocal = async (initDataIndex = []) => {
@@ -362,6 +363,7 @@ const tablePreview = React.forwardRef((props, ref) => {
         oddNumbers: arr.length + 1,
         groupType: childFormCode.groupType,
       });
+      console.log(childFormCode, '365-----');
       originData[childFormCode.id]['created'] = arr;
       localForage.setItem('flowCreateMap', originData);
       originSource.current = arr;

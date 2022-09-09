@@ -11,6 +11,7 @@ import Icon, {
   SaveOutlined,
   CheckCircleOutlined,
   EyeOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons';
 import './index.less';
 import ConfigSider from './configSider';
@@ -274,6 +275,20 @@ const homePage = (props) => {
     }
     message.success(`${data}成功!`, 1.5);
   };
+
+  const deleteHandler = () => {
+    if (localStorage.getItem('isHome')) {
+      localStorage.removeItem('isHome');
+    }
+    if (localStorage.getItem('homeDom')) {
+      localStorage.removeItem('homeDom');
+    }
+    if (localStorage.getItem('homeProperty')) {
+      localStorage.removeItem('homeProperty');
+    }
+    message.success('删除成功');
+  };
+
   useEffect(() => {
     // 从内存中获取并回显
     if (!homeDom) return;
@@ -320,7 +335,7 @@ const homePage = (props) => {
                 <CopyOutlined className="icon" /> */}
               </Space>
             </Col>
-            <Col span={15} className="header-config">
+            <Col span={14} className="header-config">
               <Space>
                 {/* <div>
                   收缩查看：
@@ -338,7 +353,7 @@ const homePage = (props) => {
                 <span className="header-config__text">主页配置面板</span> */}
               </Space>
             </Col>
-            <Col span={4} className="header_button">
+            <Col span={5} className="header_button">
               <Space>
                 {/* <Button type="primary">返回</Button> */}
                 {/* <Button type="primary">保存</Button>
@@ -367,6 +382,13 @@ const homePage = (props) => {
                   onClick={() => saveHandler('启用')}
                 >
                   启用
+                </Button>
+                <Button
+                  type="default"
+                  icon={<CloseCircleOutlined />}
+                  onClick={() => deleteHandler('启用')}
+                >
+                  删除
                 </Button>
               </Space>
             </Col>

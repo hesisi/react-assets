@@ -16,6 +16,13 @@ import RoleUser from './roleUser';
 import RoleFunction from './roleFunction';
 import UserLeftList from '../userLeftList';
 
+import {
+  getRoleList,
+  updateRoleInfo,
+  addRole,
+  deleteRole,
+} from '@/services/userManager.';
+
 const { Sider, Content } = Layout;
 const { TabPane } = Tabs;
 
@@ -61,34 +68,41 @@ export default function IndexPage() {
   };
 
   useEffect(async () => {
-    const oldData = await localForage.getItem('userSystem');
-    if (!oldData) {
-      const sysItem = {};
-      data.forEach((item) => {
-        sysItem[item.id] = {
-          ...item,
-          roleDescrib: '',
-          roleUser: [],
-          roleFunction: [],
-        };
-      });
-      localForage.setItem('userSystemInfo', sysItem);
-      localForage.setItem('userSystem', data);
-      setSystemData(data);
-    } else {
-      // const sysItem = {};
-      // oldData.forEach((item) => {
-      //   sysItem[item.id] = {
-      //     ...item,
-      //     roleDescrib: '',
-      //     roleUser: [],
-      //     roleFunction: [],
-      //   };
-      // });
-      // localForage.setItem('userSystemInfo', sysItem);
-      setSystemData(oldData);
-    }
+    fechRoleList();
+    // const oldData = await localForage.getItem('userSystem');
+    // if (!oldData) {
+    //   const sysItem = {};
+    //   data.forEach((item) => {
+    //     sysItem[item.id] = {
+    //       ...item,
+    //       roleDescrib: '',
+    //       roleUser: [],
+    //       roleFunction: [],
+    //     };
+    //   });
+    //   localForage.setItem('userSystemInfo', sysItem);
+    //   localForage.setItem('userSystem', data);
+    //   setSystemData(data);
+    // } else {
+    //   // const sysItem = {};
+    //   // oldData.forEach((item) => {
+    //   //   sysItem[item.id] = {
+    //   //     ...item,
+    //   //     roleDescrib: '',
+    //   //     roleUser: [],
+    //   //     roleFunction: [],
+    //   //   };
+    //   // });
+    //   // localForage.setItem('userSystemInfo', sysItem);
+    //   setSystemData(oldData);
+    // }
   }, []);
+
+  const fechRoleList = async () => {
+    const roleData = await getRoleList();
+    setSystemData(roleData?.data?.data || []);
+    console.log(roleData);
+  };
 
   const onChange = () => {};
 
@@ -134,19 +148,21 @@ export default function IndexPage() {
   };
 
   const handleDelete = async (idArr = []) => {
-    const currentUser = cloneDeep(systemData).filter(
-      (item) => !idArr.includes(item.id),
-    );
-    let oldData = await localForage.getItem('userSystemInfo');
-    idArr.forEach((idItem) => {
-      if (oldData?.idItem) {
-        delete oldData.idItem;
-      }
-    });
-    setSystemData(currentUser);
-    localForage.setItem('userSystemInfo', oldData);
-    localForage.setItem('userSystem', currentUser);
+    const deleteResult = await deleteRole(idArr.join());
+    // const currentUser = cloneDeep(systemData).filter(
+    //   (item) => !idArr.includes(item.id),
+    // );
+    // let oldData = await localForage.getItem('userSystemInfo');
+    // idArr.forEach((idItem) => {
+    //   if (oldData?.idItem) {
+    //     delete oldData.idItem;
+    //   }
+    // });
+    // setSystemData(currentUser);
+    // localForage.setItem('userSystemInfo', oldData);
+    // localForage.setItem('userSystem', currentUser);
     message.success('删除成功');
+    fechRoleList();
   };
 
   /* 添加分组 */
@@ -162,10 +178,15 @@ export default function IndexPage() {
         let oldSource = cloneDeep(systemData);
         const sysItem = await localForage.getItem('userSystemInfo');
         let oldItem = {};
+        let NewItem = {};
         if (eidtIdenty.current) {
           oldSource = oldSource.map((item) => {
             if (item.id === currentId.current) {
               oldItem = item;
+              NewItem = {
+                ...item,
+                ...values,
+              };
               return {
                 ...item,
                 ...values,
@@ -173,24 +194,26 @@ export default function IndexPage() {
             }
             return item;
           });
-          sysItem[currentId.current].name = values.name;
+          const updatResult = await updateRoleInfo(NewItem);
+          // sysItem[currentId.current].name = values.name;
         } else {
           const userItem = {
             ...values,
-            id: getUUID(),
+            // id: getUUID(),
           };
-          oldSource.push(userItem);
-          sysItem[userItem.id] = {
-            id: userItem.id,
-            name: values.name,
-            roleDescrib: '',
-            roleUser: [],
-            roleFunction: [],
-          };
+          // oldSource.push(userItem);
+          // sysItem[userItem.id] = {
+          //   id: userItem.id,
+          //   name: values.name,
+          //   roleDescrib: '',
+          //   roleUser: [],
+          //   roleFunction: [],
+          // };
+          const addResult = await addRole(userItem);
         }
-        setSystemData(oldSource);
-        localForage.setItem('userSystemInfo', sysItem);
-        localForage.setItem('userSystem', oldSource);
+        // setSystemData(oldSource);
+        // localForage.setItem('userSystemInfo', sysItem);
+        // localForage.setItem('userSystem', oldSource);
         message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
         if (eidtIdenty.current) {
           setGroupItem(null);
@@ -202,6 +225,7 @@ export default function IndexPage() {
           name: '',
         });
         setIsModalVisible(false);
+        fechRoleList();
       })
       .catch((reason) => {
         message.warning('请检查');
@@ -209,15 +233,16 @@ export default function IndexPage() {
   };
 
   const editItemHandle = (newItem = {}) => {
-    let oldSource = cloneDeep(systemData);
-    oldSource = oldSource.map((item) => {
-      if (item.id === newItem.id) {
-        return newItem;
-      }
-      return item;
-    });
-    setSystemData(oldSource);
-    localForage.setItem('userSystem', oldSource);
+    fechRoleList();
+    // let oldSource = cloneDeep(systemData);
+    // oldSource = oldSource.map((item) => {
+    //   if (item.id === newItem.id) {
+    //     return newItem;
+    //   }
+    //   return item;
+    // });
+    // setSystemData(oldSource);
+    // localForage.setItem('userSystem', oldSource);
   };
   return (
     <div

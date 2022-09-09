@@ -29,6 +29,7 @@ export default function GroupUser({
   const formRefS = useRef(null);
   const currentGroupId = useRef(null);
   const currentFormCode = useRef(null);
+  // const [showFormTable, setShowFormTable] = useState(false);
   const originSource = useRef(null);
   const curentClickItem = useRef(null);
   const [activeIdenty, setActiveIdenty] = useState('新建');
@@ -89,7 +90,9 @@ export default function GroupUser({
   const getCreateForm = () => {
     const targetFormCode = childFormCode.targetForm;
     currentFormCode.current = targetFormCode;
-    const formData = JSON.parse(localStorage.getItem('formMap') || {});
+    const formData = localStorage.getItem('formMap')
+      ? JSON.parse(localStorage.getItem('formMap'))
+      : {};
     const formilyData = formData[targetFormCode];
     setFormCode(targetFormCode || null);
     return formilyData;
@@ -106,6 +109,8 @@ export default function GroupUser({
   /* 初始化 */
   useEffect(async () => {
     let tableSource = await localForage.getItem('flowCreateMap');
+
+    console.log(childFormCode, '109-----');
     if (childFormCode) {
       if (groupId?.[0] !== 'shouye') {
         const formilyData = getCreateForm();
@@ -113,10 +118,10 @@ export default function GroupUser({
           setFormTree(transformToTreeNode(formilyData['formily-form-schema']));
         }
         setActiveKey('1');
+        // setShowFormTable(childFormCode?.targetForm);
       }
     } else {
       if (!groupId || groupId?.[0] === 'shouye') {
-        console.log(activeKey, '119----');
         const totalTableSource = Object.values(tableSource || []);
         const totoalNum = [0, 0, 0];
         const totoalSource = [[], [], []];
@@ -138,6 +143,7 @@ export default function GroupUser({
         setTodoSource(totoalSource[1]);
         setDataDoneSource(totoalSource[2]);
         setActiveKey('1');
+        // setShowFormTable(false);
       }
     }
   }, [groupId, childFormCode]);
@@ -246,17 +252,20 @@ export default function GroupUser({
     }, 0);
     setTimeout(() => {
       /* 控制审批人的显隐 */
-      handleShenPiFormAuthority();
+      handleShenPiFormAuthority(item);
     }, 0);
   };
 
-  const handleShenPiFormAuthority = () => {
+  const handleShenPiFormAuthority = (item) => {
     const formS = formRefS?.current?.form;
     const formSetting =
       childFormCode?.approverGroup?.[0]?.formSetting?.formField || [];
     if (formS) {
       formS.setValues({
-        approvePeople: childFormCode?.approver?.name || '',
+        approvePeople:
+          item?.applyNode ||
+          childFormCode?.approverGroup?.[0]?.approver?.name ||
+          '张总',
       });
       authorityRuleControl(formSetting, formS);
     }

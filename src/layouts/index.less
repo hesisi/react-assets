@@ -1,6 +1,7 @@
 .logo {
-  float: left;
-  width: 50px;
+  position: absolute;
+  left: 20px;
+  width: 80px;
   // height: 31px;
   margin-right: 24px;
   // background: rgba(255, 255, 255, 0.3);
@@ -25,6 +26,12 @@
 
 .header {
   background: #0d6bff !important;
+  position: relative;
+  padding-right: 300px !important;
+  padding-left: 120px !important;
+  > ul {
+    width: 100%;
+  }
 }
 
 .menu {
@@ -34,8 +41,11 @@
 }
 
 .user-message {
-  margin-left: auto;
-  position: relative;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-left: 0;
+  width: 300px;
   .user-detail {
     color: #fff;
   }

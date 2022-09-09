@@ -18,10 +18,24 @@ export default defineConfig({
   // mode: 'history',//去掉#号
   routes,
   fastRefresh: {},
+  locale: {
+    default: 'zh-CN',
+    antd: true,
+    baseNavigator: false,
+  },
   proxy: {
     '/assets/messageData': {
       // target: config.infraApiOrigin, // 头部infra配置地址
-      target: 'http://10.173.79.189:9202/',
+      target: 'http://10.173.73.250:9202/', // 韩振宇
+    },
+    '/role': {
+      target: 'http://10.173.85.133:9201/', // 田宝山
+    },
+    '/userRole': {
+      target: 'http://10.173.85.133:9201/', // 田宝山
+    },
+    '/rolePermission': {
+      target: 'http://10.173.85.133:9201/', // 田宝山
     },
   },
   // publicPath: '/',

@@ -5,6 +5,7 @@ import {
   DeleteOutlined,
   CodeSandboxOutlined,
 } from '@ant-design/icons';
+import { Empty } from 'antd';
 import React, { memo, useEffect, useState } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars';
 
@@ -46,23 +47,31 @@ function UserLeftList(props) {
       </div>
       <div className="list-cont-content">
         <Scrollbars>
-          {listData.map((x) => (
-            <div
-              className={id === x.id ? 'list-item active' : 'list-item normal'}
-              key={x.id}
-              onClick={() => handleGroupClick(x)}
-            >
-              {x.name}
-              <span className="groupOperate">
-                <span onClick={() => handleEdit(x.id)}>
-                  <FormOutlined />
+          {listData?.length ? (
+            listData.map((x) => (
+              <div
+                className={
+                  id === x.id ? 'list-item active' : 'list-item normal'
+                }
+                key={x.id}
+                onClick={() => handleGroupClick(x)}
+              >
+                {x.name}
+                <span className="groupOperate">
+                  <span onClick={() => handleEdit(x.id)}>
+                    <FormOutlined />
+                  </span>
+                  <span onClick={() => handleDelete([x.id])}>
+                    <DeleteOutlined />
+                  </span>
                 </span>
-                <span onClick={() => handleDelete([x.id])}>
-                  <DeleteOutlined />
-                </span>
-              </span>
+              </div>
+            ))
+          ) : (
+            <div>
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
             </div>
-          ))}
+          )}
         </Scrollbars>
       </div>
     </div>

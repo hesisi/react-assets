@@ -104,9 +104,11 @@ export default function GroupUser({ groupId = null }) {
       console.log(currentGroupId.current, '91------');
       const userGroup = await localForage.getItem('userGroup');
       currentGroupId.current = groupId;
-      const currentDource = initUserData?.[currentGroupId.current] || [];
+      const currentDource = initUserData?.[groupId] || [];
       currentGoupeData.current = userGroup;
+      console.log(currentDource, '109-----');
       setDataSource(currentDource);
+      setSelectedRowKeys([]);
     }
   }, [groupId]);
 
@@ -137,9 +139,8 @@ export default function GroupUser({ groupId = null }) {
     });
     let initUserListData = (await localForage.getItem('userList')) || [];
     initUserListData = initUserListData.filter(
-      (item) =>
-        !currentDourceId.includes(item.id) &&
-        ((item?.cate && item?.cate === currentGroupId.current) || !item?.cate),
+      (item) => !currentDourceId.includes(item.id) && !item?.cate,
+      // (item?.cate && item?.cate === currentGroupId.current) ||
     );
     setDataUserSource(initUserListData || []);
     setIsModalVisible(true);
@@ -155,14 +156,21 @@ export default function GroupUser({ groupId = null }) {
       const initUserListData = (await localForage.getItem('userList')) || [];
       initUserData[currentGroupId.current] =
         initUserData[currentGroupId.current] || [];
-      initUserData[currentGroupId.current] = initUserData[
-        currentGroupId.current
-      ].concat(
-        initUserListData.filter((item) =>
-          selectedUserRowKeys.includes(item.id),
-        ),
-      );
+
+      const newItems = [];
+      const newUserListData = [];
+      initUserListData.forEach((item) => {
+        if (selectedUserRowKeys.includes(item.id)) {
+          newItems.push({ ...item, cate: currentGroupId.current });
+          newUserListData.push({ ...item, cate: currentGroupId.current });
+        } else {
+          newUserListData.push(item);
+        }
+      });
+      initUserData[currentGroupId.current] =
+        initUserData[currentGroupId.current].concat(newItems);
       localForage.setItem('groupUserList', initUserData);
+      localForage.setItem('userList', newUserListData);
       setDataSource(initUserData[currentGroupId.current]);
       message.success('添加成功');
     } else {
@@ -185,10 +193,22 @@ export default function GroupUser({ groupId = null }) {
       return;
     }
     const initUserData = await localForage.getItem('groupUserList');
+    let initUserListData = (await localForage.getItem('userList')) || [];
     initUserData[currentGroupId.current] = initUserData[
       currentGroupId.current
     ].filter((item) => !idArr.includes(item.id));
+    initUserListData = initUserListData.map((item) => {
+      if (idArr.includes(item.id)) {
+        return {
+          ...item,
+          cate: undefined,
+        };
+      } else {
+        return item;
+      }
+    });
     localForage.setItem('groupUserList', initUserData);
+    localForage.setItem('userList', initUserListData);
     setDataSource(initUserData[currentGroupId.current]);
     message.success('删除成功');
   };

@@ -395,7 +395,7 @@ export default function Page() {
                       style={{ borderRadius: '5px' }}
                       className="default-btn"
                     >
-                      清除
+                      清除m
                     </Button>
                   </Space>
                 </Col>
@@ -412,6 +412,11 @@ export default function Page() {
             scroll={{ x: '100%' }}
             bordered={false}
             className="default-table"
+            pagination={{
+              total: tableData?.length || 0,
+              showSizeChanger: true,
+              // onChange: handlePageChange,
+            }}
           />
         </Content>
       </Layout>

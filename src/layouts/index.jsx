@@ -171,6 +171,7 @@ const CommonLayout = (props) => {
         <div className={Styles.logo}>
           <img src={logo} />
         </div>
+
         <Menu
           theme="dark"
           mode="horizontal"
@@ -179,6 +180,7 @@ const CommonLayout = (props) => {
           style={{ background: '#0D6BFF' }}
           className={Styles['menu']}
         />
+
         <div className="user-message">
           {/* 消息提醒 */}
           {isShowMessage ? (

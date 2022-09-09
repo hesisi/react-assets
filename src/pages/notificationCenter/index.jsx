@@ -153,11 +153,15 @@ export default function NotificationCenter(props) {
       ...params,
     };
     setLoading(true);
-    const tableData = await getMessageList(params);
-    const dataBack = tableData?.data?.data?.content || [];
-    setTotal(tableData?.data?.data?.totalSize || 0);
-    setData(dataBack);
-    setLoading(false);
+    try {
+      const tableData = await getMessageList(requetData);
+      const dataBack = tableData?.data?.data?.content || [];
+      setTotal(tableData?.data?.data?.totalSize || 0);
+      setData(dataBack);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {

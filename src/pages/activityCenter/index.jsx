@@ -120,6 +120,9 @@ export default function IndexPage() {
 
   const handleGroupChildClick = (item) => {
     setChildFormCode(item);
+    // setTimeout(() => {
+    //   setChildFormCode(item);
+    // }, 0)
   };
   return (
     <div style={{ height: '100%', padding: 20, backgroundColor: '#f0f2f5' }}>

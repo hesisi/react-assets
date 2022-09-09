@@ -194,7 +194,7 @@ export default function IndexPage() {
             <Sider className={' menu-left'} width={300}>
               <div className="col-wrapper">
                 <div className="menu-config__tree">
-                  <span>菜单架构</span>
+                  <span>菜单管理</span>
                   {/* <Button onClick={nodeClear}>清空结点</Button> */}
                 </div>
                 <MenuTree

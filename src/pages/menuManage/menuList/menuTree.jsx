@@ -202,7 +202,7 @@ function menuTree(props) {
         operateIdenty === 'add'
           ? {
               title:
-                node.title === 'Root Node'
+                node.title === '全部菜单'
                   ? `Parent-${node.children.length + 1}`
                   : `${node.title}-${node.children.length + 1}`,
               key: getUUID(),

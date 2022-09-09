@@ -1,13 +1,17 @@
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import { SearchOutlined, MinusCircleOutlined } from '@ant-design/icons';
-import { useRef } from 'react';
-
+import { useRef, useEffect, useState } from 'react';
 import RoleTransfer from './roleTransfer';
+
+import { getRoleUser, updateRoleUser } from '@/services/userManager.';
 
 const { TextArea } = Input;
 export default function RoleUser({ groupItem }) {
   const formRef = useRef(null);
+  const saveKeysRef = useRef(null);
   const [form] = Form.useForm();
+  const [roleUserList, setRoleUserList] = useState([]);
+  const [roleUserTargetKeys, setRoleUserTargetKeys] = useState([]);
 
   const onFormChange = (values) => {
     formValueChange && formValueChange(values);
@@ -31,31 +35,73 @@ export default function RoleUser({ groupItem }) {
     onFinish,
     className: 'default-form-radios',
   };
+
+  const temp = (data, keysChoose = []) => {
+    data.forEach((item) => {
+      item['key'] =
+        !item?.groupId && item.groupId !== 0 ? item.sign : item.groupId;
+      item['title'] = item.groupName || item.userName;
+      keysChoose.push(item.key);
+      if (item.children?.length > 0) {
+        temp(item.children, keysChoose);
+      }
+    });
+    return data;
+  };
+
+  useEffect(async () => {
+    if (groupItem) {
+      const chooseKeys = [];
+      const roleUserData = await getRoleUser({
+        roleId: groupItem.id,
+      });
+      const userTreeData = roleUserData?.data?.data?.groupUserList || [];
+      const userList = temp(userTreeData);
+      temp(roleUserData?.data?.data?.relationGroupUserList || [], chooseKeys);
+      saveKeysRef.current = chooseKeys || [];
+      setRoleUserList(userList);
+      setRoleUserTargetKeys(chooseKeys);
+    }
+  }, [groupItem]);
+
+  const saveRoleUser = (targetIds, selectedKeys) => {
+    // 调后端保存接口
+    saveKeysRef.current = targetIds;
+  };
+
+  const handleSaveUser = async () => {
+    let sendIds = saveKeysRef?.current || [];
+    sendIds = sendIds.filter((item) => {
+      return (item + '').indexOf('-') !== -1;
+    });
+    sendIds = sendIds.map((item) => {
+      const backItem = item.split('-')[1];
+      return backItem;
+    });
+    const updateR = await updateRoleUser(groupItem.id, sendIds);
+    message.success('保存成功');
+  };
+
   return (
     <div className="table-search-wrapper">
-      <RoleTransfer transIdenty="人员" groupItem={groupItem} />
-      {/* <Form {...formProps}>
-        <Form.Item label="" name="roleUser" key="roleName">
-
-        </Form.Item>
-        <Form.Item>
-          <Button
-            type="primary"
-            icon={<SearchOutlined />}
-            htmlType="submit"
-            style={{ marginRight: '10px' }}
-          >
-            保存
-          </Button>
-          {/* <Button
-            icon={<MinusCircleOutlined />}
-            htmlType="button"
-            onClick={onReset}
-          >
-            {formButton.clearText}
-          </Button>
-        </Form.Item>
-      </Form> */}
+      <RoleTransfer
+        transIdenty="人员"
+        groupItem={groupItem}
+        transData={roleUserList}
+        transTargetKeys={roleUserTargetKeys}
+        saveRoleUser={saveRoleUser}
+      />
+      <div style={{ marginTop: '15px' }}>
+        <Button
+          type="primary"
+          icon={<SearchOutlined />}
+          htmlType="submit"
+          onClick={handleSaveUser}
+          style={{ marginRight: '10px' }}
+        >
+          保存
+        </Button>
+      </div>
     </div>
   );
 }

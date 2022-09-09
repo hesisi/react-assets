@@ -1,76 +1,32 @@
-import { Transfer, Tree, Input } from 'antd';
+import { Transfer, Tree, Input, Empty } from 'antd';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import localForage from 'localforage';
 import { cloneDeep } from 'lodash';
+import { creatRightTree, filterArrForKey } from './treeUtil';
 
-const RoleTransfer = ({ transIdenty = '', groupItem, treeUserData = [] }) => {
+const RoleTransfer = ({
+  transIdenty = '',
+  groupItem,
+  treeUserData = [],
+  transData,
+  transTargetKeys,
+  saveRoleUser,
+}) => {
   const [targetKeys, setTargetKeys] = useState([]);
+  const checkedLeftKeys = useRef(null);
+  const checkedRightKeys = useRef(null);
   const treeC = useRef(null);
   const treeDirection = useRef(null);
+  const treeRight = useRef(null);
   treeDirection.current = 'left';
-
-  const initUserData = () => {
-    const UserData = JSON.parse(localStorage.getItem('userTreeData'));
-    const UserTreeData = UserData || [];
-    return UserTreeData;
-  };
-  /* 初始功能数据 */
-  const initFunctionData = () => {
-    const functionData = JSON.parse(localStorage.getItem('munuListTreeData'));
-    const functionTreeData = functionData?.[0]?.children || [];
-    return functionTreeData;
-  };
-
-  treeC.current = transIdenty === '人员' ? initUserData() : initFunctionData();
-  // transIdenty === '人员'
-  //   ? [
-  //       {
-  //         key: '0-0',
-  //         title: 'nick',
-  //         children: [
-  //           { key: '0-0-0', title: '张三' },
-  //           { key: '0-0-1', title: '李四' },
-  //         ],
-  //       },
-  //       {
-  //         key: '0-1',
-  //         title: '0-1',
-  //         children: [
-  //           { key: '0-1-0', title: '0-1-0' },
-  //           { key: '0-1-1', title: '0-1-1' },
-  //         ],
-  //       },
-  //       { key: '0-2', title: '0-2' },
-  //     ]
-  //   : [
-  //       {
-  //         key: '0-0',
-  //         title: '系统管理',
-  //         children: [
-  //           { key: '0-0-0', title: '用户管理' },
-  //           {
-  //             key: '0-0-1',
-  //             title: '角色管理',
-  //             children: [
-  //               { key: '0-0-1-0', title: '角色信息' },
-  //               { key: '0-0-1-1', title: '角色用户' },
-  //               { key: '0-0-1-2', title: '功能权限' },
-  //             ],
-  //           },
-  //           { key: '0-0-2', title: '菜单权限' },
-  //         ],
-  //       },
-  //       {
-  //         key: '0-1',
-  //         title: '品牌监控',
-  //       },
-  //       { key: '0-2', title: '人物画像' },
-  //       { key: '0-3', title: '竞品分析' },
-  //     ];
-
-  // transIdenty === '人员' && initUserData();
-
+  treeC.current = [];
+  treeRight.current = [];
   const [treeData, setTreeData] = useState(treeC.current);
+
+  const onChange = async (keys) => {
+    saveRoleUser && saveRoleUser(keys);
+    setTargetKeys(keys);
+  };
 
   const TreeTransfer = ({
     dataSource,
@@ -80,7 +36,7 @@ const RoleTransfer = ({ transIdenty = '', groupItem, treeUserData = [] }) => {
   }) => {
     const transferDataSource = [];
     const transferDataSourceRight = [];
-    // const dataSourceData = dataSource;
+
     function flatten(list = [], identy = 'left') {
       list.forEach((item) => {
         if (identy === 'left') {
@@ -93,14 +49,13 @@ const RoleTransfer = ({ transIdenty = '', groupItem, treeUserData = [] }) => {
     }
     flatten(dataSource);
     flatten(dataSourceRight, 'right');
+
+    /* 构造树 控制树节点disabled属性 */
     const generateTree = (
       treeNodes = [],
       checkedKeys = [],
       identy = 'left',
     ) => {
-      // if (treeDirection.current !== identy) {
-      //   return
-      // }
       return treeNodes.map(({ children, ...props }) => ({
         ...props,
         disabled:
@@ -111,68 +66,14 @@ const RoleTransfer = ({ transIdenty = '', groupItem, treeUserData = [] }) => {
       }));
     };
 
-    const isChecked = (selectedKeys, eventKey) =>
-      selectedKeys.includes(eventKey);
-
-    /* 树搜索 */
-    const filterArrForKey = (tree, searchValue) => {
-      if (!(tree && tree.length)) {
-        return [];
-      }
-      let newArr = [];
-      newArr = tree.map((item) => {
-        if (item?.title?.indexOf(searchValue) !== -1) {
-          return item;
-        }
-        if (item.children && item.children.length) {
-          const newChildren = filterArrForKey(item.children, searchValue);
-          if (newChildren && newChildren.length) {
-            return {
-              ...item,
-              children: newChildren,
-            };
-          }
-          return null;
-        }
-        return null;
-      });
-      newArr = newArr.filter((item) => item != null);
-      return newArr;
-    };
-
-    /* 构建右树 */
-    const creatRightTree = (tree, targetsKeys = []) => {
-      console.log(targetsKeys, '78--------');
-      if (!(tree && tree.length) || !targetsKeys?.length) {
-        return [];
-      }
-      let newArr = [];
-      newArr = tree.map((item) => {
-        if (targetsKeys.includes(item.key)) {
-          return item;
-        }
-        if (item.children && item.children.length) {
-          const newChildren = creatRightTree(item.children, targetsKeys);
-          if (newChildren && newChildren.length) {
-            return {
-              ...item,
-              children: newChildren,
-            };
-          }
-          return null;
-        }
-        return null;
-      });
-      newArr = newArr.filter((item) => item != null);
-      console.log(newArr, '99-----');
-      return newArr;
-    };
     let rightTreeData = creatRightTree(treeC.current, targetKeys);
+
     return (
       <Transfer
         {...restProps}
         targetKeys={targetKeys}
         dataSource={transferDataSource}
+        // onSelectChange={handleSelectChange}
         className="tree-transfer"
         showSearch
         listStyle={{
@@ -226,56 +127,68 @@ const RoleTransfer = ({ transIdenty = '', groupItem, treeUserData = [] }) => {
           selectedKeys,
         }) => {
           if (direction === 'left') {
-            const checkedKeys = [...selectedKeys, ...targetKeys];
-            return (
+            const checkedKeys = Array.from(
+              new Set([...selectedKeys, ...targetKeys]),
+            );
+            return dataSource?.length ? (
               <Tree
-                height={200}
+                height={280}
                 blockNode
                 checkable
-                checkStrictly
+                // checkStrictly
                 defaultExpandAll
                 checkedKeys={checkedKeys}
                 disableCheckbox={true}
                 treeData={generateTree(dataSource, targetKeys, 'left')}
-                onCheck={(_, { node: { key } }) => {
-                  treeDirection.current = direction;
-                  onItemSelect(key, !isChecked(checkedKeys, key));
+                onCheck={(_, e) => {
+                  const { node, halfCheckedKeys, checkedNodes } = e;
+                  checkedLeftKeys.current = _;
+                  onItemSelectAll(selectedKeys, false);
+                  const selectItems = _.filter(
+                    (item) => !targetKeys.includes(item),
+                  );
+                  onItemSelectAll(selectItems, true);
                 }}
-                onSelect={(_, { node: { key } }) => {
-                  onItemSelect(key, !isChecked(checkedKeys, key));
-                }}
+                onSelect={(checkedKeysArr, e) => {}}
               />
+            ) : (
+              <div>
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              </div>
             );
           }
           {
             /* 右侧树 */
           }
           if (direction === 'right') {
-            const checkedKeys = [...selectedKeys];
-            return (
+            const checkedKeys = Array.from(new Set([...selectedKeys]));
+
+            return dataSourceRight?.length ? (
               <Tree
-                height={200}
+                height={280}
                 blockNode
                 checkable
-                checkStrictly
+                // checkStrictly
                 defaultExpandAll
                 checkedKeys={checkedKeys}
-                disableCheckbox={true}
+                // disableCheckbox={true}
                 treeData={generateTree(
                   creatRightTree(dataSourceRight, targetKeys),
                   targetKeys,
                   'right',
                 )}
-                onCheck={(_, { node: { key } }) => {
-                  treeDirection.current = direction;
-                  console.log(treeDirection.current, '181-----');
-                  onItemSelect(key, !isChecked(checkedKeys, key));
+                onCheck={(_, e) => {
+                  const { node, halfCheckedKeys, checkedNodes } = e;
+                  checkedRightKeys.current = _;
+                  onItemSelectAll(selectedKeys, false);
+                  onItemSelectAll(checkedRightKeys.current, true);
                 }}
-                onSelect={(_, { node: { key } }) => {
-                  console.log(direction, '184-----');
-                  onItemSelect(key, !isChecked(checkedKeys, key));
-                }}
+                onSelect={(checkedKeysArr, { checkedNodes }) => {}}
               />
+            ) : (
+              <div>
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              </div>
             );
           }
         }}
@@ -283,43 +196,34 @@ const RoleTransfer = ({ transIdenty = '', groupItem, treeUserData = [] }) => {
     );
   };
 
-  const onChange = async (keys) => {
-    setTargetKeys(keys);
-
-    console.log(keys, '271----');
-
-    /* 保存在本地 */
-    const userInfo = await localForage.getItem('userSystemInfo');
-    if (transIdenty === '人员') {
-      userInfo[groupItem.id]['roleUser'] = keys;
-    }
-
-    if (transIdenty === '功能') {
-      userInfo[groupItem.id]['roleFunction'] = keys;
-    }
-
-    localForage.setItem('userSystemInfo', userInfo);
-  };
-
   useEffect(async () => {
-    const userInfo = await localForage.getItem('userSystemInfo');
-    if (transIdenty === '人员') {
-      // initUserData();
-      setTargetKeys(userInfo?.[groupItem.id]?.roleUser || []);
+    if (transData) {
+      setTreeData(transData || []);
     }
-    if (transIdenty === '功能') {
-      setTargetKeys(userInfo?.[groupItem.id]?.roleFunction || []);
+    if (transTargetKeys) {
+      setTargetKeys(transTargetKeys);
     }
-  }, [groupItem]);
+  }, [groupItem, transData, transTargetKeys]);
 
-  return (
-    <TreeTransfer
-      dataSource={treeData}
-      dataSourceRight={cloneDeep(treeData)}
-      targetKeys={targetKeys}
-      onChange={onChange}
-    />
-  );
+  const TreeTransferKj = useMemo(() => {
+    if (treeData && treeC?.current) {
+      if (treeData.length) {
+        treeC.current = treeData;
+      }
+      return (
+        <TreeTransfer
+          dataSource={treeData}
+          dataSourceRight={cloneDeep(treeData)}
+          targetKeys={targetKeys}
+          onChange={onChange}
+        />
+      );
+    } else {
+      return null;
+    }
+  }, [treeData, targetKeys]);
+
+  return <>{TreeTransferKj}</>;
 };
 
 export default RoleTransfer;

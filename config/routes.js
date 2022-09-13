@@ -33,6 +33,19 @@ export default [
     ],
   },
   {
+    name: '主页',
+    path: '/homeindex',
+    component: '@/layouts/homeIndex/index',
+    meta: { showMenu: false, showHeader: true },
+    key: 'default-9',
+    routes: [
+      {
+        path: '/homeindex',
+        redirect: '/homeIndex',
+      },
+    ],
+  },
+  {
     name: '消息中心',
     path: '/notificationCenter',
     component: '@/layouts/homeIndex/index',

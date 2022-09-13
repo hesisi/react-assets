@@ -2,11 +2,13 @@ import {
   AppstoreOutlined,
   MailOutlined,
   SettingOutlined,
+  LeftOutlined,
 } from '@ant-design/icons';
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './menuPreview.less';
 import eventBus from '../../utils/eventBus';
+import { Link } from 'umi';
 
 const { Header, Content, Sider } = Layout;
 let items = [];
@@ -84,6 +86,14 @@ export default function menuPreview() {
   return (
     <Layout>
       {/* 常规或水平模式 */}
+      <Row className="menuPriviewBack">
+        <Col span={8}>
+          <Link to="/menuManage/menuList">
+            <LeftOutlined />
+            返回
+          </Link>
+        </Col>
+      </Row>
       {header.includes(config.mode) ? (
         <Header
           className={

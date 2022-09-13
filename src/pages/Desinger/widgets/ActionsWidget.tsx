@@ -28,22 +28,29 @@ import { history } from 'umi';
 import Icon from '@/utils/icon';
 import FormPreview from '@/pages/formManage/formPreview/formPreview';
 import '../index.less';
+import eventBus from '@/utils/eventBus';
 
 interface ActionsWidgetProps {
   type: 'form' | 'table';
   getDesigner: (e: any) => {};
   onSave: () => {};
+  saveDis?: Boolean;
 }
 
 export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
-  const { type, getDesigner, onSave } = props;
+  const { type, getDesigner, onSave, saveDis = false } = props;
   const designer = useDesigner() || Engine;
   const [previewVisible, setPreviewVisible] = useState(false);
   const [formCode, setFormCode] = useState('');
+  const [saveDisabled, setSaveDisabled] = useState(false);
 
   useEffect(() => {
     getDesigner(designer);
   }, []);
+
+  useEffect(() => {
+    setSaveDisabled(saveDis as boolean);
+  }, [saveDis]);
 
   const supportLocales = ['zh-cn', 'en-us', 'ko-kr'];
 
@@ -88,6 +95,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
           onClick={() => {
             onSave();
           }}
+          disabled={saveDisabled}
           icon={<Icon icon="SaveOutlined" />}
           className="primary-btn"
         >

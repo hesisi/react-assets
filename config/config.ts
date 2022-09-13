@@ -59,6 +59,7 @@ export default defineConfig({
         /userManage/,
         /menuManage/,
         /layouts/,
+        /previewPage/,
       ], // 设置忽略文件，用正则做目录名匹配
       include: [/homeIndex/], // 设置需要使用的文件
       landscape: false, // 是否处理横屏情况

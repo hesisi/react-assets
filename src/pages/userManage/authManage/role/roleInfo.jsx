@@ -29,7 +29,7 @@ export default function RoleInfo(props) {
   const handleSaveInfo = () => {
     formRef.current.validateFields().then(async (values) => {
       const { name, roleDescrib } = values;
-      const upResult = updateRoleInfo({
+      const upResult = await updateRoleInfo({
         ...groupItem,
         name,
         desc: roleDescrib,
@@ -40,9 +40,11 @@ export default function RoleInfo(props) {
       //   name,
       //   roleDescrib,
       // };{ ...groupItem, name, roleDescrib }
-      editItemHandle && editItemHandle();
+      if (upResult?.data?.code === 200) {
+        editItemHandle && editItemHandle();
+        message.success('保存成功');
+      }
       // localForage.setItem('userSystemInfo', userOldInfo);
-      message.success('保存成功');
     });
   };
 

@@ -95,7 +95,7 @@ GlobalRegistry.registerDesignerLocales({
 });
 
 const FormDesigner = (props) => {
-  const { type = 'form', getDesigner, onSave } = props;
+  const { type = 'form', getDesigner, onSave, saveDis } = props;
 
   const [inputsSource, setInputsSource] = useState([]);
   const [layoutsSource, setLayoutsSource] = useState([
@@ -176,6 +176,7 @@ const FormDesigner = (props) => {
             type={type}
             getDesigner={getDesigner}
             onSave={onSave}
+            saveDis={saveDis}
           />
         }
       >

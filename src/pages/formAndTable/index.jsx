@@ -16,12 +16,14 @@ import {
 import FormDesigner from '../Desinger';
 import { tableConfig } from './designerConfig';
 import TableSetting from './tableSetting';
+import eventBus from '@/utils/eventBus';
 
 const { Group, Button } = Radio;
 
 export default function (props) {
   const [desingerType, setDesingerType] = useState('form');
   const [designer, setDesigner] = useState();
+  const [saveDis, setSaveDis] = useState(false);
 
   // 保存当前设计器的form schema
   const [formilyFormSchema, setFormilyFormSchema] = useState();
@@ -48,6 +50,7 @@ export default function (props) {
 
   // 模拟接口获取schem参数
   const getSchemaData = (designer) => {
+    setSaveDis(true);
     const timer = setTimeout(() => {
       const formMap =
         (localStorage.getItem('formMap') &&
@@ -64,6 +67,11 @@ export default function (props) {
 
       if (formilyFormSchema) {
         designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
+        setTimeout(() => {
+          setSaveDis(false);
+        }, 0);
+      } else {
+        setSaveDis(false);
       }
       clearTimeout(timer);
     }, 1000);
@@ -189,6 +197,7 @@ export default function (props) {
       {desingerType === 'form' ? (
         <FormDesigner
           type={desingerType}
+          saveDis={saveDis}
           getDesigner={getDesigner}
           onSave={() => {
             onSave();

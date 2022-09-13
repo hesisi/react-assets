@@ -9,7 +9,7 @@
 import { Breadcrumb, Layout, Menu, Avatar, Col, Row, Space } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link, history } from 'umi';
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import routes from '../../config/routes';
 import { dealMenuList } from '../../config/routesDy';
 import Styles from './index.less';
@@ -77,6 +77,8 @@ const getMetaInfoByPath = (routesData, path, result = []) => {
 const CommonLayout = (props) => {
   const selectKey = `/${props.location.pathname?.split('/')[1]}`;
   const [isShowMessage, setIsShowMessage] = useState(false);
+  const messagesRef = useRef(null);
+  const messagesBellRef = useRef(null);
   const [messageList, setMessageList] = useState([
     {
       icon: <AccountBookOutlined />,
@@ -162,6 +164,20 @@ const CommonLayout = (props) => {
   const goToMessageCenter = () => {
     history.push({ pathname: '/notificationCenter/notificationList' });
   };
+
+  const handleClickOutside = (e) => {
+    if (
+      !(messagesRef?.current && messagesRef?.current?.contains(e.target)) &&
+      !(messagesBellRef?.current && messagesBellRef.current.contains(e.target))
+    ) {
+      setIsShowMessage(false);
+    }
+  };
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   return (
     <Layout>
       <Header
@@ -184,7 +200,11 @@ const CommonLayout = (props) => {
         <div className="user-message">
           {/* 消息提醒 */}
           {isShowMessage ? (
-            <div className="messages">
+            <div
+              className="messages"
+              ref={messagesRef}
+              // onMouseOut={() => handleOutMessage()}
+            >
               <div className="message_header">
                 <span>全部标记为已读</span>
                 <div>
@@ -238,7 +258,11 @@ const CommonLayout = (props) => {
             <QuestionCircleOutlined
               style={{ color: '#ffffff', fontSize: '16px' }}
             />
-            <span className="bell_tips" onClick={showMessages}>
+            <span
+              className="bell_tips"
+              onClick={showMessages}
+              ref={messagesBellRef}
+            >
               <BellOutlined
                 style={{
                   color: '#ffffff',

@@ -4,6 +4,7 @@ import {
   PlusCircleOutlined,
   FormOutlined,
   DeleteOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
@@ -22,10 +23,10 @@ import {
   addRole,
   deleteRole,
 } from '@/services/userManager.';
-
+const { TextArea } = Input;
 const { Sider, Content } = Layout;
 const { TabPane } = Tabs;
-
+const { confirm } = Modal;
 const data = [
   { id: getUUID(), name: '超级管理员' },
   { id: getUUID(), name: '标注员' },
@@ -44,6 +45,7 @@ export default function IndexPage() {
   const [groupItem, setGroupItem] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
+    desc: '',
   });
   const List = (props) => {
     const { data } = props;
@@ -148,21 +150,33 @@ export default function IndexPage() {
   };
 
   const handleDelete = async (idArr = []) => {
-    const deleteResult = await deleteRole(idArr.join());
-    // const currentUser = cloneDeep(systemData).filter(
-    //   (item) => !idArr.includes(item.id),
-    // );
-    // let oldData = await localForage.getItem('userSystemInfo');
-    // idArr.forEach((idItem) => {
-    //   if (oldData?.idItem) {
-    //     delete oldData.idItem;
-    //   }
-    // });
-    // setSystemData(currentUser);
-    // localForage.setItem('userSystemInfo', oldData);
-    // localForage.setItem('userSystem', currentUser);
-    message.success('删除成功');
-    fechRoleList();
+    confirm({
+      title: '确认删除该项吗',
+      icon: <ExclamationCircleOutlined />,
+      content: '',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        const deleteResult = await deleteRole(idArr.join());
+        // const currentUser = cloneDeep(systemData).filter(
+        //   (item) => !idArr.includes(item.id),
+        // );
+        // let oldData = await localForage.getItem('userSystemInfo');
+        // idArr.forEach((idItem) => {
+        //   if (oldData?.idItem) {
+        //     delete oldData.idItem;
+        //   }
+        // });
+        // setSystemData(currentUser);
+        // localForage.setItem('userSystemInfo', oldData);
+        // localForage.setItem('userSystem', currentUser);
+        if (deleteResult?.data?.code === 200) {
+          message.success('删除成功');
+          fechRoleList();
+        }
+      },
+      onCancel() {},
+    });
   };
 
   /* 添加分组 */
@@ -179,6 +193,8 @@ export default function IndexPage() {
         const sysItem = await localForage.getItem('userSystemInfo');
         let oldItem = {};
         let NewItem = {};
+        let updatResult = null;
+        let addResult = null;
         if (eidtIdenty.current) {
           oldSource = oldSource.map((item) => {
             if (item.id === currentId.current) {
@@ -194,7 +210,7 @@ export default function IndexPage() {
             }
             return item;
           });
-          const updatResult = await updateRoleInfo(NewItem);
+          updatResult = await updateRoleInfo(NewItem);
           // sysItem[currentId.current].name = values.name;
         } else {
           const userItem = {
@@ -209,7 +225,7 @@ export default function IndexPage() {
           //   roleUser: [],
           //   roleFunction: [],
           // };
-          const addResult = await addRole(userItem);
+          addResult = await addRole(userItem);
         }
         // setSystemData(oldSource);
         // localForage.setItem('userSystemInfo', sysItem);
@@ -223,9 +239,12 @@ export default function IndexPage() {
         eidtIdenty.current = false;
         setFormData({
           name: '',
+          desc: '',
         });
         setIsModalVisible(false);
-        fechRoleList();
+        if (updatResult?.data?.code === 200 || addResult?.data?.code === 200) {
+          fechRoleList();
+        }
       })
       .catch((reason) => {
         message.warning('请检查');
@@ -314,6 +333,7 @@ export default function IndexPage() {
           eidtIdenty.current = false;
           setFormData({
             name: '',
+            desc: '',
           });
           setIsModalVisible(false);
         }}
@@ -329,7 +349,8 @@ export default function IndexPage() {
                 initialValues={formData}
                 name="basic"
                 autoComplete="off"
-                wrapperCol={{ span: 22 }}
+                labelCol={{ span: 6 }}
+                wrapperCol={{ span: 18 }}
               >
                 <Row>
                   <Col span={20}>
@@ -339,6 +360,13 @@ export default function IndexPage() {
                       rules={[{ required: true, message: '请输入角色名称!' }]}
                     >
                       <Input placeholder={'请输入角色名称'} />
+                    </Form.Item>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col span={20}>
+                    <Form.Item label="角色描述" name="desc" key="desc">
+                      <TextArea placeholder="请输入角色描述" />
                     </Form.Item>
                   </Col>
                 </Row>

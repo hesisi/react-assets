@@ -3,6 +3,7 @@ import {
   InfoCircleOutlined,
   DeleteOutlined,
   PlusOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
@@ -11,6 +12,7 @@ import localForage from 'localforage';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 
 const { Search } = Input;
+const { confirm } = Modal;
 export default function GroupUser({ groupId = null }) {
   const currentGroupId = useRef(null);
   const currentGoupeData = useRef(null);
@@ -188,29 +190,39 @@ export default function GroupUser({ groupId = null }) {
   };
 
   const handleDelete = async (idArr = []) => {
-    if (!currentGroupId?.current) {
-      message.error('请先选择分组');
-      return;
-    }
-    const initUserData = await localForage.getItem('groupUserList');
-    let initUserListData = (await localForage.getItem('userList')) || [];
-    initUserData[currentGroupId.current] = initUserData[
-      currentGroupId.current
-    ].filter((item) => !idArr.includes(item.id));
-    initUserListData = initUserListData.map((item) => {
-      if (idArr.includes(item.id)) {
-        return {
-          ...item,
-          cate: undefined,
-        };
-      } else {
-        return item;
-      }
+    confirm({
+      title: '确认删除吗',
+      icon: <ExclamationCircleOutlined />,
+      content: '',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        if (!currentGroupId?.current) {
+          message.error('请先选择分组');
+          return;
+        }
+        const initUserData = await localForage.getItem('groupUserList');
+        let initUserListData = (await localForage.getItem('userList')) || [];
+        initUserData[currentGroupId.current] = initUserData[
+          currentGroupId.current
+        ].filter((item) => !idArr.includes(item.id));
+        initUserListData = initUserListData.map((item) => {
+          if (idArr.includes(item.id)) {
+            return {
+              ...item,
+              cate: undefined,
+            };
+          } else {
+            return item;
+          }
+        });
+        localForage.setItem('groupUserList', initUserData);
+        localForage.setItem('userList', initUserListData);
+        setDataSource(initUserData[currentGroupId.current]);
+        message.success('删除成功');
+      },
+      onCancel() {},
     });
-    localForage.setItem('groupUserList', initUserData);
-    localForage.setItem('userList', initUserListData);
-    setDataSource(initUserData[currentGroupId.current]);
-    message.success('删除成功');
   };
 
   return (

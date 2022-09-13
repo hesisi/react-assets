@@ -1,9 +1,9 @@
 import request from '../utils/request';
-const basePreix = '/role';
+const basePreix = '/assets';
 
 // 查询角色列表
 export function getRoleList(params) {
-  return request(`${basePreix}/list`, {
+  return request(`${basePreix}/role/list`, {
     method: 'post',
     data: { ...params },
   });
@@ -11,7 +11,7 @@ export function getRoleList(params) {
 
 // 更新角色信息
 export function updateRoleInfo(params) {
-  return request(`${basePreix}/update`, {
+  return request(`${basePreix}/role/update`, {
     method: 'post',
     data: { ...params },
   });
@@ -19,7 +19,7 @@ export function updateRoleInfo(params) {
 
 // 新增角色信息
 export function addRole(params) {
-  return request(`${basePreix}/add`, {
+  return request(`${basePreix}/role/add`, {
     method: 'post',
     data: { ...params },
   });
@@ -27,7 +27,7 @@ export function addRole(params) {
 
 // 角色删除
 export function deleteRole(params) {
-  return request(`${basePreix}/delete/${params}`, {
+  return request(`${basePreix}/role/delete/${params}`, {
     method: 'get',
     // params,
     // data: { ...params },
@@ -36,7 +36,7 @@ export function deleteRole(params) {
 
 /* 获取角色用户 */
 export function getRoleUser(params) {
-  return request('/userRole/query', {
+  return request(`${basePreix}/userRole/query`, {
     method: 'post',
     data: { ...params },
   });
@@ -44,7 +44,7 @@ export function getRoleUser(params) {
 
 /* 保存用户橘色 */
 export function updateRoleUser(id, params) {
-  return request(`/userRole/update/${id}`, {
+  return request(`${basePreix}/userRole/update/${id}`, {
     method: 'post',
     data: params,
   });
@@ -52,7 +52,7 @@ export function updateRoleUser(id, params) {
 
 // 获取角色功能
 export function getRoleFunction(params) {
-  return request('/rolePermission/query', {
+  return request(`${basePreix}/rolePermission/query`, {
     method: 'post',
     data: params,
   });
@@ -60,7 +60,7 @@ export function getRoleFunction(params) {
 
 /* 保存角色功能 */
 export function updateRoleFunction(id, params) {
-  return request(`/rolePermission/update/${id}`, {
+  return request(`${basePreix}/rolePermission/update/${id}`, {
     method: 'post',
     data: params,
   });

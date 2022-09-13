@@ -11,6 +11,7 @@ import routes from './routes.js';
 
 import postCssPxToViewport from 'postcss-px-to-viewport';
 
+const baosanIp = '10.173.93.82:9201/';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -24,19 +25,20 @@ export default defineConfig({
     baseNavigator: false,
   },
   proxy: {
-    '/assets/messageData': {
+    '/assets/': {
       // target: config.infraApiOrigin, // 头部infra配置地址
-      target: 'http://10.173.73.250:9202/', // 韩振宇
+      // target: 'http://10.173.73.250:9202/', // 韩振宇
+      target: `http://${baosanIp}`, // 田宝山
     },
-    '/role': {
-      target: 'http://10.173.85.133:9201/', // 田宝山
-    },
-    '/userRole': {
-      target: 'http://10.173.85.133:9201/', // 田宝山
-    },
-    '/rolePermission': {
-      target: 'http://10.173.85.133:9201/', // 田宝山
-    },
+    // '/role': {
+    //   target: `http://${baosanIp}`, // 田宝山
+    // },
+    // '/userRole': {
+    //   target: `http://${baosanIp}`, // 田宝山
+    // },
+    // '/rolePermission': {
+    //   target: `http://${baosanIp}`, // 田宝山
+    // },
   },
   // publicPath: '/',
 

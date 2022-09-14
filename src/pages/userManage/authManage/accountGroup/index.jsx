@@ -156,7 +156,12 @@ export default function IndexPage() {
         // localForage.setItem('userGroup', currentUser);
         if (deleteResult?.data?.code === 200) {
           message.success('删除成功');
-          fechGroupList();
+          await fechGroupList();
+          if (idArr.join() === groupId) {
+            setTimeout(() => {
+              setGroupId(null);
+            }, 0);
+          }
         }
       },
       onCancel() {},

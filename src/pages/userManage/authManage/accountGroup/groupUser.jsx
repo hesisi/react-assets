@@ -8,6 +8,7 @@ import {
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
 import TableHeader from '@/components/tableHeader';
+import moment from 'moment';
 import localForage from 'localforage';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 import {
@@ -29,13 +30,13 @@ export default function GroupUser({ groupId = null, groupData = null }) {
   const [selectedUserRowKeys, setSelectedUserRowKeys] = useState([]);
 
   const [total, setTotal] = useState(0);
-  const [searchValue, setSearchValue] = useState({});
+  const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState(10);
   const [pageNum, setPageNum] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const [userTotal, setUserTotal] = useState(0);
-  const [searchUserValue, setSearchUserValue] = useState({});
+  const [searchUserValue, setSearchUserValue] = useState('');
   const [pageUserSize, setPageUserSize] = useState(10);
   const [pageUserNum, setPageUserNum] = useState(1);
   const [userLoading, setUserLoading] = useState(false);
@@ -54,17 +55,17 @@ export default function GroupUser({ groupId = null, groupData = null }) {
     },
     {
       title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
-      width: 140,
+      dataIndex: 'realName',
+      key: 'realName',
+      width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
       },
     },
     {
       title: '电话',
-      dataIndex: 'tel',
-      key: 'tel',
+      dataIndex: 'phone',
+      key: 'phone',
       width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -74,6 +75,10 @@ export default function GroupUser({ groupId = null, groupData = null }) {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
+      width: 100,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
     {
       title: '组别',
@@ -88,11 +93,17 @@ export default function GroupUser({ groupId = null, groupData = null }) {
     },
     {
       title: '创建时间',
-      dataIndex: 'creatTime',
-      key: 'creatTime',
+      dataIndex: 'createDate',
+      key: 'createDate',
       width: 120,
       render: (text) => {
-        return <EllipsisTooltip title={text} />;
+        return (
+          <EllipsisTooltip
+            title={
+              text ? moment(`${text}`).format('YYYY-MM-DD HH:mm:ss') : text
+            }
+          />
+        );
       },
     },
     {
@@ -150,7 +161,6 @@ export default function GroupUser({ groupId = null, groupData = null }) {
     setLoading(true);
     try {
       const tableData = await getGroupUserList(requetData);
-      console.log(tableData, '139---');
       const dataBack = tableData?.data?.data?.content || [];
       setTotal(tableData?.data?.data?.totalSize || 0);
       setDataSource(dataBack);
@@ -238,7 +248,12 @@ export default function GroupUser({ groupId = null, groupData = null }) {
       const daddResult = await addGroupUser(addUser);
       if (daddResult?.data?.code === 200) {
         message.success('添加成功');
-        // fechGroupList();
+        fechGroupUserList({
+          groupId,
+          realName: searchValue,
+          pageSize,
+          pageNum,
+        });
       }
       // const initUserData = (await localForage.getItem('groupUserList')) || {};
       // const initUserListData = (await localForage.getItem('userList')) || [];
@@ -297,7 +312,12 @@ export default function GroupUser({ groupId = null, groupData = null }) {
         const deleteResult = await deleteGroupUser(deleteItemsArr);
         if (deleteResult?.data?.code === 200) {
           message.success('删除成功');
-          // fechGroupList();
+          fechGroupUserList({
+            groupId,
+            realName: searchValue,
+            pageSize,
+            pageNum,
+          });
         }
         // const initUserData = await localForage.getItem('groupUserList');
         // let initUserListData = (await localForage.getItem('userList')) || [];
@@ -397,7 +417,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
           dataSource={dataSource}
           columns={columns}
           loading={loading}
-          scroll={{ y: 400 }}
+          scroll={{ y: 360 }}
           pagination={{
             total,
             showSizeChanger: true,

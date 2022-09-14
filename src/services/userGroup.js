@@ -60,7 +60,7 @@ export function getGroupUserList(params) {
 // 分页查询分组弹框下的用户
 export function getGroupUserAddList(params) {
   return request(`${basePreix}/userGroup/userGroupAddList`, {
-    method: 'get',
+    method: 'post',
     // params,
     data: params,
   });

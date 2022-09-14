@@ -25,13 +25,24 @@ let defaultTrreData = {
 };
 
 function menuTree(props) {
+  let localSelectedKeys = localStorage.getItem('selectedKeys') || '[]';
+  if (localSelectedKeys && typeof localSelectedKeys === 'string') {
+    localSelectedKeys = JSON.parse(localSelectedKeys);
+  }
+  let localExpandedKeys =
+    localStorage.getItem('menuTreeOnExpand') || '["00-top"]';
+  if (localExpandedKeys && typeof localExpandedKeys === 'string') {
+    localExpandedKeys = JSON.parse(localExpandedKeys);
+  }
+
   const formRef = useRef();
   const [treeData, setTreeData] = useState(defaultTreeParaent);
   const [autoParentExpand, setAutoParentExpand] = useState(true); //是否展示删除按钮
   const [operType, setOperType] = useState(''); //区别Modal弹出框的类型，(添加，修改，删除用的是一个Modal)
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedKeys, setExpandedKeys] = useState(['00-top']);
+  const [expandedKeys, setExpandedKeys] = useState(localExpandedKeys);
+  const [selectedKeys, setSelectedKeys] = useState(localSelectedKeys);
 
   const getTreeNode = async () => {
     // todo: 后续接接口保存的tree data
@@ -119,6 +130,8 @@ function menuTree(props) {
   }, [props.submitFlag]);
 
   const onSelect = async (selectedKeys, info) => {
+    setSelectedKeys(selectedKeys);
+    localStorage.setItem('selectedKeys', JSON.stringify(selectedKeys));
     const { selectedNodes } = info;
     console.log(selectedNodes, '118-----');
     if (!selectedNodes.length) {
@@ -346,6 +359,7 @@ function menuTree(props) {
   };
 
   const onExpand = (newExpandedKeys) => {
+    localStorage.setItem('menuTreeOnExpand', JSON.stringify(newExpandedKeys));
     setExpandedKeys(newExpandedKeys);
     setAutoParentExpand(false);
   };
@@ -377,6 +391,7 @@ function menuTree(props) {
                 // defaultExpandedKeys={}
                 onExpand={onExpand}
                 expandedKeys={expandedKeys}
+                selectedKeys={selectedKeys}
                 autoExpandParent={autoParentExpand}
                 onSelect={onSelect}
                 // treeData={treeDataShow}

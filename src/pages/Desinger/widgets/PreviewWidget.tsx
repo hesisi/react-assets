@@ -91,11 +91,12 @@ const SchemaField = createSchemaField({
 
 export interface IPreviewWidgetProps {
   tree: TreeNode;
+  formInitProps: any;
 }
 
 export const PreviewWidget: React.FC<IPreviewWidgetProps> = forwardRef(
   (props, ref) => {
-    const form = useMemo(() => createForm(), []);
+    const form = useMemo(() => createForm(props.formInitProps), []);
     const { form: formProps, schema } = transformToSchema(props.tree); // treeNode模式 json -> treeNode -> schema
 
     useImperativeHandle(ref, () => {

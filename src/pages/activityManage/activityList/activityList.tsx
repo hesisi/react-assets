@@ -395,7 +395,7 @@ export default function Page() {
                       style={{ borderRadius: '5px' }}
                       className="default-btn"
                     >
-                      清除m
+                      清除
                     </Button>
                   </Space>
                 </Col>

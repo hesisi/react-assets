@@ -22,6 +22,7 @@ import {
   EditOutlined,
   InboxOutlined,
   ReloadOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
@@ -35,6 +36,7 @@ import moment from 'moment';
 
 const { Dragger } = Upload;
 const { Option } = Select;
+const { confirm } = Modal;
 const data = [
   { name: '耐克', id: getUUID() },
   { name: '阿迪达斯', id: getUUID() },
@@ -51,7 +53,10 @@ export default function Account({ accountIdenty = 'user' }) {
   const [dataSource, setDataSource] = useState([]);
   const [userAddC, setUserAddC] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalGVisible, setIsModalGVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedGRowKeys, setSelectedGRowKeys] = useState([]);
+  const [dataGSource, setDataGSource] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     sex: undefined,
@@ -69,6 +74,38 @@ export default function Account({ accountIdenty = 'user' }) {
     {
       value: '1',
       label: '开发',
+    },
+  ];
+
+  const columnGs = [
+    {
+      title: '序号',
+      dataIndex: 'index',
+      key: 'index',
+      align: 'center',
+      render: (_, record, index) => {
+        return <span>{index + 1}</span>;
+      },
+      width: 80,
+      fixed: 'left',
+    },
+    {
+      title: '组名',
+      dataIndex: 'name',
+      key: 'name',
+      width: 120,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
+    },
+    {
+      title: '描述',
+      dataIndex: 'tel',
+      key: 'tel',
+      width: 160,
+      render: (text) => {
+        return <EllipsisTooltip title={text} />;
+      },
     },
   ];
 
@@ -177,19 +214,23 @@ export default function Account({ accountIdenty = 'user' }) {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-    // getCheckboxProps: (record) => ({
-    //   disabled: record.name === 'Disabled User',
-    //   name: record.name,
-    // }),
+  const onSelectGChange = (newSelectedRowKeys) => {
+    setSelectedGRowKeys(newSelectedRowKeys);
+  };
+
+  const rowGSelection = {
+    selectedGRowKeys,
+    onChange: onSelectGChange,
   };
 
   /* 用户添加， 选择用户 */
   const handleAccountAdd = () => {
     eidtIdenty.current = false;
     setIsModalVisible(true);
+  };
+
+  const handleGroup = () => {
+    setIsModalGVisible(true);
   };
 
   const props = {
@@ -219,18 +260,24 @@ export default function Account({ accountIdenty = 'user' }) {
   /* 一个人挂一个分组下面 */
   const editGroupInfo = async (groupId, userItem) => {
     const initUserData = (await localForage.getItem('groupUserList')) || {};
+    console.log(initUserData, '222----');
     const newUserData = cloneDeep(initUserData);
     let copyDataKeys = Object.keys(newUserData);
     copyDataKeys.forEach((item) => {
-      newUserData[item] = newUserData[item].filter(
-        (itemC) => itemC.id !== userItem.id,
-      );
+      if (newUserData?.[item]) {
+        console.log(newUserData[item], '226----');
+        newUserData[item] = newUserData[item].filter(
+          (itemC) => itemC.id !== userItem.id,
+        );
+      }
     });
     if (groupId) {
+      console.log(newUserData[groupId], '234----');
       newUserData[groupId] = newUserData?.[groupId]
-        ? newUserData[groupId].push(userItem)
+        ? newUserData[groupId].concat([userItem])
         : [userItem];
     }
+    console.log(newUserData, '239----');
     localForage.setItem('groupUserList', newUserData);
   };
 
@@ -286,6 +333,11 @@ export default function Account({ accountIdenty = 'user' }) {
       });
   };
 
+  const handleGOk = () => {
+    console.log(selectedGRowKeys);
+    setIsModalGVisible(true);
+  };
+
   const handleEdit = async (id) => {
     currentId.current = id;
     eidtIdenty.current = true;
@@ -314,12 +366,22 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleDelete = async (idArr = []) => {
-    const currentUser = cloneDeep(dataSource).filter(
-      (item) => !idArr.includes(item.id),
-    );
-    setDataSource(currentUser);
-    localForage.setItem('userList', currentUser);
-    message.success('删除成功');
+    confirm({
+      title: '确认删除吗',
+      icon: <ExclamationCircleOutlined />,
+      content: '',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        const currentUser = cloneDeep(dataSource).filter(
+          (item) => !idArr.includes(item.id),
+        );
+        setDataSource(currentUser);
+        localForage.setItem('userList', currentUser);
+        message.success('删除成功');
+      },
+      onCancel() {},
+    });
   };
 
   const creatSelct = (list = [], place = '') => {
@@ -345,6 +407,11 @@ export default function Account({ accountIdenty = 'user' }) {
   const handlePageChange = (num, pageSize) => {
     // setPageNum(num);
     // setPageSize(pageSize);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
   };
 
   return (
@@ -390,7 +457,14 @@ export default function Account({ accountIdenty = 'user' }) {
                   },
                   {
                     itemDom: () => {
-                      return <Button icon={<PlusOutlined />}>批量分组</Button>;
+                      return (
+                        <Button
+                          icon={<PlusOutlined />}
+                          onClick={() => handleGroup()}
+                        >
+                          批量分组
+                        </Button>
+                      );
                     },
                   },
                 ],
@@ -567,6 +641,51 @@ export default function Account({ accountIdenty = 'user' }) {
                   )}
                 </div>
               </div>
+            </div>
+          </Modal>
+
+          {/* 批量分组 分组展示 */}
+          <Modal
+            title="选择分组"
+            destroyOnClose={true}
+            width={800}
+            visible={isModalGVisible}
+            onOk={handleGOk}
+            onCancel={() => {
+              setIsModalGVisible(false);
+            }}
+            className="default-modal"
+            cancelText="取消"
+            okText="确认"
+          >
+            <div className="user-wrapper">
+              <TableHeader
+                formData={{
+                  formButton: {
+                    showButton: false,
+                    ButtonStructure: [],
+                  },
+                  operateStructure: [<Input placeholder="请输入关键字" />],
+                }}
+              />
+              <Table
+                rowSelection={{
+                  type: 'checkbox',
+                  ...rowGSelection,
+                }}
+                style={{ marginTop: 20 }}
+                dataSource={dataGSource}
+                columns={columnGs.filter((item) => item.key !== 'action')}
+                // loading={loading}
+                scroll={{ y: 340, x: '100%' }}
+                pagination={{
+                  total: dataGSource?.length || 0,
+                  showSizeChanger: true,
+                  // showQuickJumper: true,
+                  // onChange: handlePageChange,
+                }}
+                rowKey={(record) => record.id}
+              />
             </div>
           </Modal>
         </div>

@@ -13,10 +13,12 @@ import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
 import { PreviewWidget } from '@/pages/Desinger/widgets';
 import { transformToTreeNode } from '@designable/formily-transformer';
+import { onFormValuesChange } from '@formily/core';
 import { nanoid } from 'nanoid';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 import TablePreview from './tablePreview';
+import { timeDays } from './activityUtils';
 import { temp } from './temple';
 
 const { TabPane } = Tabs;
@@ -163,6 +165,22 @@ export default function GroupUser({
     setTimeout(() => {
       handleAddFormAuthority();
     }, 0);
+  };
+
+  const formInitProps = {
+    effects() {
+      onFormValuesChange((form) => {
+        const { startTime, endTime } = form.values;
+        const days = timeDays(startTime, endTime);
+        const formS = formRef?.current?.form;
+        if (formS) {
+          formS.setValuesIn(
+            'applyDays',
+            days < 0 || days === '' ? '' : days * 1 + 1,
+          );
+        }
+      });
+    },
   };
 
   const authorityRuleControl = (ruleItems = [], formDom = null) => {
@@ -446,7 +464,12 @@ export default function GroupUser({
             {activeIdenty !== '新建' ? (
               <div className="shenqingren">申请信息:</div>
             ) : null}
-            <PreviewWidget key="formS" tree={formTree} ref={formRef} />
+            <PreviewWidget
+              formInitProps={formInitProps}
+              key="formS"
+              tree={formTree}
+              ref={formRef}
+            />
 
             {activeIdenty !== '新建' ? (
               <>

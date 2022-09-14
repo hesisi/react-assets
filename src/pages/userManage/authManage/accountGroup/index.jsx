@@ -20,6 +20,7 @@ import {
   PlusCircleOutlined,
   FormOutlined,
   DeleteOutlined,
+  ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
@@ -36,6 +37,7 @@ const data = [
   { name: '李宁', id: getUUID() },
   { name: '贵人鸟', id: getUUID() },
 ];
+const { confirm } = Modal;
 export default function IndexPage() {
   const formRef = useRef(null);
   const [groupData, setGroupData] = useState([]);
@@ -111,12 +113,22 @@ export default function IndexPage() {
   };
 
   const handleDelete = async (idArr = []) => {
-    const currentUser = cloneDeep(groupData).filter(
-      (item) => !idArr.includes(item.id),
-    );
-    setGroupData(currentUser);
-    localForage.setItem('userGroup', currentUser);
-    message.success('删除成功');
+    confirm({
+      title: '确认删除吗',
+      icon: <ExclamationCircleOutlined />,
+      content: '',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        const currentUser = cloneDeep(groupData).filter(
+          (item) => !idArr.includes(item.id),
+        );
+        setGroupData(currentUser);
+        localForage.setItem('userGroup', currentUser);
+        message.success('删除成功');
+      },
+      onCancel() {},
+    });
   };
 
   const handleGroupClick = (item) => {

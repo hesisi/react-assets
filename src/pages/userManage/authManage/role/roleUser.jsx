@@ -80,12 +80,7 @@ export default function RoleUser({ groupItem }) {
     //   const backItem = item.split('-')[1];
     //   return backItem;
     // });
-    const updateR = await updateRoleUser(groupItem.id, [
-      {
-        groupId: groupItem.id,
-        children: rightTree,
-      },
-    ]);
+    const updateR = await updateRoleUser(groupItem.id, rightTree);
     message.success('保存成功');
   };
 

@@ -152,6 +152,10 @@ export default function GroupUser({ groupId = null, groupData = null }) {
         pageNum: pageUserNum,
       });
     }
+    if (!isModalVisible) {
+      setPageUserSize(10);
+      setPageUserNum(1);
+    }
   }, [isModalVisible, groupId, searchUserValue, pageUserSize, pageUserNum]);
 
   const fechGroupUserList = async (params = {}) => {
@@ -466,7 +470,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
               dataSource={dataUserSource}
               columns={columns.filter((item) => item.key !== 'action')}
               loading={userLoading}
-              scroll={{ y: 340, x: '100%' }}
+              scroll={{ y: 280, x: '100%' }}
               pagination={{
                 total: userTotal || 0,
                 showSizeChanger: true,

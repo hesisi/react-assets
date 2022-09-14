@@ -22,7 +22,7 @@ import {
   updateRoleInfo,
   addRole,
   deleteRole,
-} from '@/services/userManager.';
+} from '@/services/userManager';
 const { TextArea } = Input;
 const { Sider, Content } = Layout;
 const { TabPane } = Tabs;

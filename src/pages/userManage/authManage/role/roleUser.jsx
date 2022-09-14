@@ -2,8 +2,8 @@ import { Button, Form, Input, message } from 'antd';
 import { SearchOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { useRef, useEffect, useState } from 'react';
 import RoleTransfer from './roleTransfer';
-
-import { getRoleUser, updateRoleUser } from '@/services/userManager.';
+import { creatRightTree } from './treeUtil';
+import { getRoleUser, updateRoleUser } from '@/services/userManager';
 
 const { TextArea } = Input;
 export default function RoleUser({ groupItem }) {
@@ -70,15 +70,22 @@ export default function RoleUser({ groupItem }) {
   };
 
   const handleSaveUser = async () => {
-    let sendIds = saveKeysRef?.current || [];
-    sendIds = sendIds.filter((item) => {
-      return (item + '').indexOf('-') !== -1;
-    });
-    sendIds = sendIds.map((item) => {
-      const backItem = item.split('-')[1];
-      return backItem;
-    });
-    const updateR = await updateRoleUser(groupItem.id, sendIds);
+    const rightTree = creatRightTree(roleUserList, saveKeysRef.current);
+
+    // let sendIds = saveKeysRef?.current || [];
+    // sendIds = sendIds.filter((item) => {
+    //   return (item + '').indexOf('-') !== -1;
+    // });
+    // sendIds = sendIds.map((item) => {
+    //   const backItem = item.split('-')[1];
+    //   return backItem;
+    // });
+    const updateR = await updateRoleUser(groupItem.id, [
+      {
+        groupId: groupItem.id,
+        children: rightTree,
+      },
+    ]);
     message.success('保存成功');
   };
 

@@ -10,10 +10,16 @@ import React, { useRef, useState, useEffect } from 'react';
 import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
+import {
+  deleteGroupUser,
+  addGroupUser,
+  getGroupUserList,
+  getGroupUserAddList,
+} from '@/services/userGroup';
 
 const { Search } = Input;
 const { confirm } = Modal;
-export default function GroupUser({ groupId = null }) {
+export default function GroupUser({ groupId = null, groupData = null }) {
   const currentGroupId = useRef(null);
   const currentGoupeData = useRef(null);
   const [dataSource, setDataSource] = useState([]);
@@ -21,6 +27,18 @@ export default function GroupUser({ groupId = null }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedUserRowKeys, setSelectedUserRowKeys] = useState([]);
+
+  const [total, setTotal] = useState(0);
+  const [searchValue, setSearchValue] = useState({});
+  const [pageSize, setPageSize] = useState(10);
+  const [pageNum, setPageNum] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  const [userTotal, setUserTotal] = useState(0);
+  const [searchUserValue, setSearchUserValue] = useState({});
+  const [pageUserSize, setPageUserSize] = useState(10);
+  const [pageUserNum, setPageUserNum] = useState(1);
+  const [userLoading, setUserLoading] = useState(false);
 
   const columns = [
     {
@@ -99,20 +117,76 @@ export default function GroupUser({ groupId = null }) {
   ];
 
   /* 初始化 */
-  useEffect(async () => {
+  useEffect(() => {
     if (groupId) {
-      const initUserData = await localForage.getItem('groupUserList');
-      console.log(initUserData, '90------');
-      console.log(currentGroupId.current, '91------');
-      const userGroup = await localForage.getItem('userGroup');
+      currentGoupeData.current = groupData;
       currentGroupId.current = groupId;
-      const currentDource = initUserData?.[groupId] || [];
-      currentGoupeData.current = userGroup;
-      console.log(currentDource, '109-----');
-      setDataSource(currentDource);
       setSelectedRowKeys([]);
+      fechGroupUserList({
+        groupId,
+        realName: searchValue,
+        pageSize,
+        pageNum,
+      });
     }
-  }, [groupId]);
+  }, [groupId, searchValue, pageSize, pageNum, groupData]);
+
+  useEffect(() => {
+    if (isModalVisible && groupId) {
+      setSelectedUserRowKeys([]);
+      fechUserList({
+        groupId,
+        realName: searchUserValue,
+        pageSize: pageUserSize,
+        pageNum: pageUserNum,
+      });
+    }
+  }, [isModalVisible, groupId, searchUserValue, pageUserSize, pageUserNum]);
+
+  const fechGroupUserList = async (params = {}) => {
+    const requetData = {
+      ...params,
+    };
+    setLoading(true);
+    try {
+      const tableData = await getGroupUserList(requetData);
+      console.log(tableData, '139---');
+      const dataBack = tableData?.data?.data?.content || [];
+      setTotal(tableData?.data?.data?.totalSize || 0);
+      setDataSource(dataBack);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+
+  const fechUserList = async (params = {}) => {
+    const requetData = {
+      ...params,
+    };
+    setUserLoading(true);
+    try {
+      const tableData = await getGroupUserAddList(requetData);
+      const dataBack = tableData?.data?.data?.content || [];
+      setUserTotal(tableData?.data?.data?.totalSize || 0);
+      setDataUserSource(dataBack);
+      setUserLoading(false);
+    } catch (error) {
+      setUserLoading(false);
+    }
+  };
+
+  // useEffect(async () => {
+  //   if (groupId) {
+  // const initUserData = await localForage.getItem('groupUserList');
+  // const userGroup = await localForage.getItem('userGroup');
+  // currentGroupId.current = groupId;
+  // const currentDource = initUserData?.[groupId] || [];
+  // currentGoupeData.current = userGroup;
+  // setDataSource(currentDource);
+  //     setSelectedRowKeys([]);
+  //   }
+  // }, [groupId]);
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -134,17 +208,17 @@ export default function GroupUser({ groupId = null }) {
       message.error('请先选择分组');
       return;
     }
-    const initUserData = await localForage.getItem('groupUserList');
-    const currentDource = initUserData?.[currentGroupId.current] || [];
-    const currentDourceId = currentDource.map((item) => {
-      return item.id;
-    });
-    let initUserListData = (await localForage.getItem('userList')) || [];
-    initUserListData = initUserListData.filter(
-      (item) => !currentDourceId.includes(item.id) && !item?.cate,
-      // (item?.cate && item?.cate === currentGroupId.current) ||
-    );
-    setDataUserSource(initUserListData || []);
+    // const initUserData = await localForage.getItem('groupUserList');
+    // const currentDource = initUserData?.[currentGroupId.current] || [];
+    // const currentDourceId = currentDource.map((item) => {
+    //   return item.id;
+    // });
+    // let initUserListData = (await localForage.getItem('userList')) || [];
+    // initUserListData = initUserListData.filter(
+    //   (item) => !currentDourceId.includes(item.id) && !item?.cate,
+    //   // (item?.cate && item?.cate === currentGroupId.current) ||
+    // );
+    // setDataUserSource(initUserListData || []);
     setIsModalVisible(true);
   };
 
@@ -154,27 +228,39 @@ export default function GroupUser({ groupId = null }) {
         setIsModalVisible(false);
         return;
       }
-      const initUserData = (await localForage.getItem('groupUserList')) || {};
-      const initUserListData = (await localForage.getItem('userList')) || [];
-      initUserData[currentGroupId.current] =
-        initUserData[currentGroupId.current] || [];
-
-      const newItems = [];
-      const newUserListData = [];
-      initUserListData.forEach((item) => {
-        if (selectedUserRowKeys.includes(item.id)) {
-          newItems.push({ ...item, cate: currentGroupId.current });
-          newUserListData.push({ ...item, cate: currentGroupId.current });
-        } else {
-          newUserListData.push(item);
-        }
+      const addUser = [];
+      selectedUserRowKeys.forEach((item) => {
+        addUser.push({
+          groupId: currentGroupId.current,
+          userId: item,
+        });
       });
-      initUserData[currentGroupId.current] =
-        initUserData[currentGroupId.current].concat(newItems);
-      localForage.setItem('groupUserList', initUserData);
-      localForage.setItem('userList', newUserListData);
-      setDataSource(initUserData[currentGroupId.current]);
-      message.success('添加成功');
+      const daddResult = await addGroupUser(addUser);
+      if (daddResult?.data?.code === 200) {
+        message.success('添加成功');
+        // fechGroupList();
+      }
+      // const initUserData = (await localForage.getItem('groupUserList')) || {};
+      // const initUserListData = (await localForage.getItem('userList')) || [];
+      // initUserData[currentGroupId.current] =
+      //   initUserData[currentGroupId.current] || [];
+
+      // const newItems = [];
+      // const newUserListData = [];
+      // initUserListData.forEach((item) => {
+      //   if (selectedUserRowKeys.includes(item.id)) {
+      //     newItems.push({ ...item, cate: currentGroupId.current });
+      //     newUserListData.push({ ...item, cate: currentGroupId.current });
+      //   } else {
+      //     newUserListData.push(item);
+      //   }
+      // });
+      // initUserData[currentGroupId.current] =
+      //   initUserData[currentGroupId.current].concat(newItems);
+      // localForage.setItem('groupUserList', initUserData);
+      // localForage.setItem('userList', newUserListData);
+      // setDataSource(initUserData[currentGroupId.current]);
+      // message.success('添加成功');
     } else {
       message.warn('请先选择分组');
     }
@@ -201,28 +287,59 @@ export default function GroupUser({ groupId = null }) {
           message.error('请先选择分组');
           return;
         }
-        const initUserData = await localForage.getItem('groupUserList');
-        let initUserListData = (await localForage.getItem('userList')) || [];
-        initUserData[currentGroupId.current] = initUserData[
-          currentGroupId.current
-        ].filter((item) => !idArr.includes(item.id));
-        initUserListData = initUserListData.map((item) => {
-          if (idArr.includes(item.id)) {
-            return {
-              ...item,
-              cate: undefined,
-            };
-          } else {
-            return item;
-          }
+        const deleteItemsArr = [];
+        idArr.forEach((item) => {
+          deleteItemsArr.push({
+            groupId,
+            userId: item,
+          });
         });
-        localForage.setItem('groupUserList', initUserData);
-        localForage.setItem('userList', initUserListData);
-        setDataSource(initUserData[currentGroupId.current]);
-        message.success('删除成功');
+        const deleteResult = await deleteGroupUser(deleteItemsArr);
+        if (deleteResult?.data?.code === 200) {
+          message.success('删除成功');
+          // fechGroupList();
+        }
+        // const initUserData = await localForage.getItem('groupUserList');
+        // let initUserListData = (await localForage.getItem('userList')) || [];
+        // initUserData[currentGroupId.current] = initUserData[
+        //   currentGroupId.current
+        // ].filter((item) => !idArr.includes(item.id));
+        // initUserListData = initUserListData.map((item) => {
+        //   if (idArr.includes(item.id)) {
+        //     return {
+        //       ...item,
+        //       cate: undefined,
+        //     };
+        //   } else {
+        //     return item;
+        //   }
+        // });
+        // localForage.setItem('groupUserList', initUserData);
+        // localForage.setItem('userList', initUserListData);
+        // setDataSource(initUserData[currentGroupId.current]);
       },
       onCancel() {},
     });
+  };
+
+  const handlePageChange = (num, pageSize) => {
+    setPageNum(num);
+    setPageSize(pageSize);
+  };
+
+  const handleUserPageChange = (num, pageSize) => {
+    setPageUserNum(num);
+    setPageUserSize(pageSize);
+  };
+
+  const onSearch = (values) => {
+    setPageNum(1);
+    setSearchValue(values);
+  };
+
+  const onUserSearch = (values) => {
+    setPageUserNum(1);
+    setSearchUserValue(values);
   };
 
   return (
@@ -261,7 +378,13 @@ export default function GroupUser({ groupId = null }) {
                 },
               ],
             },
-            operateStructure: [<Search placeholder="请输入用户名" />],
+            operateStructure: [
+              <Search
+                placeholder="请输入用户名"
+                onSearch={onSearch}
+                allowClear
+              />,
+            ],
           }}
         />
         {/* table */}
@@ -273,14 +396,14 @@ export default function GroupUser({ groupId = null }) {
           style={{ marginTop: 20 }}
           dataSource={dataSource}
           columns={columns}
-          // loading={loading}
+          loading={loading}
           scroll={{ y: 400 }}
-          // pagination={{
-          //   total,
-          //   showSizeChanger: true,
-          //   // showQuickJumper: true,
-          //   onChange: handlePageChange,
-          // }}
+          pagination={{
+            total,
+            showSizeChanger: true,
+            // showQuickJumper: true,
+            onChange: handlePageChange,
+          }}
           rowKey={(record) => record.id}
         />
 
@@ -305,7 +428,13 @@ export default function GroupUser({ groupId = null }) {
                   showButton: false,
                   ButtonStructure: [],
                 },
-                operateStructure: [<Input placeholder="请输入关键字" />],
+                operateStructure: [
+                  <Search
+                    placeholder="请输入用户名"
+                    onSearch={onUserSearch}
+                    allowClear
+                  />,
+                ],
               }}
             />
             <Table
@@ -316,13 +445,13 @@ export default function GroupUser({ groupId = null }) {
               style={{ marginTop: 20 }}
               dataSource={dataUserSource}
               columns={columns.filter((item) => item.key !== 'action')}
-              // loading={loading}
+              loading={userLoading}
               scroll={{ y: 340, x: '100%' }}
               pagination={{
-                total: dataUserSource?.length || 0,
+                total: userTotal || 0,
                 showSizeChanger: true,
                 // showQuickJumper: true,
-                // onChange: handlePageChange,
+                onChange: handleUserPageChange,
               }}
               rowKey={(record) => record.id}
             />

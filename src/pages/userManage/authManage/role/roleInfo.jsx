@@ -4,7 +4,7 @@ import { cloneDeep } from 'lodash';
 import { useRef, useEffect } from 'react';
 import localForage from 'localforage';
 
-import { updateRoleInfo } from '@/services/userManager.';
+import { updateRoleInfo } from '@/services/userManager';
 
 const { TextArea } = Input;
 export default function RoleInfo(props) {

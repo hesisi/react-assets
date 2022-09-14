@@ -22,12 +22,21 @@ import { cloneDeep } from 'lodash';
 const back = require('@/assets/icons/back2.svg');
 const { Header, Footer, Sider, Content } = Layout;
 export default function IndexPage() {
+  // 如果从预览页面过来,先取预览页面数据
+  let pageDataPrev = localStorage.getItem('pageDataPrev');
+  let formDataInit = null;
+  if (pageDataPrev && typeof pageDataPrev === 'string') {
+    // formDataPrev 和 formData对应
+    pageDataPrev = JSON.parse(pageDataPrev) || {};
+    formDataInit = pageDataPrev.formDataPrev;
+  }
+
   const formRef = useRef(null);
   const configPanelRef = useRef(null);
   const [config, setConfig] = useState(null); // 配置面板相关
   const [submitFlag, setSubmitFlag] = useState(false); // 提交标识
   const [tree, setTree] = useState([]); // 结点数
-  const [formData, setForm] = useState(); // 配置面板
+  const [formData, setForm] = useState(formDataInit); // 配置面板
 
   const [menuConfig, setMenuConfig] = useState({
     mode: 'horizontalAndVertical',
@@ -39,6 +48,19 @@ export default function IndexPage() {
   const menuConfigRef = useRef(null);
 
   const configSubmit = (formValue, comIcons, iconIndex) => {
+    localStorage.setItem(
+      'pageDataPrev',
+      JSON.stringify({
+        formDataPrev: {
+          ...formData,
+          formValue: {
+            ...formData.formValue,
+            ...formValue,
+            iconIndex,
+          },
+        },
+      }),
+    );
     // 配置面板提交
     setConfig({ formValue, comIcons, iconIndex });
     setSubmitFlag(!submitFlag);
@@ -46,10 +68,10 @@ export default function IndexPage() {
 
   const history = useHistory();
   const previewHandler = () => {
-    if (!(tree?.[0]?.children && tree?.[0].children.length)) {
-      message.warning('请先配置菜单!');
-      return;
-    }
+    // if (!(tree?.[0]?.children && tree?.[0].children.length)) {
+    //   message.warning('请先配置菜单!');
+    //   return;
+    // }
     // 页面预览
     const temp = (data) => {
       // 回调处理menu所需参数label
@@ -75,16 +97,16 @@ export default function IndexPage() {
     history.push('/previewPage/menuPreview');
   };
 
-  const previewSave = () => {
+  const previewSave = (isPreview) => {
     if (!formRef?.current) {
-      saveMenuLoad();
+      saveMenuLoad(isPreview);
       return;
     }
     formRef.current
       ?.validateFields()
       .then((values) => {
         configPanelRef.current.onFinish(values);
-        saveMenuLoad();
+        saveMenuLoad(isPreview);
       })
       .catch(() => {
         message.warning('请先检查当前菜单信息配置是否正确!');
@@ -92,7 +114,7 @@ export default function IndexPage() {
       });
   };
 
-  const saveMenuLoad = () => {
+  const saveMenuLoad = (isPreview) => {
     if (!(tree?.[0]?.children && tree?.[0].children.length)) {
       message.warning('请先配置菜单!');
       return;
@@ -141,9 +163,17 @@ export default function IndexPage() {
     localForage.setItem('menuTree', treeDataSave);
     // munuListDataSave = munuListDataSave.filter((item) => newKeys.includes(item.key));
     // localStorage.setItem('munuListData', JSON.stringify(munuListDataSave));
-    localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
-    message.success('菜单保存成功!');
-    location.reload();
+    if (isPreview) {
+      // localStorage.setItem('pageDataPrev', JSON.stringify({
+      //   formDataPrev: formData
+      // }));
+      previewHandler(); // 跳转到预览页面
+    } else {
+      localStorage.removeItem('pageDataPrev');
+      localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
+      message.success('菜单保存成功!');
+      location.reload();
+    }
   };
 
   const nodeClear = () => {
@@ -184,7 +214,7 @@ export default function IndexPage() {
             >
               保存
             </Button>
-            <Button icon={<EyeOutlined />} onClick={() => previewHandler()}>
+            <Button icon={<EyeOutlined />} onClick={() => previewSave(true)}>
               预览
             </Button>
           </Col>

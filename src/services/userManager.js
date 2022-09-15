@@ -21,6 +21,20 @@ export function deleteUser(params) {
     data: params,
   });
 }
+//批量分组
+export function addUsersToGroups(params) {
+  return request(`${basePreix}/user/addUsersToGroups`, {
+    method: 'post',
+    data: params,
+  });
+}
+//编辑用户
+export function updateOneUser(params) {
+  return request(`${basePreix}/user/update`, {
+    method: 'post',
+    data: { ...params },
+  });
+}
 // 查询角色列表
 export function getRoleList(params) {
   return request(`${basePreix}/role/list`, {

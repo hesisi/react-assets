@@ -3,7 +3,7 @@ import { SearchOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { useRef, useEffect, useState } from 'react';
 import RoleTransfer from './roleTransfer';
 
-import { getRoleUser, updateRoleUser } from '@/services/userManager.';
+import { getRoleUser, updateRoleUser } from '@/services/userManager';
 
 const { TextArea } = Input;
 export default function RoleUser({ groupItem }) {

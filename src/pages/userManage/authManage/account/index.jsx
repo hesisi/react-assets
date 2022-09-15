@@ -29,7 +29,14 @@ import React, { useRef, useState, useEffect } from 'react';
 import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
 import { getUUID } from '@/utils/utils';
-import { getUserList, addOneUser, deleteUser } from '@/services/userManager';
+import {
+  getUserList,
+  addOneUser,
+  deleteUser,
+  updateOneUser,
+  addUsersToGroups,
+} from '@/services/userManager';
+import { getUserGroupList } from '@/services/userGroup';
 import { REGEXP_MAIL, REGEXP_YD_PHONE } from '@/utils/validate';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 import { cloneDeep } from 'lodash';
@@ -61,15 +68,15 @@ export default function Account({ accountIdenty = 'user' }) {
   const [pageInfo, setPageInfo] = useState({
     pageSize: 10,
     pageNum: 1,
-    totalSize: 0,
   });
+  const [totalSize, setTotalSize] = useState(0);
   const [dataGSource, setDataGSource] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
-    sex: undefined,
+    gender: undefined,
     tel: '',
     email: '',
-    work: undefined,
+    job: undefined,
     groupList: undefined,
   });
 
@@ -162,8 +169,9 @@ export default function Account({ accountIdenty = 'user' }) {
       render: (text) => {
         return (
           <span>
-            {dataGSource.filter((item) => text.includes(item.id))?.[0]?.name ||
-              ''}
+            {/* {dataGSource.filter((item) => text.includes(item.id))?.[0]?.name ||
+              ''} */}
+            {filterGroup(text)}
           </span>
         );
       },
@@ -227,26 +235,30 @@ export default function Account({ accountIdenty = 'user' }) {
         setPageInfo({
           pageSize: data.pageSize,
           pageNum: data.pageNum,
-          totalSize: data.totalSize,
         });
+        setTotalSize(data.totalSize);
         setDataSource(data?.content || []);
       }
     });
   };
 
   const getGroupList = async () => {
-    await getGroup().then((res) => {
+    await getUserGroupList().then((res) => {
       if (res?.data?.isSuccess > 0) {
         const data = res?.data?.data || [];
-        // console.log(res.data);
-        setPageInfo({
-          pageSize: data.pageSize,
-          pageNum: data.pageNum,
-          totalSize: data.totalSize,
-        });
-        setDataGSource(data?.content || []);
+        console.log(res.data);
+        setDataGSource(data || []);
       }
     });
+  };
+
+  const filterGroup = (text) => {
+    const Group = dataGSource.filter((item) => text.includes(item.id)) || [];
+    let arr = [];
+    for (let item of Group) {
+      arr.push(item.name);
+    }
+    return arr.join(';');
   };
 
   const onSelectChange = (newSelectedRowKeys) => {
@@ -269,6 +281,10 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleGroup = () => {
+    if (!selectedRowKeys?.length) {
+      message.warn('请选择至少一条数据');
+      return;
+    }
     setIsModalGVisible(true);
   };
 
@@ -324,57 +340,48 @@ export default function Account({ accountIdenty = 'user' }) {
     formRef.current
       .validateFields()
       .then((values) => {
-        // let oldSource = cloneDeep(dataSource);
-        // let currentItem = null;
-        // if (eidtIdenty.current) {
-        //   oldSource = oldSource.map((item) => {
-        //     if (item.id === currentId.current) {
-        //       currentItem = {
-        //         ...item,
-        //         ...values,
-        //       };
-        //       return {
-        //         ...item,
-        //         ...values,
-        //       };
-        //     }
-        //     return item;
-        //   });
-        // } else {
-        const userItem = {
-          ...values,
-          code: values.userName,
-          realName: values.userName,
-          passwd: '123456',
-          // id: getUUID(),
-          // creatTime: moment(`${new Date()}`).format('YYYY-MM-DD HH:mm:ss'),
-        };
-        // currentItem = userItem;
-        // oldSource.push(userItem);
-        // }
-        // if (currentItem) {
-        //   editGroupInfo(values.cate, currentItem);
-        // }
-        // setDataSource(oldSource);
-        // localForage.setItem('userList', oldSource);
-        // message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
-        // currentId.current = null;
-        // eidtIdenty.current = false;
-        console.log('newUser', userItem);
-        addOneUser({ ...userItem }).then((res) => {
-          if (res?.data?.isSuccess > 0) {
-            message.success('添加成功');
-            getUserListByPage(searchName, pageInfo);
-          } else {
-            message.error('添加失败');
-          }
-        });
+        if (eidtIdenty.current) {
+          //true为编辑，false为新增
+          const userItem = {
+            ...values,
+            id: currentId.current,
+            code: values.userName,
+            realName: values.userName,
+            passwd: '123456',
+          };
+          console.log('newUser', userItem);
+          updateOneUser({ ...userItem }).then((res) => {
+            if (res?.data?.isSuccess > 0) {
+              message.success('编辑成功');
+              getUserListByPage(searchName, pageInfo);
+            } else {
+              message.error('编辑失败');
+            }
+          });
+        } else {
+          const userItem = {
+            ...values,
+            code: values.userName,
+            realName: values.userName,
+            passwd: '123456',
+          };
+          console.log('newUser', userItem);
+          addOneUser({ ...userItem }).then((res) => {
+            if (res?.data?.isSuccess > 0) {
+              message.success('添加成功');
+              getUserListByPage(searchName, pageInfo);
+            } else {
+              message.error('添加失败');
+            }
+          });
+        }
+        eidtIdenty.current = false;
         setFormData({
           userName: '',
-          sex: undefined,
+          gender: undefined,
           phone: '',
           email: '',
-          work: undefined,
+          job: undefined,
           groupList: undefined,
         });
         setIsModalVisible(false);
@@ -385,8 +392,29 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleGOk = () => {
-    console.log(selectedGRowKeys);
-    setIsModalGVisible(true);
+    if (!selectedGRowKeys?.length) {
+      message.warn('请选择至少一条数据');
+      return;
+    }
+    const addUser = [];
+    selectedGRowKeys.forEach((group) => {
+      selectedRowKeys.forEach((user) => {
+        addUser.push({
+          groupId: group,
+          userId: user,
+        });
+      });
+    });
+    console.log(addUser);
+    addUsersToGroups(addUser).then((res) => {
+      if (res.data.isSuccess > 0) {
+        getUserListByPage(searchName, pageInfo);
+        message.success('分组成功');
+      } else {
+        message.error('分组失败');
+      }
+    });
+    setIsModalGVisible(false);
   };
 
   const handleEdit = async (id) => {
@@ -397,10 +425,10 @@ export default function Account({ accountIdenty = 'user' }) {
       setFormData(
         currentUser?.[0] || {
           userName: '',
-          sex: undefined,
+          gender: undefined,
           phone: '',
           email: '',
-          work: undefined,
+          job: undefined,
           groupList: undefined,
         },
       );
@@ -471,11 +499,10 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleUserSearch = (value) => {
-    // console.log(value, '298-----');
     setSearchName(value);
-    getUserListByPage(value, pageInfo);
+    getUserListByPage(value, { ...pageInfo, pageNum: 1 });
   };
-
+  const handleGroupSearch = (value) => {};
   const onFinish = () => {};
 
   const handlePageChange = (num, pageSize) => {
@@ -575,7 +602,7 @@ export default function Account({ accountIdenty = 'user' }) {
             // }}
             rowKey={(record) => record.id}
             pagination={{
-              total: pageInfo.totalSize,
+              total: totalSize,
               showSizeChanger: true,
               // showQuickJumper: true,
               onChange: handlePageChange,
@@ -592,10 +619,10 @@ export default function Account({ accountIdenty = 'user' }) {
             onCancel={() => {
               setFormData({
                 userName: '',
-                sex: undefined,
+                gender: undefined,
                 phone: '',
                 email: '',
-                work: undefined,
+                job: undefined,
                 groupList: undefined,
               });
               currentId.current = null;
@@ -653,11 +680,11 @@ export default function Account({ accountIdenty = 'user' }) {
                           </Form.Item>
                         </Col>
                         <Col span={12}>
-                          <Form.Item label="性别" name="sex">
+                          <Form.Item label="性别" name="gender">
                             {creatSelct(
                               [
-                                { value: '1', label: '男' },
-                                { value: '2', label: '女' },
+                                { value: '男', label: '男' },
+                                { value: '女', label: '女' },
                               ],
                               '请选择性别',
                             )}
@@ -696,7 +723,7 @@ export default function Account({ accountIdenty = 'user' }) {
                       </Row>
                       <Row>
                         <Col span={12}>
-                          <Form.Item label="岗位" name="work">
+                          <Form.Item label="岗位" name="job">
                             {creatSelct(workList, '请选择岗位')}
                           </Form.Item>
                         </Col>
@@ -747,7 +774,12 @@ export default function Account({ accountIdenty = 'user' }) {
                     showButton: false,
                     ButtonStructure: [],
                   },
-                  operateStructure: [<Input placeholder="请输入关键字" />],
+                  operateStructure: [
+                    <Search
+                      placeholder="请输入关键字"
+                      onSearch={handleGroupSearch}
+                    />,
+                  ],
                 }}
               />
               <Table

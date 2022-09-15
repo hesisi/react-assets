@@ -119,12 +119,16 @@ export default [
         exact: true,
         key: 'default-3-1-1',
         meta: {
-          showMenu: true,
+          showMenu: false,
           showHeader: true,
           breadcrumb: [
-            { label: '用户管理', active: true },
-            { label: '分组管理' },
-            { label: '角色管理' },
+            {
+              label: '用户管理',
+              active: true,
+              path: '/userManage/authManage/account',
+            },
+            { label: '分组管理', path: '/userManage/authManage/accountGroup' },
+            { label: '角色管理', path: '/userManage/authManage/role' },
           ],
         },
       },
@@ -135,12 +139,16 @@ export default [
         exact: true,
         key: 'default-3-1-2',
         meta: {
-          showMenu: true,
+          showMenu: false,
           showHeader: true,
           breadcrumb: [
-            { label: '用户管理' },
-            { label: '分组管理', active: true },
-            { label: '角色管理' },
+            { label: '用户管理', path: '/userManage/authManage/account' },
+            {
+              label: '分组管理',
+              active: true,
+              path: '/userManage/authManage/accountGroup',
+            },
+            { label: '角色管理', path: '/userManage/authManage/role' },
           ],
         },
       },
@@ -150,12 +158,16 @@ export default [
         component: '@/pages/userManage/authManage/role',
         key: 'default-3-1-3',
         meta: {
-          showMenu: true,
+          showMenu: false,
           showHeader: true,
           breadcrumb: [
-            { label: '用户管理' },
-            { label: '分组管理' },
-            { label: '角色权限管理', active: true },
+            { label: '用户管理', path: '/userManage/authManage/account' },
+            { label: '分组管理', path: '/userManage/authManage/accountGroup' },
+            {
+              label: '角色权限管理',
+              active: true,
+              path: '/userManage/authManage/role',
+            },
           ],
         },
       },

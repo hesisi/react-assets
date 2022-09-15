@@ -11,7 +11,9 @@ import routes from './routes.js';
 
 import postCssPxToViewport from 'postcss-px-to-viewport';
 
-const baosanIp = '10.173.75.120:9201/';
+// const baosanIp = '10.173.75.120:9201/';
+// const baosanIp = '10.173.89.241:9201/';
+const baosanIp = '10.172.27.197:9201/';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -62,6 +64,7 @@ export default defineConfig({
         /menuManage/,
         /layouts/,
         /previewPage/,
+        /notificationCenter/,
       ], // 设置忽略文件，用正则做目录名匹配
       include: [/homeIndex/], // 设置需要使用的文件
       landscape: false, // 是否处理横屏情况

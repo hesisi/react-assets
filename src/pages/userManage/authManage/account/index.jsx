@@ -191,7 +191,7 @@ export default function Account({ accountIdenty = 'user' }) {
       align: 'center',
       width: 290,
       render: (_, record) => (
-        <Space size="middle">
+        <Space size="small">
           <span className="table-button" onClick={() => handleEdit(record.id)}>
             <span style={{ marginRight: '5px' }}>
               <EditOutlined />

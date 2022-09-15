@@ -5,7 +5,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "importHelpers": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "esModuleInterop": true,
     "sourceMap": true,
     "baseUrl": "./",
@@ -15,7 +15,7 @@
       "@@/*": ["src/.umi/*"]
     },
     "allowSyntheticDefaultImports": true,
-    "suppressImplicitAnyIndexErrors": true,
+    "suppressImplicitAnyIndexErrors": true
   },
   "include": [
     "mock/**/*",

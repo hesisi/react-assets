@@ -13,7 +13,7 @@ import { message } from 'antd';
 // 请求
 const http = axios.create({
   baseUrl: '',
-  timeout: 10 * 1000,
+  timeout: 100000 * 1000,
 });
 
 // 请求拦截

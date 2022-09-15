@@ -187,6 +187,7 @@
 .active-bread {
   color: #0d6bff;
   font-weight: 600;
+  font-size: 16px;
 }
 .ant-table-cell {
   & > span {
@@ -214,5 +215,26 @@
   to {
     // top: 0;
     opacity: 1;
+  }
+}
+.bread-normal {
+  line-height: 28px;
+}
+.bread-click {
+  cursor: pointer;
+}
+.bread-click:hover {
+  color: #1890ff;
+}
+.tree-transfer {
+  .ant-transfer-operation {
+    .ant-btn:first-child {
+      margin-bottom: 15px;
+    }
+    .ant-btn[disabled] {
+      color: #0d6bff !important;
+      border-color: rgba(13, 107, 255, 1) !important;
+      background-color: #fff;
+    }
   }
 }

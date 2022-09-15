@@ -75,7 +75,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
-      width: 100,
+      // width: 160,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
       },
@@ -320,6 +320,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
         const deleteResult = await deleteGroupUser(deleteItemsArr);
         if (deleteResult?.data?.code === 200) {
           message.success('删除成功');
+          setSelectedRowKeys([]);
           fechGroupUserList({
             groupId,
             realName: searchValue,

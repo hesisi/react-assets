@@ -170,9 +170,15 @@ export default function IndexPage() {
         // setSystemData(currentUser);
         // localForage.setItem('userSystemInfo', oldData);
         // localForage.setItem('userSystem', currentUser);
+
         if (deleteResult?.data?.code === 200) {
           message.success('删除成功');
-          fechRoleList();
+          await fechRoleList();
+          if (idArr.join() === groupId) {
+            setTimeout(() => {
+              setGroupId(null);
+            }, 0);
+          }
         }
       },
       onCancel() {},

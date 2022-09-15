@@ -6,7 +6,6 @@ const creatRightTree = (tree, targetsKeys = []) => {
   let newArr = [];
   newArr = tree.map((item) => {
     if (targetsKeys.includes(item.key) && !item?.children?.length) {
-      console.log(item, '11-----');
       return item;
     }
     if (item.children && item.children.length) {

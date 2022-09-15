@@ -25,9 +25,12 @@ function UserLeftList(props) {
   const [id, setId] = useState(null);
 
   useEffect(() => {
-    console.log(data, '18-----');
+    const initId = groupId || data?.[0]?.id || null;
     setListData(data);
-    setId(groupId);
+    setId(initId);
+    if (data?.length && !groupId) {
+      handleGroupClick(data[0]);
+    }
   }, [data, groupId]);
 
   return (

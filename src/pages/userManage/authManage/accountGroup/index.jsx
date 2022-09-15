@@ -30,6 +30,12 @@ import localForage from 'localforage';
 import { getUUID } from '@/utils/utils';
 import { cloneDeep } from 'lodash';
 import UserLeftList from '../userLeftList';
+import {
+  getUserGroupList,
+  deleteUserGroup,
+  updateGroupInfo,
+  addGroup,
+} from '@/services/userGroup';
 
 const data = [
   { name: '耐克', id: getUUID() },
@@ -50,14 +56,20 @@ export default function IndexPage() {
   const currentId = useRef(null);
 
   useEffect(async () => {
-    const oldData = await localForage.getItem('userGroup');
-    if (!oldData) {
-      setGroupData(data);
-      localForage.setItem('userGroup', data);
-    } else {
-      setGroupData(oldData);
-    }
+    // const oldData = await localForage.getItem('userGroup');
+    // if (!oldData) {
+    //   setGroupData(data);
+    //   localForage.setItem('userGroup', data);
+    // } else {
+    //   setGroupData(oldData);
+    // }
+    fechGroupList();
   }, []);
+
+  const fechGroupList = async () => {
+    const groupData = await getUserGroupList();
+    setGroupData(groupData?.data?.data || []);
+  };
 
   /* 添加分组 */
   const handleAddGroup = () => {
@@ -68,11 +80,18 @@ export default function IndexPage() {
   const handleOk = () => {
     formRef.current
       .validateFields()
-      .then((values) => {
+      .then(async (values) => {
         let oldSource = cloneDeep(groupData);
+        let NewItem = {};
+        let updatResult = null;
+        let addResult = null;
         if (eidtIdenty.current) {
           oldSource = oldSource.map((item) => {
             if (item.id === currentId.current) {
+              NewItem = {
+                ...item,
+                ...values,
+              };
               return {
                 ...item,
                 ...values,
@@ -80,22 +99,31 @@ export default function IndexPage() {
             }
             return item;
           });
+          updatResult = await updateGroupInfo(NewItem);
         } else {
           const userItem = {
             ...values,
-            id: getUUID(),
+            // id: getUUID(),
           };
-          oldSource.push(userItem);
+          // oldSource.push(userItem);
+          addResult = await addGroup([userItem]);
         }
-        setGroupData(oldSource);
-        localForage.setItem('userGroup', oldSource);
+        // setGroupData(oldSource);
+        // localForage.setItem('userGroup', oldSource);
         message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
+        //  if (eidtIdenty.current) {
+        //   setGroupId(null);
+        //   setGroupId({ ...oldItem, ...values });
+        // }
         currentId.current = null;
         eidtIdenty.current = false;
         setFormData({
           name: '',
         });
         setIsModalVisible(false);
+        if (updatResult?.data?.code === 200 || addResult?.data?.code === 200) {
+          fechGroupList();
+        }
       })
       .catch((reason) => {
         message.warning('请检查');
@@ -120,12 +148,21 @@ export default function IndexPage() {
       okText: '确认',
       cancelText: '取消',
       onOk: async () => {
-        const currentUser = cloneDeep(groupData).filter(
-          (item) => !idArr.includes(item.id),
-        );
-        setGroupData(currentUser);
-        localForage.setItem('userGroup', currentUser);
-        message.success('删除成功');
+        const deleteResult = await deleteUserGroup(idArr.join());
+        // const currentUser = cloneDeep(groupData).filter(
+        //   (item) => !idArr.includes(item.id),
+        // );
+        // setGroupData(currentUser);
+        // localForage.setItem('userGroup', currentUser);
+        if (deleteResult?.data?.code === 200) {
+          message.success('删除成功');
+          await fechGroupList();
+          if (idArr.join() === groupId) {
+            setTimeout(() => {
+              setGroupId(null);
+            }, 0);
+          }
+        }
       },
       onCancel() {},
     });
@@ -156,7 +193,7 @@ export default function IndexPage() {
         </Sider>
         <Content style={{ paddingLeft: 10 }}>
           {/* 用户列表 */}
-          <GroupUser groupId={groupId} />
+          <GroupUser groupId={groupId} groupData={groupData} />
 
           {/* 分组弹框 */}
           {/* 新建用户、选择用户弹框 */}

@@ -11,7 +11,7 @@ import routes from './routes.js';
 
 import postCssPxToViewport from 'postcss-px-to-viewport';
 
-const baosanIp = '10.173.93.82:9201/';
+const baosanIp = '10.173.75.120:9201/';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',

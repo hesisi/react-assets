@@ -2,7 +2,7 @@ import { Button, Form, Input, message } from 'antd';
 import { SearchOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { useRef, useEffect, useState } from 'react';
 import RoleTransfer from './roleTransfer';
-import { creatRightTree } from './treeUtil';
+
 import { getRoleUser, updateRoleUser } from '@/services/userManager';
 
 const { TextArea } = Input;

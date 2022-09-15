@@ -2,10 +2,21 @@ import './login.less';
 import { Space, Select, Form, Button, Input, Row, Col, Checkbox } from 'antd';
 const testImg = require('../../assets/images/登录页.png');
 import { history } from 'umi';
+import { useState } from 'react';
 
 const Login = () => {
+  const [showLabel, setShowLabel] = useState('');
   const onFinish = (values) => {
     history.push('homeIndex');
+  };
+  const changeShowLabel = (lable) => {
+    if (showLabel === lable && lable === 'username') {
+      return <span className="right-login__label">邮箱或用户名</span>;
+    } else if (showLabel === lable && lable === 'password') {
+      return <span className="right-login__label">密码</span>;
+    } else {
+      return <span className="right-login__label"></span>;
+    }
   };
   return (
     <div className="login">
@@ -45,15 +56,22 @@ const Login = () => {
           <p className="right-title">欢迎回来</p>
 
           <Form name="normal_login" onFinish={onFinish}>
+            {/* <span className='right-login__label' >邮箱或用户名</span> */}
+            {changeShowLabel('username')}
             <Form.Item name="username">
               <Input
                 placeholder="请输入邮箱或用户名"
                 className="right-form__input"
-                style={{
-                  marginBottom: '20px',
+                onFocus={() => {
+                  setShowLabel('username');
+                }}
+                onBlur={() => {
+                  setShowLabel('');
                 }}
               />
             </Form.Item>
+            {/* <span className='right-login__label' >密码</span> */}
+            {changeShowLabel('password')}
             <Form.Item
               name="password"
               rules={[
@@ -67,6 +85,12 @@ const Login = () => {
                 type="password"
                 placeholder="请输入密码"
                 className="right-form__input"
+                onFocus={() => {
+                  setShowLabel('password');
+                }}
+                onBlur={() => {
+                  setShowLabel('');
+                }}
               />
             </Form.Item>
             <Form.Item>

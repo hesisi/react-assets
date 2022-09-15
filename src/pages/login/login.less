@@ -82,13 +82,13 @@
   background: @white;
   width: 624.19px;
   border-radius: 0px @borderRadius @borderRadius 0px;
-  padding: 60px 50px;
+  padding: 60px 50px 50px 50px;
   position: relative;
   .ant-select-selector:nth-child(1) {
     border: none;
   }
   .ant-form-item {
-    margin-bottom: 42px;
+    margin-bottom: 27px;
     font-size: @fontSize;
     // .ant-input:hover, {
     //   border: none;
@@ -98,6 +98,7 @@
     .ant-input:focus,
     .ant-input-focused {
       box-shadow: none;
+      border-color: #3a63ff;
     }
     .ant-input {
       font-family: 'PingFang Regular';
@@ -133,16 +134,23 @@
   font-family: 'PingFang Medium';
   letter-spacing: 5px;
 }
-
+.right-login__label {
+  height: 25px;
+  display: block;
+  font-size: 18px;
+  color: #0d6bff;
+  margin-bottom: 25px;
+}
 .right-form__input {
   height: 39px;
   border: none;
   border-bottom: 3px solid #cecece;
   font-size: @fontSize;
-  color: #d3d3d3;
+  color: #333333;
   font-weight: @weight-2;
   line-height: 39px;
   box-shadow: none;
+  margin-bottom: 0px;
 }
 
 .right-login__checkbox {
@@ -169,5 +177,6 @@
   font-family: 'PingFang Regular';
 }
 .login-form-forgot {
+  color: #0d6bff;
   font-family: 'PingFang Regular';
 }

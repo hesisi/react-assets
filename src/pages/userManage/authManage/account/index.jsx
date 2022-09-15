@@ -29,6 +29,14 @@ import React, { useRef, useState, useEffect } from 'react';
 import TableHeader from '@/components/tableHeader';
 import localForage from 'localforage';
 import { getUUID } from '@/utils/utils';
+import {
+  getUserList,
+  addOneUser,
+  deleteUser,
+  updateOneUser,
+  addUsersToGroups,
+} from '@/services/userManager';
+import { getUserGroupList } from '@/services/userGroup';
 import { REGEXP_MAIL, REGEXP_YD_PHONE } from '@/utils/validate';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 import { cloneDeep } from 'lodash';
@@ -37,12 +45,12 @@ import moment from 'moment';
 const { Dragger } = Upload;
 const { Option } = Select;
 const { confirm } = Modal;
-const data = [
-  { name: '耐克', id: getUUID() },
-  { name: '阿迪达斯', id: getUUID() },
-  { name: '李宁', id: getUUID() },
-  { name: '贵人鸟', id: getUUID() },
-];
+// const data = [
+//   { name: '耐克', id: getUUID() },
+//   { name: '阿迪达斯', id: getUUID() },
+//   { name: '李宁', id: getUUID() },
+//   { name: '贵人鸟', id: getUUID() },
+// ];
 const { Search } = Input;
 export default function Account({ accountIdenty = 'user' }) {
   const formRef = useRef(null);
@@ -56,14 +64,20 @@ export default function Account({ accountIdenty = 'user' }) {
   const [isModalGVisible, setIsModalGVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedGRowKeys, setSelectedGRowKeys] = useState([]);
+  const [searchName, setSearchName] = useState('');
+  const [pageInfo, setPageInfo] = useState({
+    pageSize: 10,
+    pageNum: 1,
+  });
+  const [totalSize, setTotalSize] = useState(0);
   const [dataGSource, setDataGSource] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
-    sex: undefined,
+    gender: undefined,
     tel: '',
     email: '',
-    work: undefined,
-    cate: undefined,
+    job: undefined,
+    groupList: undefined,
   });
 
   const workList = [
@@ -123,8 +137,8 @@ export default function Account({ accountIdenty = 'user' }) {
     },
     {
       title: '姓名',
-      dataIndex: 'name',
-      key: 'name',
+      dataIndex: 'userName',
+      key: 'userName',
       width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -132,8 +146,8 @@ export default function Account({ accountIdenty = 'user' }) {
     },
     {
       title: '电话',
-      dataIndex: 'tel',
-      key: 'tel',
+      dataIndex: 'phone',
+      key: 'phone',
       width: 160,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -150,21 +164,22 @@ export default function Account({ accountIdenty = 'user' }) {
     },
     {
       title: '组别',
-      dataIndex: 'cate',
-      key: 'cate',
+      dataIndex: 'groupList',
+      key: 'groupList',
       render: (text) => {
         return (
           <span>
-            {goupArr?.current?.filter((item) => item.id === text)?.[0]?.name ||
-              ''}
+            {/* {dataGSource.filter((item) => text.includes(item.id))?.[0]?.name ||
+              ''} */}
+            {filterGroup(text)}
           </span>
         );
       },
     },
     {
       title: '创建时间',
-      dataIndex: 'creatTime',
-      key: 'creatTime',
+      dataIndex: 'createDate',
+      key: 'createDate',
       width: '14%',
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -204,11 +219,47 @@ export default function Account({ accountIdenty = 'user' }) {
   ];
 
   useEffect(async () => {
-    const initUserData = await localForage.getItem('userList');
-    goupArr.current = (await localForage.getItem('userGroup')) || data;
-    localForage.setItem('userGroup', goupArr.current);
-    setDataSource(initUserData || []);
+    // const initUserData = await localForage.getItem('userList');
+    getUserListByPage('', pageInfo);
+    getGroupList();
+    // goupArr.current = (await localForage.getItem('userGroup')) || data;
+    // localForage.setItem('userGroup', goupArr.current);
+    // setDataSource(initUserData || []);
   }, []);
+
+  const getUserListByPage = async (name, userDTO) => {
+    await getUserList({ name: name, userDTO: userDTO }).then((res) => {
+      if (res?.data?.isSuccess > 0) {
+        const data = res?.data?.data || [];
+        // console.log(res.data);
+        setPageInfo({
+          pageSize: data.pageSize,
+          pageNum: data.pageNum,
+        });
+        setTotalSize(data.totalSize);
+        setDataSource(data?.content || []);
+      }
+    });
+  };
+
+  const getGroupList = async () => {
+    await getUserGroupList().then((res) => {
+      if (res?.data?.isSuccess > 0) {
+        const data = res?.data?.data || [];
+        console.log(res.data);
+        setDataGSource(data || []);
+      }
+    });
+  };
+
+  const filterGroup = (text) => {
+    const Group = dataGSource.filter((item) => text.includes(item.id)) || [];
+    let arr = [];
+    for (let item of Group) {
+      arr.push(item.name);
+    }
+    return arr.join(';');
+  };
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -230,6 +281,10 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleGroup = () => {
+    if (!selectedRowKeys?.length) {
+      message.warn('请选择至少一条数据');
+      return;
+    }
     setIsModalGVisible(true);
   };
 
@@ -258,73 +313,76 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   /* 一个人挂一个分组下面 */
-  const editGroupInfo = async (groupId, userItem) => {
-    const initUserData = (await localForage.getItem('groupUserList')) || {};
-    console.log(initUserData, '222----');
-    const newUserData = cloneDeep(initUserData);
-    let copyDataKeys = Object.keys(newUserData);
-    copyDataKeys.forEach((item) => {
-      if (newUserData?.[item]) {
-        console.log(newUserData[item], '226----');
-        newUserData[item] = newUserData[item].filter(
-          (itemC) => itemC.id !== userItem.id,
-        );
-      }
-    });
-    if (groupId) {
-      console.log(newUserData[groupId], '234----');
-      newUserData[groupId] = newUserData?.[groupId]
-        ? newUserData[groupId].concat([userItem])
-        : [userItem];
-    }
-    console.log(newUserData, '239----');
-    localForage.setItem('groupUserList', newUserData);
-  };
+  // const editGroupInfo = async (groupId, userItem) => {
+  //   const initUserData = (await localForage.getItem('groupUserList')) || {};
+  //   console.log(initUserData, '222----');
+  //   const newUserData = cloneDeep(initUserData);
+  //   let copyDataKeys = Object.keys(newUserData);
+  //   copyDataKeys.forEach((item) => {
+  //     if (newUserData?.[item]) {
+  //       console.log(newUserData[item], '226----');
+  //       newUserData[item] = newUserData[item].filter(
+  //         (itemC) => itemC.id !== userItem.id,
+  //       );
+  //     }
+  //   });
+  //   if (groupId) {
+  //     console.log(newUserData[groupId], '234----');
+  //     newUserData[groupId] = newUserData?.[groupId]
+  //       ? newUserData[groupId].concat([userItem])
+  //       : [userItem];
+  //   }
+  //   console.log(newUserData, '239----');
+  //   localForage.setItem('groupUserList', newUserData);
+  // };
 
   const handleOk = () => {
     formRef.current
       .validateFields()
       .then((values) => {
-        let oldSource = cloneDeep(dataSource);
-        let currentItem = null;
         if (eidtIdenty.current) {
-          oldSource = oldSource.map((item) => {
-            if (item.id === currentId.current) {
-              currentItem = {
-                ...item,
-                ...values,
-              };
-              return {
-                ...item,
-                ...values,
-              };
+          //true为编辑，false为新增
+          const userItem = {
+            ...values,
+            id: currentId.current,
+            code: values.userName,
+            realName: values.userName,
+            passwd: '123456',
+          };
+          console.log('newUser', userItem);
+          updateOneUser({ ...userItem }).then((res) => {
+            if (res?.data?.isSuccess > 0) {
+              message.success('编辑成功');
+              getUserListByPage(searchName, pageInfo);
+            } else {
+              message.error('编辑失败');
             }
-            return item;
           });
         } else {
           const userItem = {
             ...values,
-            id: getUUID(),
-            creatTime: moment(`${new Date()}`).format('YYYY-MM-DD HH:mm:ss'),
+            code: values.userName,
+            realName: values.userName,
+            passwd: '123456',
           };
-          currentItem = userItem;
-          oldSource.push(userItem);
+          console.log('newUser', userItem);
+          addOneUser({ ...userItem }).then((res) => {
+            if (res?.data?.isSuccess > 0) {
+              message.success('添加成功');
+              getUserListByPage(searchName, pageInfo);
+            } else {
+              message.error('添加失败');
+            }
+          });
         }
-        if (currentItem) {
-          editGroupInfo(values.cate, currentItem);
-        }
-        setDataSource(oldSource);
-        localForage.setItem('userList', oldSource);
-        message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
-        currentId.current = null;
         eidtIdenty.current = false;
         setFormData({
-          name: '',
-          sex: undefined,
-          tel: '',
+          userName: '',
+          gender: undefined,
+          phone: '',
           email: '',
-          work: undefined,
-          cate: undefined,
+          job: undefined,
+          groupList: undefined,
         });
         setIsModalVisible(false);
       })
@@ -334,8 +392,29 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleGOk = () => {
-    console.log(selectedGRowKeys);
-    setIsModalGVisible(true);
+    if (!selectedGRowKeys?.length) {
+      message.warn('请选择至少一条数据');
+      return;
+    }
+    const addUser = [];
+    selectedGRowKeys.forEach((group) => {
+      selectedRowKeys.forEach((user) => {
+        addUser.push({
+          groupId: group,
+          userId: user,
+        });
+      });
+    });
+    console.log(addUser);
+    addUsersToGroups(addUser).then((res) => {
+      if (res.data.isSuccess > 0) {
+        getUserListByPage(searchName, pageInfo);
+        message.success('分组成功');
+      } else {
+        message.error('分组失败');
+      }
+    });
+    setIsModalGVisible(false);
   };
 
   const handleEdit = async (id) => {
@@ -345,12 +424,12 @@ export default function Account({ accountIdenty = 'user' }) {
     if (currentUser?.[0]) {
       setFormData(
         currentUser?.[0] || {
-          name: '',
-          sex: undefined,
-          tel: '',
+          userName: '',
+          gender: undefined,
+          phone: '',
           email: '',
-          work: undefined,
-          cate: undefined,
+          job: undefined,
+          groupList: undefined,
         },
       );
     }
@@ -373,12 +452,20 @@ export default function Account({ accountIdenty = 'user' }) {
       okText: '确认',
       cancelText: '取消',
       onOk: async () => {
-        const currentUser = cloneDeep(dataSource).filter(
-          (item) => !idArr.includes(item.id),
-        );
-        setDataSource(currentUser);
-        localForage.setItem('userList', currentUser);
-        message.success('删除成功');
+        deleteUser(idArr).then((res) => {
+          if (res?.data?.isSuccess > 0) {
+            message.success('删除成功');
+            getUserListByPage(searchName, pageInfo);
+          } else {
+            message.success('删除失败');
+          }
+        });
+        // const currentUser = cloneDeep(dataSource).filter(
+        //   (item) => !idArr.includes(item.id),
+        // );
+        // setDataSource(currentUser);
+        // localForage.setItem('userList', currentUser);
+        // message.success('删除成功');
       },
       onCancel() {},
     });
@@ -397,16 +484,35 @@ export default function Account({ accountIdenty = 'user' }) {
       </Select>
     );
   };
-
-  const handleUserSearch = (value) => {
-    console.log(value, '298-----');
+  const creatMultipleSelect = (list = [], place = '') => {
+    return (
+      <Select mode="multiple" placeholder={place}>
+        {list.map((x) => {
+          return (
+            <Option key={x.value || x.id} value={x.value || x.id}>
+              {x.label || x.name}
+            </Option>
+          );
+        })}
+      </Select>
+    );
   };
 
+  const handleUserSearch = (value) => {
+    setSearchName(value);
+    getUserListByPage(value, { ...pageInfo, pageNum: 1 });
+  };
+  const handleGroupSearch = (value) => {};
   const onFinish = () => {};
 
   const handlePageChange = (num, pageSize) => {
-    // setPageNum(num);
-    // setPageSize(pageSize);
+    const newPageInfo = {
+      ...pageInfo,
+      pageNum: num,
+      pageSize: pageSize,
+    };
+    setPageInfo(newPageInfo);
+    getUserListByPage(searchName, newPageInfo);
   };
 
   const rowSelection = {
@@ -496,7 +602,7 @@ export default function Account({ accountIdenty = 'user' }) {
             // }}
             rowKey={(record) => record.id}
             pagination={{
-              total: dataSource?.length || 0,
+              total: totalSize,
               showSizeChanger: true,
               // showQuickJumper: true,
               onChange: handlePageChange,
@@ -512,12 +618,12 @@ export default function Account({ accountIdenty = 'user' }) {
             destroyOnClose={true}
             onCancel={() => {
               setFormData({
-                name: '',
-                sex: undefined,
-                tel: '',
+                userName: '',
+                gender: undefined,
+                phone: '',
                 email: '',
-                work: undefined,
-                cate: undefined,
+                job: undefined,
+                groupList: undefined,
               });
               currentId.current = null;
               eidtIdenty.current = false;
@@ -567,18 +673,18 @@ export default function Account({ accountIdenty = 'user' }) {
                         <Col span={12}>
                           <Form.Item
                             label="姓名"
-                            name="name"
+                            name="userName"
                             rules={[{ required: true, message: '请输入姓名!' }]}
                           >
                             <Input placeholder={'请输入姓名'} />
                           </Form.Item>
                         </Col>
                         <Col span={12}>
-                          <Form.Item label="性别" name="sex">
+                          <Form.Item label="性别" name="gender">
                             {creatSelct(
                               [
-                                { value: '1', label: '男' },
-                                { value: '2', label: '女' },
+                                { value: '男', label: '男' },
+                                { value: '女', label: '女' },
                               ],
                               '请选择性别',
                             )}
@@ -589,7 +695,7 @@ export default function Account({ accountIdenty = 'user' }) {
                         <Col span={12}>
                           <Form.Item
                             label="电话"
-                            name="tel"
+                            name="phone"
                             rules={[
                               {
                                 pattern: REGEXP_YD_PHONE,
@@ -617,13 +723,16 @@ export default function Account({ accountIdenty = 'user' }) {
                       </Row>
                       <Row>
                         <Col span={12}>
-                          <Form.Item label="岗位" name="work">
+                          <Form.Item label="岗位" name="job">
                             {creatSelct(workList, '请选择岗位')}
                           </Form.Item>
                         </Col>
                         <Col span={12}>
-                          <Form.Item label="组别" name="cate">
-                            {creatSelct(goupArr.current || [], '请选择组别')}
+                          <Form.Item label="组别" name="groupList">
+                            {creatMultipleSelect(
+                              dataGSource || [],
+                              '请选择组别',
+                            )}
                           </Form.Item>
                         </Col>
                       </Row>
@@ -665,7 +774,12 @@ export default function Account({ accountIdenty = 'user' }) {
                     showButton: false,
                     ButtonStructure: [],
                   },
-                  operateStructure: [<Input placeholder="请输入关键字" />],
+                  operateStructure: [
+                    <Search
+                      placeholder="请输入关键字"
+                      onSearch={handleGroupSearch}
+                    />,
+                  ],
                 }}
               />
               <Table

@@ -1,6 +1,40 @@
 import request from '../utils/request';
 const basePreix = '/assets';
-
+//获取用户信息
+export function getUserList(params) {
+  return request(`${basePreix}/user/listByPage/?name=${params.name}`, {
+    method: 'post',
+    data: { ...params.userDTO },
+  });
+}
+//新建用户
+export function addOneUser(params) {
+  return request(`${basePreix}/user/add`, {
+    method: 'post',
+    data: { ...params },
+  });
+}
+//删除用户
+export function deleteUser(params) {
+  return request(`${basePreix}/user/batchDelete`, {
+    method: 'post',
+    data: params,
+  });
+}
+//批量分组
+export function addUsersToGroups(params) {
+  return request(`${basePreix}/user/addUsersToGroups`, {
+    method: 'post',
+    data: params,
+  });
+}
+//编辑用户
+export function updateOneUser(params) {
+  return request(`${basePreix}/user/update`, {
+    method: 'post',
+    data: { ...params },
+  });
+}
 // 查询角色列表
 export function getRoleList(params) {
   return request(`${basePreix}/role/list`, {
@@ -42,7 +76,7 @@ export function getRoleUser(params) {
   });
 }
 
-/* 保存用户橘色 */
+/* 保存用户角色 */
 export function updateRoleUser(id, params) {
   return request(`${basePreix}/userRole/update/${id}`, {
     method: 'post',

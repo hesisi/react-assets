@@ -82,14 +82,18 @@ export default function GroupUser({ groupId = null, groupData = null }) {
     },
     {
       title: '组别',
-      dataIndex: 'cate',
-      key: 'cate',
+      dataIndex: 'owningGroup',
+      key: 'owningGroup',
+      // width: 80,
       render: (text) => {
-        const item = currentGoupeData?.current
-          ? currentGoupeData.current.filter((itemF) => itemF.id === text)
-          : [];
-        return <span>{item?.[0] ? item[0].name : ''}</span>;
+        return <EllipsisTooltip title={text} />;
       },
+      // render: (text) => {
+      //   const item = currentGoupeData?.current
+      //     ? currentGoupeData.current.filter((itemF) => itemF.id === text)
+      //     : [];
+      //   return <span>{item?.[0] ? item[0].name : ''}</span>;
+      // },
     },
     {
       title: '创建时间',
@@ -110,7 +114,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
       title: '操作',
       key: 'action',
       align: 'center',
-      width: '120',
+      width: 100,
       render: (_, record) => (
         <Space size="middle">
           <span

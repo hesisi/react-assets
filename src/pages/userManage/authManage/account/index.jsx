@@ -87,11 +87,11 @@ export default function Account({ accountIdenty = 'user' }) {
 
   const workList = [
     {
-      value: '0',
+      value: '财务',
       label: '财务',
     },
     {
-      value: '1',
+      value: '开发',
       label: '开发',
     },
   ];
@@ -382,8 +382,8 @@ export default function Account({ accountIdenty = 'user' }) {
             const userItem = {
               ...values,
               id: currentId.current,
-              code: values.userName,
-              realName: values.userName,
+              // code: values.userName,
+              // realName: values.userName,
             };
             console.log('newUser', userItem);
             updateOneUser({ ...userItem }).then((res) => {
@@ -397,8 +397,8 @@ export default function Account({ accountIdenty = 'user' }) {
           } else {
             const userItem = {
               ...values,
-              code: values.userName,
-              realName: values.userName,
+              // code: values.userName,
+              // realName: values.userName,
             };
             console.log('newUser', userItem);
             addOneUser({ ...userItem }).then((res) => {
@@ -732,7 +732,10 @@ export default function Account({ accountIdenty = 'user' }) {
                           <Form.Item
                             label="姓名"
                             name="userName"
-                            rules={[{ required: true, message: '请输入姓名!' }]}
+                            rules={[
+                              { required: true, message: '请输入姓名!' },
+                              { pattern: /^[^\s]*$/, message: '禁止输入空格' },
+                            ]}
                           >
                             <Input placeholder={'请输入姓名'} />
                           </Form.Item>

@@ -2,9 +2,9 @@ import request from '../utils/request';
 const basePreix = '/assets';
 //获取用户信息
 export function getUserList(params) {
-  return request(`${basePreix}/user/listByPage/?name=${params.name}`, {
+  return request(`${basePreix}/user/listByPage`, {
     method: 'post',
-    data: { ...params.userDTO },
+    data: params,
   });
 }
 //新建用户

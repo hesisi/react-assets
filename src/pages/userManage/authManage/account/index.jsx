@@ -233,7 +233,7 @@ export default function Account({ accountIdenty = 'user' }) {
   }, []);
 
   const getUserListByPage = async (name, userDTO) => {
-    await getUserList({ name: name, userDTO: userDTO }).then((res) => {
+    await getUserList({ name: name, ...userDTO }).then((res) => {
       if (res?.data?.isSuccess > 0) {
         const data = res?.data?.data || [];
         // console.log(res.data);

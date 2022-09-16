@@ -120,7 +120,7 @@ export default function Home(params) {
               spaceBetween={-250} //设置堆叠轮播，item之间叠的距离
               slidesPerView={5} //设置显示的数量
               zoom={true}
-              navigation={true}
+              navigation={false}
               // grabCursor={true}
               modules={[Navigation, Pagination, EffectCreative, Autoplay]}
               effect={'creative'} //modules上加了同时要设置

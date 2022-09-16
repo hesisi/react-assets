@@ -2,9 +2,9 @@ import request from '../utils/request';
 const basePreix = '/assets';
 //获取用户信息
 export function getUserList(params) {
-  return request(`${basePreix}/user/listByPage/?name=${params.name}`, {
+  return request(`${basePreix}/user/listByPage`, {
     method: 'post',
-    data: { ...params.userDTO },
+    data: params,
   });
 }
 //新建用户
@@ -12,6 +12,13 @@ export function addOneUser(params) {
   return request(`${basePreix}/user/add`, {
     method: 'post',
     data: { ...params },
+  });
+}
+//批量添加
+export function addUserByUpload(params) {
+  return request(`${basePreix}/user/upload`, {
+    method: 'post',
+    data: params,
   });
 }
 //删除用户
@@ -26,6 +33,12 @@ export function addUsersToGroups(params) {
   return request(`${basePreix}/user/addUsersToGroups`, {
     method: 'post',
     data: params,
+  });
+}
+//密码重置
+export function resetPasswd(params) {
+  return request(`${basePreix}/user/resetPasswd/${params}`, {
+    method: 'get',
   });
 }
 //编辑用户

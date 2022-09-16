@@ -207,56 +207,57 @@ const CommonLayout = (props) => {
           {/* 消息提醒 */}
           {isShowMessage ? (
             <div
-              className="messages"
-              ref={messagesRef}
+              className="messages-warp"
               // onMouseOut={() => handleOutMessage()}
             >
-              <div className="message_header">
-                <span>全部标记为已读</span>
-                <div>
-                  查看全部 <RightOutlined />
+              <div className="messages" ref={messagesRef}>
+                <div className="message_header">
+                  <span>全部标记为已读</span>
+                  <div>
+                    查看全部 <RightOutlined />
+                  </div>
                 </div>
-              </div>
-              <div className="message_content">
-                {messageList.map((item) => {
-                  return (
-                    <div className="message_item" onClick={goToMessageCenter}>
-                      <div className="icon_container">
-                        <div>{item.icon}</div>
-                      </div>
-                      <div className="item">
-                        <span className="items_title">{item.titles}</span>
-                        <div>
-                          <span>{item.types}</span>{' '}
-                          <span>
-                            {item.status ? (
-                              <a
-                                href="#"
-                                className="circle"
-                                style={{
-                                  backgroundColor:
-                                    item.status === '已完成'
-                                      ? 'green'
-                                      : 'yellow',
-                                }}
-                              ></a>
-                            ) : null}
-                            {item.status}
-                          </span>{' '}
+                <div className="message_content">
+                  {messageList.map((item) => {
+                    return (
+                      <div className="message_item" onClick={goToMessageCenter}>
+                        <div className="icon_container">
+                          <div>{item.icon}</div>
                         </div>
-                        <span
-                          style={{
-                            fontSize: '12px',
-                            color: 'rgb(170,170,170)',
-                          }}
-                        >
-                          {item.time}
-                        </span>
+                        <div className="item">
+                          <span className="items_title">{item.titles}</span>
+                          <div>
+                            <span>{item.types}</span>{' '}
+                            <span>
+                              {item.status ? (
+                                <a
+                                  href="#"
+                                  className="circle"
+                                  style={{
+                                    backgroundColor:
+                                      item.status === '已完成'
+                                        ? 'green'
+                                        : 'yellow',
+                                  }}
+                                ></a>
+                              ) : null}
+                              {item.status}
+                            </span>{' '}
+                          </div>
+                          <span
+                            style={{
+                              fontSize: '12px',
+                              color: 'rgb(170,170,170)',
+                            }}
+                          >
+                            {item.time}
+                          </span>
+                        </div>
+                        <RightOutlined />
                       </div>
-                      <RightOutlined />
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           ) : null}

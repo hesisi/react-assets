@@ -301,26 +301,23 @@ export default function Account({ accountIdenty = 'user' }) {
       console.log('file-----------', file);
     });
     console.log('uplodefile', fileList);
-    addUserByUpload(formData)
-      .then((res) => {
-        if (res.data.isSuccess > 0) {
-          setFileList([]);
-          message.success('上传成功');
-          setIsModalVisible(false);
-          getUserListByPage(searchName, pageInfo);
-        } else {
-          message.error('上传失败');
-        }
-      })
-      .catch(() => {
-        message.error('上传失败');
-      });
+    addUserByUpload(formData).then((res) => {
+      if (res.data.isSuccess > 0) {
+        setFileList([]);
+        message.success('添加成功');
+        setIsModalVisible(false);
+        getUserListByPage(searchName, pageInfo);
+      } else {
+        // message.error(res.data.message);
+      }
+    });
   };
 
   const props = {
     name: 'file',
     multiple: false,
     accept: '.xls,.xlsx',
+    maxCount: 1,
     onRemove: (file) => {
       const index = fileList.indexOf(file);
       const newFileList = fileList.slice();
@@ -394,7 +391,7 @@ export default function Account({ accountIdenty = 'user' }) {
                 message.success('编辑成功');
                 getUserListByPage(searchName, pageInfo);
               } else {
-                message.error('编辑失败');
+                // message.error(res.data.message);
               }
             });
           } else {
@@ -409,7 +406,7 @@ export default function Account({ accountIdenty = 'user' }) {
                 message.success('添加成功');
                 getUserListByPage(searchName, pageInfo);
               } else {
-                message.error('添加失败');
+                // message.error(res.data.message);
               }
             });
           }

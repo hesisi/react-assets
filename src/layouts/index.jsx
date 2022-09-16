@@ -185,7 +185,7 @@ const CommonLayout = (props) => {
   };
 
   return (
-    <Layout>
+    <Layout className={Styles.layoutMain}>
       <Header
         className={Styles.header}
         style={{ display: meta && !meta.showHeader ? 'none' : 'flex' }}
@@ -283,8 +283,11 @@ const CommonLayout = (props) => {
 
             <div className={'user-detail'}>
               <Space size={10}>
-                <Avatar src="https://joeschmoe.io/api/v1/random" />
-                <span>欢迎你，用户一</span>
+                <Avatar
+                  src="https://joeschmoe.io/api/v1/random"
+                  className={Styles.avatar}
+                />
+                <span style={{ marginRight: '20px' }}>欢迎你，用户一</span>
                 <DownOutlined />
               </Space>
             </div>

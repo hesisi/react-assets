@@ -23,12 +23,22 @@
   height: 100%;
   background-color: #fff;
 }
-
+#root,
+.layoutMain {
+  height: 100%;
+}
+.avatar {
+  width: 24px !important;
+  height: 24px !important;
+  line-height: 24px !important;
+}
 .header {
   background: #0d6bff !important;
   position: relative;
-  padding-right: 300px !important;
+  padding-right: 320px !important;
   padding-left: 120px !important;
+  height: 52px !important;
+  line-height: 52px !important;
   > ul {
     width: 100%;
   }
@@ -45,7 +55,7 @@
   right: 0;
   top: 0;
   margin-left: 0;
-  width: 300px;
+  width: 320px;
   .user-detail {
     color: #fff;
   }
@@ -177,7 +187,7 @@
 }
 
 .layout-content {
-  height: calc(100vh - 65px);
+  height: calc(100% - 52px);
   background-color: #f0f2f5;
 }
 .ant-breadcrumb li:last-child {
@@ -236,5 +246,49 @@
       border-color: rgba(13, 107, 255, 1) !important;
       background-color: #fff;
     }
+  }
+}
+
+/* table */
+
+.ant-table-tbody > tr > td {
+  border-bottom: 0 !important;
+}
+.ant-table-thead
+  > tr
+  > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+  display: none;
+}
+.ant-table-thead > tr > th {
+  color: #8591aa !important;
+  font-weight: 600 !important;
+  border-bottom: 0 !important;
+  background: #f4f7f9 !important;
+}
+.ant-table-tbody > tr:nth-of-type(even) > td {
+  background: #f9fbfc;
+}
+
+/* 分页 */
+.ant-pagination-item,
+.ant-select-selector {
+  border-radius: 10px !important;
+}
+.ant-pagination-prev,
+.ant-pagination-next {
+  button {
+    border-radius: 10px !important;
+  }
+}
+// .ant-pagination-item{
+//   background: #F9FBFC!important;
+//   a{
+//     color: #8995AD!important;
+//   }
+// }
+.ant-pagination-item-active {
+  background: #0d6bff !important;
+  a {
+    color: #fff !important;
   }
 }

@@ -55,8 +55,8 @@ export default function GroupUser({ groupId = null, groupData = null }) {
     },
     {
       title: '姓名',
-      dataIndex: 'realName',
-      key: 'realName',
+      dataIndex: 'userName',
+      key: 'userName',
       width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -99,7 +99,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
       title: '创建时间',
       dataIndex: 'createDate',
       key: 'createDate',
-      width: 120,
+      width: 180,
       render: (text) => {
         return (
           <EllipsisTooltip
@@ -131,16 +131,8 @@ export default function GroupUser({ groupId = null, groupData = null }) {
     },
   ];
 
-  /* 初始化 */
-  //  useEffect(() => {
-  //  return () => {
-  //   setSearchValue('');
-  //   setSearchDealtValue('');
-  //  }
-  // }, [])
-
   useEffect(() => {
-    if (groupId) {
+    if (groupId || groupId === 0) {
       if (groupId !== 0) {
         currentGoupeData.current = groupData;
         currentGroupId.current = groupId;
@@ -152,11 +144,10 @@ export default function GroupUser({ groupId = null, groupData = null }) {
           pageNum,
         });
       } else {
-        setSelectedRowKeys([]);
         setSearchValue('');
         setSearchDealtValue('');
-        setPageSize(10);
-        setPageNum(1);
+        setPageUserNum(1);
+        setPageUserSize(10);
       }
     }
   }, [groupId, pageSize, pageNum, groupData]);
@@ -451,6 +442,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
             type: 'checkbox',
             ...rowSelection,
           }}
+          bordered={false}
           style={{ marginTop: 20 }}
           dataSource={dataSource}
           columns={columns}

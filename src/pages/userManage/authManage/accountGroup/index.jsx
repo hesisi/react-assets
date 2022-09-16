@@ -187,7 +187,7 @@ export default function IndexPage() {
         backgroundColor: '#f0f2f5',
       }}
     >
-      <Layout className={'user-cont list-layout'}>
+      <Layout className={'user-cont list-layout account-group'}>
         <Sider className={'user-sider'} width={300}>
           <UserLeftList
             data={groupData}
@@ -201,12 +201,6 @@ export default function IndexPage() {
         <Content style={{ paddingLeft: 10 }}>
           {/* 用户列表 */}
           <GroupUser groupId={groupId} groupData={groupData} />
-          {/* {groupId ? (
-
-          ) : (
-
-          )}
-           */}
           {/* 分组弹框 */}
           {/* 新建用户、选择用户弹框 */}
           <Modal

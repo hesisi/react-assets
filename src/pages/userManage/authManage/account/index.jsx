@@ -390,6 +390,16 @@ export default function Account({ accountIdenty = 'user' }) {
               if (res?.data?.isSuccess > 0) {
                 message.success('编辑成功');
                 getUserListByPage(searchName, pageInfo);
+                setIsModalVisible(false);
+                eidtIdenty.current = false;
+                setFormData({
+                  userName: '',
+                  gender: undefined,
+                  phone: '',
+                  email: '',
+                  job: undefined,
+                  groupList: undefined,
+                });
               } else {
                 // message.error(res.data.message);
               }
@@ -405,21 +415,26 @@ export default function Account({ accountIdenty = 'user' }) {
               if (res?.data?.isSuccess > 0) {
                 message.success('添加成功');
                 getUserListByPage(searchName, pageInfo);
+                setPageInfo({
+                  ...pageInfo,
+                  pageNum: 1,
+                });
+                getUserListByPage(searchName, { ...pageInfo, pageNum: 1 });
+                setIsModalVisible(false);
+                eidtIdenty.current = false;
+                setFormData({
+                  userName: '',
+                  gender: undefined,
+                  phone: '',
+                  email: '',
+                  job: undefined,
+                  groupList: undefined,
+                });
               } else {
                 // message.error(res.data.message);
               }
             });
           }
-          eidtIdenty.current = false;
-          setFormData({
-            userName: '',
-            gender: undefined,
-            phone: '',
-            email: '',
-            job: undefined,
-            groupList: undefined,
-          });
-          setIsModalVisible(false);
         })
         .catch((reason) => {
           message.warning('请检查');

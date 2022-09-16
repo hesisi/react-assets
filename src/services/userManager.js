@@ -14,6 +14,13 @@ export function addOneUser(params) {
     data: { ...params },
   });
 }
+//批量添加
+export function addUserByUpload(params) {
+  return request(`${basePreix}/user/upload`, {
+    method: 'post',
+    data: params,
+  });
+}
 //删除用户
 export function deleteUser(params) {
   return request(`${basePreix}/user/batchDelete`, {
@@ -26,6 +33,12 @@ export function addUsersToGroups(params) {
   return request(`${basePreix}/user/addUsersToGroups`, {
     method: 'post',
     data: params,
+  });
+}
+//密码重置
+export function resetPasswd(params) {
+  return request(`${basePreix}/user/resetPasswd/${params}`, {
+    method: 'get',
   });
 }
 //编辑用户

@@ -35,10 +35,15 @@ import {
   deleteUser,
   updateOneUser,
   addUsersToGroups,
+  resetPasswd,
+  addUserByUpload,
 } from '@/services/userManager';
 import { getUserGroupList } from '@/services/userGroup';
 import { REGEXP_MAIL, REGEXP_YD_PHONE } from '@/utils/validate';
-import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
+import {
+  EllipsisTooltip,
+  TimeEllipsisTooltip,
+} from '@/components/tablecellEllips.jsx';
 import { cloneDeep } from 'lodash';
 import moment from 'moment';
 
@@ -54,10 +59,9 @@ const { confirm } = Modal;
 const { Search } = Input;
 export default function Account({ accountIdenty = 'user' }) {
   const formRef = useRef(null);
-  const [form] = Form.useForm();
+  const groupFormRef = useRef(null);
   const eidtIdenty = useRef(null);
   const currentId = useRef(null);
-  const goupArr = useRef(null);
   const [dataSource, setDataSource] = useState([]);
   const [userAddC, setUserAddC] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -65,6 +69,7 @@ export default function Account({ accountIdenty = 'user' }) {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedGRowKeys, setSelectedGRowKeys] = useState([]);
   const [searchName, setSearchName] = useState('');
+  const [fileList, setFileList] = useState([]);
   const [pageInfo, setPageInfo] = useState({
     pageSize: 10,
     pageNum: 1,
@@ -166,23 +171,18 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '组别',
       dataIndex: 'groupList',
       key: 'groupList',
+      width: 200,
       render: (text) => {
-        return (
-          <span>
-            {/* {dataGSource.filter((item) => text.includes(item.id))?.[0]?.name ||
-              ''} */}
-            {filterGroup(text)}
-          </span>
-        );
+        return <EllipsisTooltip title={filterGroup(text)} />;
       },
     },
     {
       title: '创建时间',
       dataIndex: 'createDate',
       key: 'createDate',
-      width: '14%',
+      width: 200,
       render: (text) => {
-        return <EllipsisTooltip title={text} />;
+        return <TimeEllipsisTooltip title={text} />;
       },
     },
     {
@@ -207,7 +207,12 @@ export default function Account({ accountIdenty = 'user' }) {
             </span>
             删除
           </span>
-          <span className="table-button">
+          <span
+            className="table-button"
+            onClick={() => {
+              handleReset(record.id);
+            }}
+          >
             <span style={{ marginRight: '5px' }}>
               <ReloadOutlined />
             </span>
@@ -238,6 +243,7 @@ export default function Account({ accountIdenty = 'user' }) {
         });
         setTotalSize(data.totalSize);
         setDataSource(data?.content || []);
+        setSelectedRowKeys([]);
       }
     });
   };
@@ -269,10 +275,10 @@ export default function Account({ accountIdenty = 'user' }) {
     setSelectedGRowKeys(newSelectedRowKeys);
   };
 
-  const rowGSelection = {
-    selectedGRowKeys,
-    onChange: onSelectGChange,
-  };
+  // const rowGSelection = {
+  //   selectedGRowKeys,
+  //   onChange: onSelectGChange,
+  // };
 
   /* 用户添加， 选择用户 */
   const handleAccountAdd = () => {
@@ -288,23 +294,56 @@ export default function Account({ accountIdenty = 'user' }) {
     setIsModalGVisible(true);
   };
 
+  const handleUpload = () => {
+    const formData = new FormData();
+    fileList.forEach((file) => {
+      formData.append('excelFile', file);
+      console.log('file-----------', file);
+    });
+    console.log('uplodefile', fileList);
+    addUserByUpload(formData)
+      .then((res) => {
+        if (res.data.isSuccess > 0) {
+          setFileList([]);
+          message.success('上传成功');
+          setIsModalVisible(false);
+          getUserListByPage(searchName, pageInfo);
+        } else {
+          message.error('上传失败');
+        }
+      })
+      .catch(() => {
+        message.error('上传失败');
+      });
+  };
+
   const props = {
     name: 'file',
-    multiple: true,
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
+    multiple: false,
+    accept: '.xls,.xlsx',
+    onRemove: (file) => {
+      const index = fileList.indexOf(file);
+      const newFileList = fileList.slice();
+      newFileList.splice(index, 1);
+      setFileList(newFileList);
+    },
     onChange(info) {
       const { status } = info.file;
       if (status !== 'uploading') {
-        console.log(info.file, info.fileList);
+        console.log('fileinfo-----------------', info.file, info.fileList);
       }
       if (status === 'done') {
-        message.success(`${info.file.name} file uploaded successfully.`);
+        message.success(`${info.file.name} 文件上传成功`);
       } else if (status === 'error') {
-        message.error(`${info.file.name} file upload failed.`);
+        message.error(`${info.file.name} 文件上传失败`);
       }
     },
     onDrop(e) {
       console.log('Dropped files', e.dataTransfer.files);
+    },
+    beforeUpload: (file) => {
+      setFileList([file]);
+      return false;
     },
   };
 
@@ -337,84 +376,88 @@ export default function Account({ accountIdenty = 'user' }) {
   // };
 
   const handleOk = () => {
-    formRef.current
-      .validateFields()
-      .then((values) => {
-        if (eidtIdenty.current) {
-          //true为编辑，false为新增
-          const userItem = {
-            ...values,
-            id: currentId.current,
-            code: values.userName,
-            realName: values.userName,
-            passwd: '123456',
-          };
-          console.log('newUser', userItem);
-          updateOneUser({ ...userItem }).then((res) => {
-            if (res?.data?.isSuccess > 0) {
-              message.success('编辑成功');
-              getUserListByPage(searchName, pageInfo);
-            } else {
-              message.error('编辑失败');
-            }
+    if (userAddC) {
+      formRef.current
+        .validateFields()
+        .then((values) => {
+          if (eidtIdenty.current) {
+            //true为编辑，false为新增
+            const userItem = {
+              ...values,
+              id: currentId.current,
+              code: values.userName,
+              realName: values.userName,
+            };
+            console.log('newUser', userItem);
+            updateOneUser({ ...userItem }).then((res) => {
+              if (res?.data?.isSuccess > 0) {
+                message.success('编辑成功');
+                getUserListByPage(searchName, pageInfo);
+              } else {
+                message.error('编辑失败');
+              }
+            });
+          } else {
+            const userItem = {
+              ...values,
+              code: values.userName,
+              realName: values.userName,
+            };
+            console.log('newUser', userItem);
+            addOneUser({ ...userItem }).then((res) => {
+              if (res?.data?.isSuccess > 0) {
+                message.success('添加成功');
+                getUserListByPage(searchName, pageInfo);
+              } else {
+                message.error('添加失败');
+              }
+            });
+          }
+          eidtIdenty.current = false;
+          setFormData({
+            userName: '',
+            gender: undefined,
+            phone: '',
+            email: '',
+            job: undefined,
+            groupList: undefined,
           });
-        } else {
-          const userItem = {
-            ...values,
-            code: values.userName,
-            realName: values.userName,
-            passwd: '123456',
-          };
-          console.log('newUser', userItem);
-          addOneUser({ ...userItem }).then((res) => {
-            if (res?.data?.isSuccess > 0) {
-              message.success('添加成功');
-              getUserListByPage(searchName, pageInfo);
-            } else {
-              message.error('添加失败');
-            }
-          });
-        }
-        eidtIdenty.current = false;
-        setFormData({
-          userName: '',
-          gender: undefined,
-          phone: '',
-          email: '',
-          job: undefined,
-          groupList: undefined,
+          setIsModalVisible(false);
+        })
+        .catch((reason) => {
+          message.warning('请检查');
         });
-        setIsModalVisible(false);
-      })
-      .catch((reason) => {
-        message.warning('请检查');
-      });
+    } else {
+      handleUpload();
+    }
   };
 
   const handleGOk = () => {
-    if (!selectedGRowKeys?.length) {
-      message.warn('请选择至少一条数据');
-      return;
-    }
-    const addUser = [];
-    selectedGRowKeys.forEach((group) => {
-      selectedRowKeys.forEach((user) => {
-        addUser.push({
-          groupId: group,
-          userId: user,
+    groupFormRef.current.validateFields().then((values) => {
+      if (!values?.groupList?.length) {
+        message.warn('请选择至少一条数据');
+        return;
+      }
+      const addUser = [];
+      values.groupList.forEach((group) => {
+        selectedRowKeys.forEach((user) => {
+          addUser.push({
+            groupId: group,
+            userId: user,
+          });
         });
       });
+      console.log(addUser);
+      addUsersToGroups(addUser).then((res) => {
+        if (res.data.isSuccess > 0) {
+          getUserListByPage(searchName, pageInfo);
+          message.success('分组成功');
+        } else {
+          message.error('分组失败');
+        }
+      });
+      setIsModalGVisible(false);
     });
-    console.log(addUser);
-    addUsersToGroups(addUser).then((res) => {
-      if (res.data.isSuccess > 0) {
-        getUserListByPage(searchName, pageInfo);
-        message.success('分组成功');
-      } else {
-        message.error('分组失败');
-      }
-    });
-    setIsModalGVisible(false);
   };
 
   const handleEdit = async (id) => {
@@ -471,6 +514,16 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  const handleReset = (id) => {
+    resetPasswd(id).then((res) => {
+      if (res?.data?.isSuccess > 0) {
+        message.success('密码重置成功');
+      } else {
+        message.success('密码重置失败');
+      }
+    });
+  };
+
   const creatSelct = (list = [], place = '') => {
     return (
       <Select placeholder={place}>
@@ -486,7 +539,7 @@ export default function Account({ accountIdenty = 'user' }) {
   };
   const creatMultipleSelect = (list = [], place = '') => {
     return (
-      <Select mode="multiple" placeholder={place}>
+      <Select mode="multiple" placeholder={place} maxTagCount={3}>
         {list.map((x) => {
           return (
             <Option key={x.value || x.id} value={x.value || x.id}>
@@ -499,11 +552,15 @@ export default function Account({ accountIdenty = 'user' }) {
   };
 
   const handleUserSearch = (value) => {
+    setPageInfo({
+      ...pageInfo,
+      pageNum: 1,
+    });
     setSearchName(value);
     getUserListByPage(value, { ...pageInfo, pageNum: 1 });
   };
-  const handleGroupSearch = (value) => {};
-  const onFinish = () => {};
+  // const handleGroupSearch = (value) => { };
+  // const onFinish = () => { };
 
   const handlePageChange = (num, pageSize) => {
     const newPageInfo = {
@@ -577,6 +634,7 @@ export default function Account({ accountIdenty = 'user' }) {
               },
               operateStructure: [
                 <Search
+                  allowClear
                   placeholder="请输入关键字"
                   onSearch={handleUserSearch}
                 />,
@@ -602,6 +660,7 @@ export default function Account({ accountIdenty = 'user' }) {
             // }}
             rowKey={(record) => record.id}
             pagination={{
+              current: pageInfo.pageNum,
               total: totalSize,
               showSizeChanger: true,
               // showQuickJumper: true,
@@ -628,6 +687,7 @@ export default function Account({ accountIdenty = 'user' }) {
               currentId.current = null;
               eidtIdenty.current = false;
               setIsModalVisible(false);
+              setFileList([]);
             }}
             className="default-modal"
             cancelText="取消"
@@ -755,9 +815,9 @@ export default function Account({ accountIdenty = 'user' }) {
 
           {/* 批量分组 分组展示 */}
           <Modal
-            title="选择分组"
+            title="批量分组"
             destroyOnClose={true}
-            width={800}
+            width={400}
             visible={isModalGVisible}
             onOk={handleGOk}
             onCancel={() => {
@@ -768,21 +828,7 @@ export default function Account({ accountIdenty = 'user' }) {
             okText="确认"
           >
             <div className="user-wrapper">
-              <TableHeader
-                formData={{
-                  formButton: {
-                    showButton: false,
-                    ButtonStructure: [],
-                  },
-                  operateStructure: [
-                    <Search
-                      placeholder="请输入关键字"
-                      onSearch={handleGroupSearch}
-                    />,
-                  ],
-                }}
-              />
-              <Table
+              {/* <Table
                 rowSelection={{
                   type: 'checkbox',
                   ...rowGSelection,
@@ -799,7 +845,18 @@ export default function Account({ accountIdenty = 'user' }) {
                   // onChange: handlePageChange,
                 }}
                 rowKey={(record) => record.id}
-              />
+              /> */}
+              <Form
+                className="account-add default-form-radios"
+                ref={groupFormRef}
+                autoComplete="off"
+                layout="vertical"
+                wrapperCol={{ span: 22 }}
+              >
+                <Form.Item label="组别" name="groupList">
+                  {creatMultipleSelect(dataGSource || [], '请选择组别')}
+                </Form.Item>
+              </Form>
             </div>
           </Modal>
         </div>

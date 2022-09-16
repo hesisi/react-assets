@@ -179,6 +179,7 @@ export default function NotificationCenter(props) {
   }, [searchValue, pageSize, pageNum]);
 
   const handleSubmit = (values) => {
+    setPageNum(1);
     setSearchValue(values);
     // initTable({
     //   values,
@@ -324,9 +325,12 @@ export default function NotificationCenter(props) {
             rowSelection={rowSelection}
             pagination={{
               total,
+              current: pageNum,
+              pageSize,
               showSizeChanger: true,
               // showQuickJumper: true,
               onChange: handlePageChange,
+              showTotal: (total) => `共${total}条`,
             }}
             // onShowSizeChange={onShowSizeChange}
 

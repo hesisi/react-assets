@@ -28,7 +28,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [selectedUserRowKeys, setSelectedUserRowKeys] = useState([]);
-
+  const [searchDealtvalue, setSearchDealtValue] = useState('');
   const [total, setTotal] = useState(0);
   const [searchValue, setSearchValue] = useState('');
   const [pageSize, setPageSize] = useState(10);
@@ -132,19 +132,34 @@ export default function GroupUser({ groupId = null, groupData = null }) {
   ];
 
   /* 初始化 */
+  //  useEffect(() => {
+  //  return () => {
+  //   setSearchValue('');
+  //   setSearchDealtValue('');
+  //  }
+  // }, [])
+
   useEffect(() => {
     if (groupId) {
-      currentGoupeData.current = groupData;
-      currentGroupId.current = groupId;
-      setSelectedRowKeys([]);
-      fechGroupUserList({
-        groupId,
-        realName: searchValue,
-        pageSize,
-        pageNum,
-      });
+      if (groupId !== 0) {
+        currentGoupeData.current = groupData;
+        currentGroupId.current = groupId;
+        setSelectedRowKeys([]);
+        fechGroupUserList({
+          groupId: currentGroupId.current,
+          realName: searchValue,
+          pageSize,
+          pageNum,
+        });
+      } else {
+        setSelectedRowKeys([]);
+        setSearchValue('');
+        setSearchDealtValue('');
+        setPageSize(10);
+        setPageNum(1);
+      }
     }
-  }, [groupId, searchValue, pageSize, pageNum, groupData]);
+  }, [groupId, pageSize, pageNum, groupData]);
 
   useEffect(() => {
     if (isModalVisible && groupId) {
@@ -254,7 +269,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
         });
       });
       const daddResult = await addGroupUser(addUser);
-      if (daddResult?.data?.code === 200) {
+      if (daddResult?.data?.isSuccess !== -1) {
         message.success('添加成功');
         fechGroupUserList({
           groupId,
@@ -318,7 +333,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
           });
         });
         const deleteResult = await deleteGroupUser(deleteItemsArr);
-        if (deleteResult?.data?.code === 200) {
+        if (deleteResult?.data?.isSuccess !== -1) {
           message.success('删除成功');
           setSelectedRowKeys([]);
           fechGroupUserList({
@@ -362,13 +377,24 @@ export default function GroupUser({ groupId = null, groupData = null }) {
   };
 
   const onSearch = (values) => {
+    // setSearchDealtValue(values);
     setPageNum(1);
     setSearchValue(values);
+    fechGroupUserList({
+      groupId: currentGroupId.current,
+      realName: values,
+      pageSize,
+      pageNum: 1,
+    });
   };
 
   const onUserSearch = (values) => {
     setPageUserNum(1);
     setSearchUserValue(values);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchDealtValue(e.target.value);
   };
 
   return (
@@ -409,6 +435,8 @@ export default function GroupUser({ groupId = null, groupData = null }) {
             },
             operateStructure: [
               <Search
+                value={searchDealtvalue}
+                onChange={handleSearchChange}
                 placeholder="请输入用户名"
                 onSearch={onSearch}
                 allowClear
@@ -416,6 +444,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
             ],
           }}
         />
+
         {/* table */}
         <Table
           rowSelection={{
@@ -428,10 +457,13 @@ export default function GroupUser({ groupId = null, groupData = null }) {
           loading={loading}
           scroll={{ y: 360 }}
           pagination={{
+            current: pageNum,
+            pageSize,
             total,
             showSizeChanger: true,
             // showQuickJumper: true,
             onChange: handlePageChange,
+            showTotal: (total) => `共${total}条`,
           }}
           rowKey={(record) => record.id}
         />
@@ -477,9 +509,12 @@ export default function GroupUser({ groupId = null, groupData = null }) {
               loading={userLoading}
               scroll={{ y: 280, x: '100%' }}
               pagination={{
+                current: pageUserNum,
+                pageSize: pageUserSize,
                 total: userTotal || 0,
                 showSizeChanger: true,
                 // showQuickJumper: true,
+                showTotal: (total) => `共${total}条`,
                 onChange: handleUserPageChange,
               }}
               rowKey={(record) => record.id}

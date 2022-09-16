@@ -40,7 +40,7 @@ export default function RoleInfo(props) {
       //   name,
       //   roleDescrib,
       // };{ ...groupItem, name, roleDescrib }
-      if (upResult?.data?.code === 200) {
+      if (upResult?.data?.isSuccess !== -1) {
         editItemHandle && editItemHandle();
         message.success('保存成功');
       }

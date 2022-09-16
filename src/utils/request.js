@@ -36,9 +36,11 @@ http.interceptors.response.use(
     if (res.request.responseType === 'blob') {
       return res;
     } else {
+      if (res?.data?.isSuccess === -1) {
+        message.error(res?.data?.message || '系统错误');
+      }
       return res;
     }
-
     // if(res.data.status === '401'){
     // window.location.pathname = '/login'
     // }

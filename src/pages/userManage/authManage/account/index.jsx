@@ -606,6 +606,7 @@ export default function Account({ accountIdenty = 'user' }) {
               showSizeChanger: true,
               // showQuickJumper: true,
               onChange: handlePageChange,
+              showTotal: (total) => `共${total}条`,
             }}
           />
 
@@ -795,6 +796,7 @@ export default function Account({ accountIdenty = 'user' }) {
                 pagination={{
                   total: dataGSource?.length || 0,
                   showSizeChanger: true,
+                  showTotal: (total) => `共${total}条`,
                   // showQuickJumper: true,
                   // onChange: handlePageChange,
                 }}

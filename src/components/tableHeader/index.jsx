@@ -5,6 +5,7 @@ import { useRef } from 'react';
 
 export default function TableHeader({
   formData: {
+    formZdyProps = {},
     formStructure = [],
     formButton = {
       showButton: true,
@@ -43,12 +44,14 @@ export default function TableHeader({
         onValuesChange: onFormChange,
         onFinish,
         className: 'default-form-radios',
+        ...formZdyProps,
       }
     : {
         ref: formRef,
         layout: 'inline',
         form,
         className: 'default-form-radios',
+        ...formZdyProps,
       };
   return (
     <div

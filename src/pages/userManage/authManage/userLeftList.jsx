@@ -28,7 +28,7 @@ function UserLeftList(props) {
     const initId = groupId || data?.[0]?.id || null;
     setListData(data);
     setId(initId);
-    if (data?.length && !groupId) {
+    if (data?.length && !groupId && groupId !== 0) {
       handleGroupClick(data[0]);
     }
   }, [data, groupId]);

@@ -171,7 +171,7 @@ export default function IndexPage() {
         // localForage.setItem('userSystemInfo', oldData);
         // localForage.setItem('userSystem', currentUser);
 
-        if (deleteResult?.data?.code === 200) {
+        if (deleteResult?.data?.isSuccess !== -1) {
           message.success('删除成功');
           await fechRoleList();
           if (idArr.join() === groupId) {
@@ -236,19 +236,23 @@ export default function IndexPage() {
         // setSystemData(oldSource);
         // localForage.setItem('userSystemInfo', sysItem);
         // localForage.setItem('userSystem', oldSource);
-        message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
-        if (eidtIdenty.current) {
-          setGroupItem(null);
-          setGroupItem({ ...oldItem, ...values });
-        }
-        currentId.current = null;
-        eidtIdenty.current = false;
-        setFormData({
-          name: '',
-          desc: '',
-        });
-        setIsModalVisible(false);
-        if (updatResult?.data?.code === 200 || addResult?.data?.code === 200) {
+
+        if (
+          (eidtIdenty.current && updatResult?.data?.isSuccess !== -1) ||
+          (!eidtIdenty.current && addResult?.data?.isSuccess !== -1)
+        ) {
+          message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
+          if (eidtIdenty.current) {
+            setGroupItem(null);
+            setGroupItem({ ...oldItem, ...values });
+          }
+          currentId.current = null;
+          eidtIdenty.current = false;
+          setFormData({
+            name: '',
+            desc: '',
+          });
+          setIsModalVisible(false);
           fechRoleList();
         }
       })

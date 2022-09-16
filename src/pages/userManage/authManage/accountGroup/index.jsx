@@ -110,18 +110,22 @@ export default function IndexPage() {
         }
         // setGroupData(oldSource);
         // localForage.setItem('userGroup', oldSource);
-        message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
+
         //  if (eidtIdenty.current) {
         //   setGroupId(null);
         //   setGroupId({ ...oldItem, ...values });
         // }
-        currentId.current = null;
-        eidtIdenty.current = false;
-        setFormData({
-          name: '',
-        });
-        setIsModalVisible(false);
-        if (updatResult?.data?.code === 200 || addResult?.data?.code === 200) {
+        if (
+          (eidtIdenty.current && updatResult?.data?.isSuccess !== -1) ||
+          (!eidtIdenty.current && addResult?.data?.isSuccess !== -1)
+        ) {
+          message.success(eidtIdenty.current ? '编辑成功' : '添加成功');
+          currentId.current = null;
+          eidtIdenty.current = false;
+          setFormData({
+            name: '',
+          });
+          setIsModalVisible(false);
           fechGroupList();
         }
       })
@@ -154,7 +158,7 @@ export default function IndexPage() {
         // );
         // setGroupData(currentUser);
         // localForage.setItem('userGroup', currentUser);
-        if (deleteResult?.data?.code === 200) {
+        if (deleteResult?.data?.isSuccess !== -1) {
           message.success('删除成功');
           await fechGroupList();
           if (idArr.join() === groupId) {
@@ -169,7 +173,10 @@ export default function IndexPage() {
   };
 
   const handleGroupClick = (item) => {
-    setGroupId(item.id);
+    setGroupId(0);
+    setTimeout(() => {
+      setGroupId(item.id);
+    }, 0);
   };
 
   return (
@@ -194,7 +201,12 @@ export default function IndexPage() {
         <Content style={{ paddingLeft: 10 }}>
           {/* 用户列表 */}
           <GroupUser groupId={groupId} groupData={groupData} />
+          {/* {groupId ? (
 
+          ) : (
+
+          )}
+           */}
           {/* 分组弹框 */}
           {/* 新建用户、选择用户弹框 */}
           <Modal

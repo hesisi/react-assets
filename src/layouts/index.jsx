@@ -178,6 +178,12 @@ const CommonLayout = (props) => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  const handleBreadClick = (item) => {
+    if (item?.path) {
+      history.push(item.path);
+    }
+  };
+
   return (
     <Layout>
       <Header
@@ -337,7 +343,14 @@ const CommonLayout = (props) => {
                   return (
                     <Breadcrumb.Item
                       key={i}
-                      className={e.active ? 'active-bread' : ''}
+                      className={
+                        e.active
+                          ? 'active-bread bread-normal'
+                          : e.path
+                          ? 'bread-normal bread-click'
+                          : 'bread-normal'
+                      }
+                      onClick={() => handleBreadClick(e)}
                     >
                       {e.label}
                     </Breadcrumb.Item>

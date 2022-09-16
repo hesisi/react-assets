@@ -191,7 +191,7 @@ export default function Account({ accountIdenty = 'user' }) {
       align: 'center',
       width: 290,
       render: (_, record) => (
-        <Space size="middle">
+        <Space size="small">
           <span className="table-button" onClick={() => handleEdit(record.id)}>
             <span style={{ marginRight: '5px' }}>
               <EditOutlined />
@@ -665,6 +665,7 @@ export default function Account({ accountIdenty = 'user' }) {
               showSizeChanger: true,
               // showQuickJumper: true,
               onChange: handlePageChange,
+              showTotal: (total) => `共${total}条`,
             }}
           />
 
@@ -841,6 +842,7 @@ export default function Account({ accountIdenty = 'user' }) {
                 pagination={{
                   total: dataGSource?.length || 0,
                   showSizeChanger: true,
+                  showTotal: (total) => `共${total}条`,
                   // showQuickJumper: true,
                   // onChange: handlePageChange,
                 }}

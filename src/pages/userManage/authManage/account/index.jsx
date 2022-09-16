@@ -684,6 +684,7 @@ export default function Account({ accountIdenty = 'user' }) {
               });
               currentId.current = null;
               eidtIdenty.current = false;
+              setUserAddC(true);
               setIsModalVisible(false);
               setFileList([]);
             }}

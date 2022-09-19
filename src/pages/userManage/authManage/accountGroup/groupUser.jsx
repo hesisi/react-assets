@@ -124,7 +124,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
             <span style={{ marginRight: '5px' }}>
               <DeleteOutlined />
             </span>
-            删除
+            移出
           </span>
         </Space>
       ),
@@ -306,7 +306,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
 
   const handleDelete = async (idArr = []) => {
     confirm({
-      title: '确认删除吗',
+      title: '确认移出吗',
       icon: <ExclamationCircleOutlined />,
       content: '',
       okText: '确认',
@@ -417,7 +417,7 @@ export default function GroupUser({ groupId = null, groupData = null }) {
                         onClick={() => handleBatchDelete()}
                         icon={<DeleteOutlined />}
                       >
-                        删除用户
+                        移出分组
                       </Button>
                     );
                   },

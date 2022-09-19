@@ -11,7 +11,8 @@ import routes from './routes.js';
 
 import postCssPxToViewport from 'postcss-px-to-viewport';
 
-const baosanIp = '10.173.75.120:9201/';
+const baosanIp = '10.173.88.203:9201/';
+const liqingIp = '10.173.73.4:9202/';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -25,6 +26,11 @@ export default defineConfig({
     baseNavigator: false,
   },
   proxy: {
+    '/assets/messageData': {
+      // target: config.infraApiOrigin, // 头部infra配置地址
+      // target: 'http://10.173.73.250:9202/', // 韩振宇
+      target: `http://${liqingIp}`, // 田宝山
+    },
     '/assets/': {
       // target: config.infraApiOrigin, // 头部infra配置地址
       // target: 'http://10.173.73.250:9202/', // 韩振宇
@@ -64,6 +70,7 @@ export default defineConfig({
         /layouts/,
         /previewPage/,
         /notificationCenter/,
+        /components/,
       ], // 设置忽略文件，用正则做目录名匹配
       include: [/homeIndex/], // 设置需要使用的文件
       landscape: false, // 是否处理横屏情况

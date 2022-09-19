@@ -60,11 +60,15 @@ function UserLeftList(props) {
                 onClick={() => handleGroupClick(x)}
               >
                 {x.name}
-                <span className="groupOperate">
-                  <span onClick={() => handleEdit(x.id)}>
+                <span
+                  className={
+                    id === x.id ? 'groupOperate show' : 'groupOperate hide'
+                  }
+                >
+                  <span onClick={(e) => handleEdit(e, x.id)}>
                     <FormOutlined />
                   </span>
-                  <span onClick={() => handleDelete([x.id])}>
+                  <span onClick={(e) => handleDelete(e, [x.id])}>
                     <DeleteOutlined />
                   </span>
                 </span>

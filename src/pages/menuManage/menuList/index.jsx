@@ -170,7 +170,7 @@ export default function IndexPage() {
       // }));
       previewHandler(); // 跳转到预览页面
     } else {
-      localStorage.removeItem('pageDataPrev');
+      // localStorage.removeItem('pageDataPrev');
       localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
       message.success('菜单保存成功!');
       location.reload();

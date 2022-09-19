@@ -48,6 +48,13 @@ export function updateOneUser(params) {
     data: { ...params },
   });
 }
+//模板下载
+export function getTemplate() {
+  return request(`${basePreix}/user/downLoad`, {
+    method: 'get',
+    responseType: 'blob',
+  });
+}
 // 查询角色列表
 export function getRoleList(params) {
   return request(`${basePreix}/role/list`, {

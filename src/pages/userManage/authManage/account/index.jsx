@@ -37,6 +37,7 @@ import {
   addUsersToGroups,
   resetPasswd,
   addUserByUpload,
+  getTemplate,
 } from '@/services/userManager';
 import { getUserGroupList } from '@/services/userGroup';
 import { REGEXP_MAIL, REGEXP_YD_PHONE } from '@/utils/validate';
@@ -112,6 +113,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '组名',
       dataIndex: 'name',
       key: 'name',
+      align: 'center',
       width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -121,6 +123,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '描述',
       dataIndex: 'tel',
       key: 'tel',
+      align: 'center',
       width: 160,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -144,6 +147,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '姓名',
       dataIndex: 'userName',
       key: 'userName',
+      align: 'center',
       width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -153,6 +157,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '电话',
       dataIndex: 'phone',
       key: 'phone',
+      align: 'center',
       width: 160,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -162,7 +167,8 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
-      width: 160,
+      align: 'center',
+      width: 200,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
       },
@@ -171,6 +177,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '组别',
       dataIndex: 'groupList',
       key: 'groupList',
+      align: 'center',
       width: 200,
       render: (text) => {
         return <EllipsisTooltip title={filterGroup(text)} />;
@@ -180,6 +187,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '创建时间',
       dataIndex: 'createDate',
       key: 'createDate',
+      align: 'center',
       width: 200,
       render: (text) => {
         return <TimeEllipsisTooltip title={text} />;
@@ -264,16 +272,16 @@ export default function Account({ accountIdenty = 'user' }) {
     for (let item of Group) {
       arr.push(item.name);
     }
-    return arr.join(';');
+    return arr.join('; ');
   };
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  const onSelectGChange = (newSelectedRowKeys) => {
-    setSelectedGRowKeys(newSelectedRowKeys);
-  };
+  // const onSelectGChange = (newSelectedRowKeys) => {
+  //   setSelectedGRowKeys(newSelectedRowKeys);
+  // };
 
   // const rowGSelection = {
   //   selectedGRowKeys,
@@ -292,6 +300,23 @@ export default function Account({ accountIdenty = 'user' }) {
       return;
     }
     setIsModalGVisible(true);
+  };
+  //批量新增的模板，下载
+  const downloadTemplate = () => {
+    getTemplate().then((res) => {
+      if (res) {
+        const blob = new Blob([res.data]); //处理文档流
+        const fileName = `user.xls`;
+        const elink = document.createElement('a');
+        elink.download = fileName;
+        elink.style.display = 'none';
+        elink.href = URL.createObjectURL(blob);
+        document.body.appendChild(elink);
+        elink.click();
+        URL.revokeObjectURL(elink.href); // 释放URL 对象
+        document.body.removeChild(elink);
+      }
+    });
   };
 
   const handleUpload = () => {
@@ -436,9 +461,7 @@ export default function Account({ accountIdenty = 'user' }) {
             });
           }
         })
-        .catch((reason) => {
-          message.warning('请检查');
-        });
+        .catch((reason) => {});
     } else {
       handleUpload();
     }
@@ -714,13 +737,15 @@ export default function Account({ accountIdenty = 'user' }) {
                     <span
                       className={userAddC ? 'active' : 'normal'}
                       onClick={() => handleAddC(true)}
+                      style={{ cursor: 'pointer' }}
                     >
                       单个用户
-                    </span>{' '}
-                    /
+                    </span>
+                    {' / '}
                     <span
                       className={!userAddC ? 'active' : 'normal'}
                       onClick={() => handleAddC(false)}
+                      style={{ cursor: 'pointer' }}
                     >
                       批量添加
                     </span>
@@ -815,15 +840,27 @@ export default function Account({ accountIdenty = 'user' }) {
                       </Row>
                     </Form>
                   ) : (
-                    <Dragger {...props}>
-                      <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                      </p>
-                      <p className="ant-upload-text">
-                        点击或将文件拖拽到这里上传
-                      </p>
-                      <p className="ant-upload-hint">最大文件大小限制为20MB</p>
-                    </Dragger>
+                    <>
+                      <Dragger {...props}>
+                        <p className="ant-upload-drag-icon">
+                          <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">
+                          点击或将文件拖拽到这里上传
+                        </p>
+                        <p className="ant-upload-hint">
+                          最大文件大小限制为20MB
+                        </p>
+                      </Dragger>
+                      <a
+                        onClick={() => {
+                          downloadTemplate();
+                        }}
+                        style={{ fontSize: '12px', float: 'right' }}
+                      >
+                        模板下载
+                      </a>
+                    </>
                   )}
                 </div>
               </div>

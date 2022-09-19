@@ -561,7 +561,7 @@ export default function Account({ accountIdenty = 'user' }) {
 
   const creatSelct = (list = [], place = '') => {
     return (
-      <Select placeholder={place}>
+      <Select placeholder={place} allowClear>
         {list.map((x) => {
           return (
             <Option key={x.value || x.id} value={x.value || x.id}>

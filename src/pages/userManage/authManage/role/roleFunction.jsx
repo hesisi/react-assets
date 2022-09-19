@@ -6,7 +6,7 @@ import { creatRightTree } from './treeUtil';
 import { getRoleFunction, updateRoleFunction } from '@/services/userManager';
 
 const { TextArea } = Input;
-export default function RoleFunction({ groupItem }) {
+export default function RoleFunction({ groupItem, activeKey }) {
   const formRef = useRef(null);
   const saveKeysRef = useRef(null);
   const [form] = Form.useForm();
@@ -40,7 +40,7 @@ export default function RoleFunction({ groupItem }) {
   };
 
   useEffect(async () => {
-    if (groupItem) {
+    if (groupItem && activeKey === '3') {
       let chooseKeys = [];
       const roleUserData = await getRoleFunction({
         roleId: groupItem.id,
@@ -59,19 +59,20 @@ export default function RoleFunction({ groupItem }) {
         }),
       );
     }
-  }, [groupItem]);
-
-  const saveRoleUser = (targetIds) => {
-    // 调后端保存接口
-    saveKeysRef.current = targetIds;
-  };
+  }, [groupItem, activeKey]);
 
   const handleSaveUser = async () => {
     const rightTree = creatRightTree(roleFList, saveKeysRef.current);
     const sendIds = [];
     temp(rightTree, sendIds);
     const updateR = await updateRoleFunction(groupItem.id, sendIds);
-    message.success('保存成功');
+    // message.success('保存成功');
+  };
+
+  const saveRoleUser = (targetIds) => {
+    // 调后端保存接口
+    saveKeysRef.current = targetIds;
+    handleSaveUser();
   };
 
   return (
@@ -83,7 +84,7 @@ export default function RoleFunction({ groupItem }) {
         transTargetKeys={roleFTargetKeys}
         saveRoleUser={saveRoleUser}
       />
-      <div style={{ marginTop: '15px' }}>
+      {/* <div style={{ marginTop: '15px' }}>
         <Button
           type="primary"
           icon={<SearchOutlined />}
@@ -93,7 +94,7 @@ export default function RoleFunction({ groupItem }) {
         >
           保存
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

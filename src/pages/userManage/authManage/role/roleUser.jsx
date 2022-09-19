@@ -7,7 +7,7 @@ import RoleTransfer from './roleTransfer';
 import { getRoleUser, updateRoleUser } from '@/services/userManager';
 
 const { TextArea } = Input;
-export default function RoleUser({ groupItem }) {
+export default function RoleUser({ groupItem, activeKey }) {
   const formRef = useRef(null);
   const saveKeysRef = useRef(null);
   const [form] = Form.useForm();
@@ -51,7 +51,7 @@ export default function RoleUser({ groupItem }) {
   };
 
   useEffect(async () => {
-    if (groupItem) {
+    if (groupItem && activeKey === '2') {
       const chooseKeys = [];
       const roleUserData = await getRoleUser({
         roleId: groupItem.id,
@@ -63,11 +63,12 @@ export default function RoleUser({ groupItem }) {
       setRoleUserList(userList);
       setRoleUserTargetKeys(chooseKeys);
     }
-  }, [groupItem]);
+  }, [groupItem, activeKey]);
 
   const saveRoleUser = (targetIds, selectedKeys) => {
     // 调后端保存接口
     saveKeysRef.current = targetIds;
+    handleSaveUser();
   };
 
   const handleSaveUser = async () => {
@@ -82,7 +83,7 @@ export default function RoleUser({ groupItem }) {
     //   return backItem;
     // });
     const updateR = await updateRoleUser(groupItem.id, rightTree);
-    message.success('保存成功');
+    // message.success('保存成功');
   };
 
   return (
@@ -94,7 +95,7 @@ export default function RoleUser({ groupItem }) {
         transTargetKeys={roleUserTargetKeys}
         saveRoleUser={saveRoleUser}
       />
-      <div style={{ marginTop: '15px' }}>
+      {/* <div style={{ marginTop: '15px' }}>
         <Button
           type="primary"
           icon={<SearchOutlined />}
@@ -104,7 +105,7 @@ export default function RoleUser({ groupItem }) {
         >
           保存
         </Button>
-      </div>
+      </div> */}
     </div>
   );
 }

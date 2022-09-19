@@ -113,6 +113,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '组名',
       dataIndex: 'name',
       key: 'name',
+      align: 'center',
       width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -122,6 +123,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '描述',
       dataIndex: 'tel',
       key: 'tel',
+      align: 'center',
       width: 160,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -145,6 +147,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '姓名',
       dataIndex: 'userName',
       key: 'userName',
+      align: 'center',
       width: 120,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -154,6 +157,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '电话',
       dataIndex: 'phone',
       key: 'phone',
+      align: 'center',
       width: 160,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
@@ -163,7 +167,8 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '邮箱',
       dataIndex: 'email',
       key: 'email',
-      width: 160,
+      align: 'center',
+      width: 200,
       render: (text) => {
         return <EllipsisTooltip title={text} />;
       },
@@ -172,6 +177,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '组别',
       dataIndex: 'groupList',
       key: 'groupList',
+      align: 'center',
       width: 200,
       render: (text) => {
         return <EllipsisTooltip title={filterGroup(text)} />;
@@ -181,6 +187,7 @@ export default function Account({ accountIdenty = 'user' }) {
       title: '创建时间',
       dataIndex: 'createDate',
       key: 'createDate',
+      align: 'center',
       width: 200,
       render: (text) => {
         return <TimeEllipsisTooltip title={text} />;
@@ -265,16 +272,16 @@ export default function Account({ accountIdenty = 'user' }) {
     for (let item of Group) {
       arr.push(item.name);
     }
-    return arr.join(';');
+    return arr.join('; ');
   };
 
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  const onSelectGChange = (newSelectedRowKeys) => {
-    setSelectedGRowKeys(newSelectedRowKeys);
-  };
+  // const onSelectGChange = (newSelectedRowKeys) => {
+  //   setSelectedGRowKeys(newSelectedRowKeys);
+  // };
 
   // const rowGSelection = {
   //   selectedGRowKeys,
@@ -454,9 +461,7 @@ export default function Account({ accountIdenty = 'user' }) {
             });
           }
         })
-        .catch((reason) => {
-          message.warning('请检查');
-        });
+        .catch((reason) => {});
     } else {
       handleUpload();
     }
@@ -735,8 +740,8 @@ export default function Account({ accountIdenty = 'user' }) {
                       style={{ cursor: 'pointer' }}
                     >
                       单个用户
-                    </span>{' '}
-                    /
+                    </span>
+                    {' / '}
                     <span
                       className={!userAddC ? 'active' : 'normal'}
                       onClick={() => handleAddC(false)}

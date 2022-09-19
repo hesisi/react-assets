@@ -20,9 +20,10 @@ const http = axios.create({
 http.interceptors.request.use(
   (config) => {
     // 设置请求头
-    let token =
-      (Cookies.get('Token') && JSON.parse(Cookies.get('Token'))) || '';
-    config.headers.Authorization = `bearer ${token}`;
+    // let token =
+    //   (Cookies.get('Token') && JSON.parse(Cookies.get('Token'))) || '';
+    let token = window.localStorage.getItem('loginToken') || '';
+    config.headers.Authorization = `${token}`;
     return config;
   },
   (err) => {

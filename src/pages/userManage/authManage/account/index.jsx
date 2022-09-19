@@ -37,6 +37,7 @@ import {
   addUsersToGroups,
   resetPasswd,
   addUserByUpload,
+  getTemplate,
 } from '@/services/userManager';
 import { getUserGroupList } from '@/services/userGroup';
 import { REGEXP_MAIL, REGEXP_YD_PHONE } from '@/utils/validate';
@@ -292,6 +293,23 @@ export default function Account({ accountIdenty = 'user' }) {
       return;
     }
     setIsModalGVisible(true);
+  };
+  //批量新增的模板，下载
+  const downloadTemplate = () => {
+    getTemplate().then((res) => {
+      if (res) {
+        const blob = new Blob([res.data]); //处理文档流
+        const fileName = `user.xls`;
+        const elink = document.createElement('a');
+        elink.download = fileName;
+        elink.style.display = 'none';
+        elink.href = URL.createObjectURL(blob);
+        document.body.appendChild(elink);
+        elink.click();
+        URL.revokeObjectURL(elink.href); // 释放URL 对象
+        document.body.removeChild(elink);
+      }
+    });
   };
 
   const handleUpload = () => {
@@ -714,6 +732,7 @@ export default function Account({ accountIdenty = 'user' }) {
                     <span
                       className={userAddC ? 'active' : 'normal'}
                       onClick={() => handleAddC(true)}
+                      style={{ cursor: 'pointer' }}
                     >
                       单个用户
                     </span>{' '}
@@ -721,6 +740,7 @@ export default function Account({ accountIdenty = 'user' }) {
                     <span
                       className={!userAddC ? 'active' : 'normal'}
                       onClick={() => handleAddC(false)}
+                      style={{ cursor: 'pointer' }}
                     >
                       批量添加
                     </span>
@@ -815,15 +835,27 @@ export default function Account({ accountIdenty = 'user' }) {
                       </Row>
                     </Form>
                   ) : (
-                    <Dragger {...props}>
-                      <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                      </p>
-                      <p className="ant-upload-text">
-                        点击或将文件拖拽到这里上传
-                      </p>
-                      <p className="ant-upload-hint">最大文件大小限制为20MB</p>
-                    </Dragger>
+                    <>
+                      <Dragger {...props}>
+                        <p className="ant-upload-drag-icon">
+                          <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">
+                          点击或将文件拖拽到这里上传
+                        </p>
+                        <p className="ant-upload-hint">
+                          最大文件大小限制为20MB
+                        </p>
+                      </Dragger>
+                      <a
+                        onClick={() => {
+                          downloadTemplate();
+                        }}
+                        style={{ fontSize: '12px', float: 'right' }}
+                      >
+                        模板下载
+                      </a>
+                    </>
                   )}
                 </div>
               </div>

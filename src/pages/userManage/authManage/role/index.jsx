@@ -139,7 +139,8 @@ export default function IndexPage() {
     setGroupId(item.id);
   };
 
-  const handleEdit = async (id) => {
+  const handleEdit = async (e, id) => {
+    e && e.stopPropagation();
     currentId.current = id;
     eidtIdenty.current = true;
     const currentUser = cloneDeep(systemData).filter((item) => item.id === id);
@@ -149,7 +150,8 @@ export default function IndexPage() {
     setIsModalVisible(true);
   };
 
-  const handleDelete = async (idArr = []) => {
+  const handleDelete = async (e, idArr = []) => {
+    e && e.stopPropagation();
     confirm({
       title: '确认删除该项吗',
       icon: <ExclamationCircleOutlined />,

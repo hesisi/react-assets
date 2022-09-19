@@ -112,3 +112,11 @@ export function updateRoleFunction(id, params) {
     data: params,
   });
 }
+
+// 修改用户密码
+export function getUserChangePasswd(params) {
+  return request(`${basePreix}/user/ChangePasswd`, {
+    method: 'get',
+    params,
+  });
+}

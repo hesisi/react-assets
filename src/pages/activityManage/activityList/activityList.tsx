@@ -30,6 +30,7 @@ import {
   EditOutlined,
 } from '@ant-design/icons';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
+import ContentHeader from '@/components/contentHeader';
 import { history } from 'umi';
 
 const { Content } = Layout;
@@ -332,6 +333,7 @@ export default function Page() {
   return (
     <div className="list">
       <Layout className="list-layout">
+        <ContentHeader title="流程管理" />
         <Content className="list-content">
           <Row justify="start" className="list-row">
             <Col>

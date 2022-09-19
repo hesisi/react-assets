@@ -328,7 +328,7 @@ const CommonLayout = (props) => {
               // padding: '0 24px',
               height: '100%',
               minHeight: 280,
-              backgroundColor: '#f0f2f5',
+              backgroundColor: '#f6f8fb',
             }}
           >
             {meta && meta.breadcrumb ? (
@@ -370,7 +370,7 @@ const CommonLayout = (props) => {
                   ? Styles.contentWrappeB
                   : Styles.contentWrapper
               }
-              style={{ background: '#f0f2f5' }}
+              style={{ background: '#f6f8fb' }}
             >
               {props.children}
             </div>

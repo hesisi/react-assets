@@ -47,6 +47,7 @@ import {
 import '@/assets/style/layout.less';
 import copy from 'copy-to-clipboard';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
+import ContentHeader from '@/components/contentHeader';
 
 const { TextArea } = Input;
 
@@ -394,6 +395,7 @@ export default function FormList() {
   return (
     <div className="list" style={{ paddingBottom: '20px' }}>
       <Layout className="list-layout">
+        <ContentHeader title="表单管理" />
         <Content className="list-content">
           {/* 筛选框 */}
           <Row justify="space-between">

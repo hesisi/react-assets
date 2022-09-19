@@ -221,7 +221,6 @@ export default [
         meta: {
           showMenu: false,
           showHeader: true,
-          breadcrumb: [{ label: '流程管理' }],
         },
       },
       {
@@ -265,7 +264,7 @@ export default [
         meta: {
           showMenu: false,
           showHeader: true,
-          breadcrumb: [{ label: '表单管理' }, { label: '表单列表' }],
+          // breadcrumb: [{ label: '表单管理' }, { label: '表单列表' }],
         },
       },
       {

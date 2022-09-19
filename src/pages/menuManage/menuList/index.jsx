@@ -18,6 +18,7 @@ import eventBus from '../../../utils/eventBus';
 import localForage from 'localforage';
 import { list } from './iconBox';
 import { cloneDeep } from 'lodash';
+import ContentHeader from '@/components/contentHeader';
 
 const back = require('@/assets/icons/back2.svg');
 const { Header, Footer, Sider, Content } = Layout;
@@ -199,26 +200,32 @@ export default function IndexPage() {
   return (
     <div className="menu">
       <div className="menu-wrapper">
-        <Row justify="space-between" align="middle" className="menu-top">
+        <ContentHeader
+          title="菜单管理"
+          opreateArea={
+            <>
+              <Button
+                type="primary"
+                icon={<FileDoneOutlined />}
+                onClick={() => previewSave()}
+              >
+                保存
+              </Button>
+              <Button icon={<EyeOutlined />} onClick={() => previewSave(true)}>
+                预览
+              </Button>
+            </>
+          }
+        />
+        {/* <Row justify="space-between" align="middle" className="menu-top">
           <Col span={4}>
             <span className="back-wrapper" onClick={() => handleBack()}>
               <LeftOutlined />
               主页
             </span>
           </Col>
-          <Col span={4} className="menu__btn-preview">
-            <Button
-              type="primary"
-              icon={<FileDoneOutlined />}
-              onClick={() => previewSave()}
-            >
-              保存
-            </Button>
-            <Button icon={<EyeOutlined />} onClick={() => previewSave(true)}>
-              预览
-            </Button>
-          </Col>
-        </Row>
+          <Col span={4} className="menu__btn-preview"></Col>
+        </Row> */}
         <div className="menu-config">
           <Layout className={'user-cont list-layout'}>
             <Sider className={' menu-left'} width={300}>

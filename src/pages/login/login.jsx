@@ -1,23 +1,73 @@
 import './login.less';
-import { Space, Select, Form, Button, Input, Row, Col, Checkbox } from 'antd';
+import {
+  Space,
+  Select,
+  Form,
+  Button,
+  Input,
+  Row,
+  Col,
+  Checkbox,
+  message,
+} from 'antd';
 const testImg = require('../../assets/images/登录页.png');
 import { history } from 'umi';
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import { userLogin, getUserLoginValidatePic } from '@/services/userLogin';
 const Login = () => {
   const [showLabel, setShowLabel] = useState('');
+  const [validatePic, setValidatePic] = useState('');
+  const [validateUuid, setValidateUuid] = useState('');
+  const [form] = Form.useForm();
+
   const onFinish = (values) => {
-    history.push('homeIndex');
+    console.log(values);
+    const params = {
+      ...values,
+      uuid: validateUuid,
+    };
+    userLogin(params).then((res) => {
+      if (res?.data?.isSuccess > 0) {
+        window.localStorage.setItem('loginToken', res.data.message);
+        if (res.data.resetPassword) {
+          history.push('resetPassword');
+        } else {
+          history.push('homeIndex');
+        }
+      } else {
+        message.error(res?.data?.message);
+      }
+    });
   };
   const changeShowLabel = (lable) => {
     if (showLabel === lable && lable === 'username') {
       return <span className="right-login__label">邮箱或用户名</span>;
     } else if (showLabel === lable && lable === 'password') {
       return <span className="right-login__label">密码</span>;
+    } else if (showLabel === lable && lable === 'code') {
+      return <span className="right-login__label">验证码</span>;
     } else {
       return <span className="right-login__label"></span>;
     }
   };
+  const getValidatePic = () => {
+    getUserLoginValidatePic().then((res) => {
+      if (res?.data?.isSuccess > 0) {
+        setValidatePic('data:image/jpg;base64,' + res.data.data.img);
+        setValidateUuid(res.data.data.uuid);
+      } else {
+        message.error(res?.data?.message);
+      }
+    });
+  };
+  useEffect(() => {
+    getValidatePic();
+    form.setFieldValue(
+      'username',
+      window.localStorage.getItem('username') || '',
+    );
+  }, []);
+
   return (
     <div className="login">
       <div className="login-card">
@@ -55,11 +105,20 @@ const Login = () => {
 
           <p className="right-title">欢迎回来</p>
 
-          <Form name="normal_login" onFinish={onFinish}>
+          <Form name="normal_login" onFinish={onFinish} form={form}>
             {/* <span className='right-login__label' >邮箱或用户名</span> */}
             {changeShowLabel('username')}
-            <Form.Item name="username">
+            <Form.Item
+              name="username"
+              rules={[
+                {
+                  required: true,
+                  message: '用户名不能为空！',
+                },
+              ]}
+            >
               <Input
+                type="username"
                 placeholder="请输入邮箱或用户名"
                 className="right-form__input"
                 onFocus={() => {
@@ -93,19 +152,39 @@ const Login = () => {
                 }}
               />
             </Form.Item>
-            <Form.Item>
+            {changeShowLabel('code')}
+            <Form.Item
+              name="code"
+              rules={[
+                {
+                  required: true,
+                  message: '验证码不能为空！',
+                },
+              ]}
+            >
               <Row justify="space-between">
-                <Col>
-                  <Form.Item name="remember" valuePropName="checked" noStyle>
-                    <Checkbox className="right-login__checkbox">
-                      记住密码
-                    </Checkbox>
-                  </Form.Item>
+                <Col flex={2}>
+                  <Input
+                    type="code"
+                    placeholder="请输入验证码"
+                    className="right-form__input"
+                    onFocus={() => {
+                      setShowLabel('code');
+                    }}
+                    onBlur={() => {
+                      setShowLabel('');
+                    }}
+                  />
                 </Col>
-                <Col>
-                  <a className="login-form-forgot" href="">
-                    忘记密码？
-                  </a>
+                <Col flex={3}>
+                  <img
+                    className="valid-pic"
+                    src={validatePic}
+                    alt="验证码"
+                    onClick={() => {
+                      getValidatePic();
+                    }}
+                  ></img>
                 </Col>
               </Row>
             </Form.Item>
@@ -121,13 +200,6 @@ const Login = () => {
               {/* Or <a href="">register now!</a> */}
             </Form.Item>
           </Form>
-
-          <div className="right-login__register">
-            <span>没有账号？</span>
-            <a href="" style={{ textDecoration: 'underline' }}>
-              点击注册
-            </a>
-          </div>
         </div>
       </div>
     </div>

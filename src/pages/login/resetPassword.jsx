@@ -9,23 +9,40 @@ import {
   Col,
   Checkbox,
   message,
+  Tooltip,
 } from 'antd';
 const testImg = require('../../assets/images/登录页.png');
 import { history } from 'umi';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { getUserChangePasswd } from '@/services/userManager';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 const Login = () => {
   const [showLabel, setShowLabel] = useState('');
+  const formRef = useRef(null);
+  const reg =
+    /^(?![a-z]+$)(?![A-Z]+$)(?![\W_]+$)(?![0-9]+$)[a-zA-Z0-9\W_]{8,12}$/;
+  // /^(?![d]+$)(?![a-z]+$)(?![A-Z]+$)(?![\x21-\x7e]+$)[da-zA-z]{8,12}$/;
+
+  // 表单提交
   const onFinish = (values) => {
-    if (values.password1 !== values.password2) {
-      message.error('两次输入的密码不同，请确认后重新输入');
-      return;
-    }
-    localStorage.setItem('username', values.username);
-    history.push('login');
+    setPassword({ id: values.username, pwd: values.password1 });
   };
+
+  // 调用接口重设密码
+  const setPassword = (params) => {
+    getUserChangePasswd({ ...params })
+      .then((res) => {
+        localStorage.setItem('username', params.id);
+        history.push('login');
+      })
+      .catch(() => {
+        message.error('修改密码失败，请稍后再试');
+      });
+  };
+
+  // 修改显示label
   const changeShowLabel = (label) => {
-    // 修改显示label
     if (showLabel === label && label === 'username') {
       return <span className="right-login__label">邮箱/手机/账号</span>;
     } else if (showLabel === label && label === 'password1') {
@@ -35,6 +52,12 @@ const Login = () => {
     } else {
       return <span className="right-login__label"></span>;
     }
+  };
+
+  // 跳过修改密码
+  const jumpToLogin = () => {
+    const { username } = formRef.current.getFieldsValue();
+    setPassword({ id: username, pwd: '' });
   };
 
   return (
@@ -74,12 +97,12 @@ const Login = () => {
 
           <div className="right-title__reset">
             <p className="title-reset">修改默认密码</p>
-            <a href="/login" className="title-link">
+            <Button type="link" className="title-link" onClick={jumpToLogin}>
               跳过
-            </a>
+            </Button>
           </div>
 
-          <Form name="normal_login" onFinish={onFinish}>
+          <Form name="normal_login" onFinish={onFinish} ref={formRef}>
             {changeShowLabel('username')}
             <Form.Item name="username">
               <Input
@@ -99,10 +122,17 @@ const Login = () => {
             <Form.Item
               name="password1"
               rules={[
-                {
-                  required: true,
-                  message: '请输入正确的密码',
-                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value) {
+                      return Promise.reject('请输入正确的密码');
+                    } else if (reg.test(value)) {
+                      return Promise.resolve();
+                    } else {
+                      return Promise.reject('密码不符合规范');
+                    }
+                  },
+                }),
               ]}
             >
               <Input
@@ -112,10 +142,15 @@ const Login = () => {
                 onFocus={() => {
                   setShowLabel('password1');
                 }}
-                onBlur={() => {
+                onBlur={(e) => {
                   setShowLabel('');
                 }}
                 autoComplete="off"
+                suffix={
+                  <Tooltip title="英文字母大写、小写、数字、特殊字符，需要至少包含其中2个，8~12位数。">
+                    <QuestionCircleOutlined style={{ color: '#c5bfbf' }} />
+                  </Tooltip>
+                }
               />
             </Form.Item>
 
@@ -124,10 +159,19 @@ const Login = () => {
             <Form.Item
               name="password2"
               rules={[
-                {
-                  required: true,
-                  message: '请输入正确的密码',
-                },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value) {
+                      return Promise.reject('请输入正确的密码');
+                    } else if (value === getFieldValue('password1')) {
+                      return Promise.resolve();
+                    } else {
+                      return Promise.reject(
+                        '两次输入的密码不同，请确认后重新输入',
+                      );
+                    }
+                  },
+                }),
               ]}
             >
               <Input
@@ -141,6 +185,11 @@ const Login = () => {
                   setShowLabel('');
                 }}
                 autoComplete="off"
+                suffix={
+                  <Tooltip title="英文字母大写、小写、数字、特殊字符，需要至少包含其中2个，8~12位数。">
+                    <QuestionCircleOutlined style={{ color: '#c5bfbf' }} />
+                  </Tooltip>
+                }
               />
             </Form.Item>
 

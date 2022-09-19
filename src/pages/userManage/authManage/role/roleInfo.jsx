@@ -2,13 +2,12 @@ import { Button, Form, Input, message } from 'antd';
 import { SearchOutlined, MinusCircleOutlined } from '@ant-design/icons';
 import { cloneDeep } from 'lodash';
 import { useRef, useEffect } from 'react';
-import localForage from 'localforage';
 
 import { updateRoleInfo } from '@/services/userManager';
 
 const { TextArea } = Input;
 export default function RoleInfo(props) {
-  const { groupItem, editItemHandle } = props;
+  const { groupItem, editItemHandle, activeKey } = props;
   const formRef = useRef(null);
   const [form] = Form.useForm();
   const { formValueChange, formValueSubmit, formResetCallback } = props;
@@ -34,28 +33,23 @@ export default function RoleInfo(props) {
         name,
         desc: roleDescrib,
       });
-      // const userOldInfo = (await localForage.getItem('userSystemInfo')) || {};
-      // userOldInfo[groupItem.id] = {
-      //   ...userOldInfo[groupItem.id],
-      //   name,
-      //   roleDescrib,
-      // };{ ...groupItem, name, roleDescrib }
       if (upResult?.data?.isSuccess !== -1) {
         editItemHandle && editItemHandle();
         message.success('保存成功');
       }
-      // localForage.setItem('userSystemInfo', userOldInfo);
     });
   };
 
   useEffect(async () => {
     if (formRef?.current && groupItem) {
-      formRef.current.setFieldsValue({
-        name: groupItem.name || '',
-        roleDescrib: groupItem.desc || '',
-      });
+      if (activeKey === '1') {
+        formRef.current.setFieldsValue({
+          name: groupItem.name || '',
+          roleDescrib: groupItem.desc || '',
+        });
+      }
     }
-  }, [groupItem]);
+  }, [groupItem, activeKey]);
 
   const formProps = {
     ref: formRef,
@@ -82,7 +76,6 @@ export default function RoleInfo(props) {
         <Form.Item label=" " className="no-item-label">
           <Button
             type="primary"
-            icon={<SearchOutlined />}
             htmlType="submit"
             onClick={handleSaveInfo}
             style={{ marginRight: '10px' }}

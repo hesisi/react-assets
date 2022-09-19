@@ -9,7 +9,6 @@ import {
 import './index.less';
 import React, { useRef, useState, useEffect } from 'react';
 import { getUUID } from '@/utils/utils';
-import localForage from 'localforage';
 import { cloneDeep } from 'lodash';
 
 import RoleInfo from './roleInfo';
@@ -39,10 +38,12 @@ export default function IndexPage() {
   const eidtIdenty = useRef(null);
   const currentId = useRef(null);
   const userTree = useRef(null);
+  const roleNewData = useRef(null);
   const [systemData, setSystemData] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [groupId, setGroupId] = useState(null);
   const [groupItem, setGroupItem] = useState(null);
+  const [activeKey, setActiveKey] = useState('1');
   const [formData, setFormData] = useState({
     name: '',
     desc: '',
@@ -71,70 +72,19 @@ export default function IndexPage() {
 
   useEffect(async () => {
     fechRoleList();
-    // const oldData = await localForage.getItem('userSystem');
-    // if (!oldData) {
-    //   const sysItem = {};
-    //   data.forEach((item) => {
-    //     sysItem[item.id] = {
-    //       ...item,
-    //       roleDescrib: '',
-    //       roleUser: [],
-    //       roleFunction: [],
-    //     };
-    //   });
-    //   localForage.setItem('userSystemInfo', sysItem);
-    //   localForage.setItem('userSystem', data);
-    //   setSystemData(data);
-    // } else {
-    //   // const sysItem = {};
-    //   // oldData.forEach((item) => {
-    //   //   sysItem[item.id] = {
-    //   //     ...item,
-    //   //     roleDescrib: '',
-    //   //     roleUser: [],
-    //   //     roleFunction: [],
-    //   //   };
-    //   // });
-    //   // localForage.setItem('userSystemInfo', sysItem);
-    //   setSystemData(oldData);
-    // }
   }, []);
 
   const fechRoleList = async () => {
     const roleData = await getRoleList();
+    roleNewData.current = roleData?.data?.data || [];
     setSystemData(roleData?.data?.data || []);
-    console.log(roleData);
   };
 
-  const onChange = () => {};
-
-  /* 初始人员数据 */
-  const initUserData = async () => {
-    const initUserData = await localForage.getItem('groupUserList');
-    const userGroup = await localForage.getItem('userGroup');
-    const peopleInitData = [];
-    userGroup.forEach((item) => {
-      const childData = {
-        ...item,
-        title: item.name,
-        key: item.id,
-      };
-      if (initUserData?.[item.id]?.length) {
-        childData['children'] = initUserData?.[item.id].map((item) => {
-          return {
-            ...item,
-            title: item.name,
-            key: item.id,
-          };
-        });
-      }
-      peopleInitData.push(childData);
-    });
-    localStorage.setItem('userTreeData', JSON.stringify(peopleInitData));
+  const onChange = (key) => {
+    setActiveKey(key);
   };
 
   const handleGroupClick = (item) => {
-    initUserData();
     setGroupItem(item);
     setGroupId(item.id);
   };
@@ -160,18 +110,6 @@ export default function IndexPage() {
       cancelText: '取消',
       onOk: async () => {
         const deleteResult = await deleteRole(idArr.join());
-        // const currentUser = cloneDeep(systemData).filter(
-        //   (item) => !idArr.includes(item.id),
-        // );
-        // let oldData = await localForage.getItem('userSystemInfo');
-        // idArr.forEach((idItem) => {
-        //   if (oldData?.idItem) {
-        //     delete oldData.idItem;
-        //   }
-        // });
-        // setSystemData(currentUser);
-        // localForage.setItem('userSystemInfo', oldData);
-        // localForage.setItem('userSystem', currentUser);
 
         if (deleteResult?.data?.isSuccess !== -1) {
           message.success('删除成功');
@@ -198,7 +136,6 @@ export default function IndexPage() {
       .validateFields()
       .then(async (values) => {
         let oldSource = cloneDeep(systemData);
-        const sysItem = await localForage.getItem('userSystemInfo');
         let oldItem = {};
         let NewItem = {};
         let updatResult = null;
@@ -219,25 +156,12 @@ export default function IndexPage() {
             return item;
           });
           updatResult = await updateRoleInfo(NewItem);
-          // sysItem[currentId.current].name = values.name;
         } else {
           const userItem = {
             ...values,
-            // id: getUUID(),
           };
-          // oldSource.push(userItem);
-          // sysItem[userItem.id] = {
-          //   id: userItem.id,
-          //   name: values.name,
-          //   roleDescrib: '',
-          //   roleUser: [],
-          //   roleFunction: [],
-          // };
           addResult = await addRole(userItem);
         }
-        // setSystemData(oldSource);
-        // localForage.setItem('userSystemInfo', sysItem);
-        // localForage.setItem('userSystem', oldSource);
 
         if (
           (eidtIdenty.current && updatResult?.data?.isSuccess !== -1) ||
@@ -263,17 +187,12 @@ export default function IndexPage() {
       });
   };
 
-  const editItemHandle = (newItem = {}) => {
-    fechRoleList();
-    // let oldSource = cloneDeep(systemData);
-    // oldSource = oldSource.map((item) => {
-    //   if (item.id === newItem.id) {
-    //     return newItem;
-    //   }
-    //   return item;
-    // });
-    // setSystemData(oldSource);
-    // localForage.setItem('userSystem', oldSource);
+  const editItemHandle = async (newItem = {}) => {
+    await fechRoleList();
+    setGroupItem(null);
+    setTimeout(() => {
+      setGroupItem(roleNewData.current[0]);
+    }, 0);
   };
   return (
     <div
@@ -300,27 +219,22 @@ export default function IndexPage() {
             {/* tabs show */}
             {groupId ? (
               <Tabs
-                defaultActiveKey="1"
+                activeKey={activeKey}
                 onChange={onChange}
                 className="role-tabs"
               >
                 <TabPane tab="角色信息" key="1">
                   <RoleInfo
                     groupItem={groupItem}
+                    activeKey={activeKey}
                     editItemHandle={editItemHandle}
                   />
                 </TabPane>
                 <TabPane tab="角色用户" key="2">
-                  <RoleUser
-                    groupItem={groupItem}
-                    // editItemHandle={editItemHandle}
-                  />
+                  <RoleUser activeKey={activeKey} groupItem={groupItem} />
                 </TabPane>
                 <TabPane tab="功能权限" key="3">
-                  <RoleFunction
-                    groupItem={groupItem}
-                    // editItemHandle={editItemHandle}
-                  />
+                  <RoleFunction activeKey={activeKey} groupItem={groupItem} />
                 </TabPane>
                 <TabPane tab="数据权限" key="4">
                   <div>数据权限</div>

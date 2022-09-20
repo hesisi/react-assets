@@ -170,8 +170,8 @@ const Login = () => {
                 },
               ]}
             >
-              <Row justify="space-between">
-                <Col flex={2}>
+              <Row justify="space-between" wrap={false}>
+                <Col>
                   <Input
                     type="code"
                     placeholder="请输入验证码"
@@ -184,7 +184,7 @@ const Login = () => {
                     }}
                   />
                 </Col>
-                <Col flex={3}>
+                <Col>
                   <img
                     className="valid-pic"
                     src={validatePic}

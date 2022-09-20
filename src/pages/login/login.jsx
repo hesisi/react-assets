@@ -26,27 +26,28 @@ const Login = () => {
       ...values,
       uuid: validateUuid,
     };
-    userLogin(params)
-      .then((res) => {
-        if (res?.data?.isSuccess > 0) {
-          const { data } = res.data;
-          window.localStorage.setItem('loginToken', data.token);
-          window.localStorage.setItem('username', params.username) || '';
-          if (!data.isReset) {
-            history.push('resetPassword');
-          } else {
-            history.push('homeIndex');
-          }
+    userLogin(params).then((res) => {
+      if (res?.data?.isSuccess > 0) {
+        const { data } = res.data;
+        window.localStorage.setItem('loginToken', data?.token || '');
+        window.localStorage.setItem('username', params?.username || '');
+        window.localStorage.setItem('accountName', data?.userName || ''); // 右上角的用户名
+        if (!data.isReset) {
+          history.push('resetPassword');
+        } else {
+          history.push('homeIndex');
         }
-        //  else {
-        //   message.error(res?.data?.message);
-        // }
-      })
-      .catch(() => {
+      } else {
         // 报错时，重新请求验证码
         form.setFieldValue('code', '');
         getValidatePic();
-      });
+      }
+    });
+    // .catch(() => {
+    //   // 报错时，重新请求验证码
+    //   form.setFieldValue('code', '');
+    //   getValidatePic();
+    // });
   };
   const changeShowLabel = (lable) => {
     if (showLabel === lable && lable === 'username') {

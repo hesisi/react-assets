@@ -16,6 +16,7 @@ import {
   Space,
   Dropdown,
   Button,
+  Tooltip,
 } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link, history } from 'umi';
@@ -119,8 +120,8 @@ const CommonLayout = (props) => {
       time: '2022-9-06 14:14:56',
     },
   ]);
-  const [username, setUserName] = useState(
-    window.localStorage.getItem('username') || '',
+  const [accountName, setAccountName] = useState(
+    window.localStorage.getItem('accountName') || '',
   ); // 用户名
 
   const activePath = props.location.pathname;
@@ -211,7 +212,11 @@ const CommonLayout = (props) => {
         {
           key: '1',
           label: (
-            <Button type="text" onClick={loginOut}>
+            <Button
+              type="text"
+              onClick={loginOut}
+              style={{ width: '100%', textAlign: 'left' }}
+            >
               退出
             </Button>
           ),
@@ -325,7 +330,15 @@ const CommonLayout = (props) => {
                     src="https://joeschmoe.io/api/v1/random"
                     className={Styles.avatar}
                   />
-                  <span>欢迎你，{username || '用户'}</span>
+
+                  <span>
+                    欢迎你，
+                    {/* <Tooltip title={accountName} placement="left"> */}
+                    {(accountName.length > 8
+                      ? `${accountName.slice(0, 8)}...`
+                      : accountName) || '用户'}
+                    {/* </Tooltip> */}
+                  </span>
                   <DownOutlined />
                 </Space>
               </div>

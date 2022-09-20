@@ -24,11 +24,13 @@ export default [
     component: '@/layouts/homeIndex/index',
     meta: { showMenu: false, showHeader: true },
     key: 'default-1',
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         name: '首页',
         path: '/homeIndex',
         component: '@/pages/homeIndex/home',
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -38,6 +40,7 @@ export default [
     component: '@/layouts/homeIndex/index',
     meta: { showMenu: false, showHeader: true },
     key: 'default-9',
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/homeindex',
@@ -51,6 +54,7 @@ export default [
     component: '@/layouts/homeIndex/index',
     key: 'default-2',
     meta: { showMenu: false, showHeader: true },
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/notificationCenter',
@@ -61,6 +65,7 @@ export default [
         path: '/notificationCenter/notificationList',
         component: '@/pages/notificationCenter/index',
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -70,11 +75,13 @@ export default [
     component: '@/layouts/userManageLoyout/index',
     key: 'default-3',
     meta: { showMenu: false, showHeader: true },
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/userManage',
         redirect: '/userManage/authManage/account',
         meta: { showMenu: true, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
       // {
       //   name: '权限管理',
@@ -131,6 +138,7 @@ export default [
             { label: '角色权限管理', path: '/userManage/authManage/role' },
           ],
         },
+        wrappers: ['@/wrappers/auth'],
       },
       {
         name: '分组管理',
@@ -151,6 +159,7 @@ export default [
             { label: '角色权限管理', path: '/userManage/authManage/role' },
           ],
         },
+        wrappers: ['@/wrappers/auth'],
       },
       {
         name: '角色权限管理',
@@ -170,6 +179,7 @@ export default [
             },
           ],
         },
+        wrappers: ['@/wrappers/auth'],
       },
       // {
       //   name: '组织管理',
@@ -186,6 +196,7 @@ export default [
     key: 'default-3-4',
     path: '/menuManage',
     component: '@/layouts/menuManageLayout',
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/menuManage',
@@ -201,6 +212,7 @@ export default [
         path: '/menuManage/menuList',
         component: '@/pages/menuManage/menuList',
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -209,6 +221,7 @@ export default [
     path: '/activityManage',
     component: '@/layouts/activityManageLayout',
     key: 'default-5',
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/activityManage',
@@ -222,12 +235,14 @@ export default [
           showMenu: false,
           showHeader: true,
         },
+        wrappers: ['@/wrappers/auth'],
       },
       {
         name: '流程配置',
         path: '/activityManage/activityConfig',
         component: '@/pages/activityManage/activityConfig',
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -236,6 +251,7 @@ export default [
     path: '/formManage',
     component: '@/layouts/formManageLayout',
     key: 'default-6',
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/formManage',
@@ -256,6 +272,7 @@ export default [
           showMenu: false,
           showHeader: true,
         },
+        wrappers: ['@/wrappers/auth'],
       },
       {
         name: '动态表单',
@@ -266,6 +283,7 @@ export default [
           showHeader: true,
           // breadcrumb: [{ label: '表单管理' }, { label: '表单列表' }],
         },
+        wrappers: ['@/wrappers/auth'],
       },
       {
         name: '表单demo',
@@ -273,6 +291,7 @@ export default [
         component: '@/pages/formManage/formPreview/formPreview',
         hidden: true,
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
       {
         name: '列表demo',
@@ -280,6 +299,7 @@ export default [
         component: '@/pages/formManage/formPreview/tablePreview',
         hidden: true,
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -288,6 +308,7 @@ export default [
     path: '/pageManage',
     key: 'default-7',
     component: '@/layouts/pageManageLayout/index',
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/pageManage',
@@ -298,6 +319,7 @@ export default [
         path: '/pageManage/homePage',
         component: '@/pages/pageManage/homePage/index',
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -306,18 +328,21 @@ export default [
     path: '/previewPage/menuPreview',
     component: '@/pages/previewPage/menuPreview',
     meta: { navHidden: true },
+    wrappers: ['@/wrappers/auth'],
   },
   {
     name: '页面预览',
     path: '/previewPage/pagePreview',
     component: '@/pages/previewPage/pagePreview',
     meta: { navHidden: true },
+    wrappers: ['@/wrappers/auth'],
   },
   {
     name: '首页预览',
     path: '/previewPage/homePage',
     component: '@/pages/previewPage/homePage',
     meta: { navHidden: true },
+    wrappers: ['@/wrappers/auth'],
   },
   {
     name: '登录页',
@@ -337,6 +362,7 @@ export default [
     key: 'default-8',
     component: '@/layouts/homeIndex/index',
     meta: { showMenu: false, showHeader: true },
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/dyformManage',
@@ -347,6 +373,7 @@ export default [
         path: '/dyformManage/formCreate',
         component: '@/pages/dyFormCreate/index',
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -356,6 +383,7 @@ export default [
     key: 'default-8',
     component: '@/layouts/homeIndex/index',
     meta: { showMenu: false, showHeader: true },
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/activityCenter',
@@ -366,6 +394,7 @@ export default [
         path: '/activityCenter/centerHome',
         component: '@/pages/activityCenter/index',
         meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },

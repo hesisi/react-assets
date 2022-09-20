@@ -20,7 +20,7 @@ export default function Home(params) {
       id: nanoid(),
       description:
         '主页管理提供各色组件，让您可以自由配置您想要的主页，方便各类信息的即时观测，实现个性化需求。',
-      icon: require('../../assets/icons/u30.png'),
+      icon: require('../../assets/icons/u30.svg'),
       en: 'Home Management',
       url: '/pageManage/homePage',
     },
@@ -30,7 +30,7 @@ export default function Home(params) {
       id: nanoid(),
       description:
         '报表管理可以帮助您报表可以总括地、系统地反映企业的财务收支情况和经营成果,有利于考核企 业、单位的财务、成本计划或预算的执行情况........',
-      icon: require('../../assets/icons/u48.png'),
+      icon: require('../../assets/icons/u48.svg'),
       en: 'Statement Management',
       url: '/dyformManage/formCreate',
     },
@@ -40,7 +40,7 @@ export default function Home(params) {
       id: nanoid(),
       description:
         '在流程管理中，您可以拖拽不同的组件后，定义各个流程节点，完成构建您专属的业务流程。',
-      icon: require('../../assets/icons/u42.png'),
+      icon: require('../../assets/icons/u42.svg'),
       en: 'Process Management',
       url: '/activityManage/activityList',
     },
@@ -50,7 +50,7 @@ export default function Home(params) {
       id: nanoid(),
       description:
         '您通过菜单模块可以新建菜单、修改菜单、删除菜单、查看菜单详情、以及通过权限控制，定义不同角色可查看的菜单内容。',
-      icon: require('../../assets/icons/u36.png'),
+      icon: require('../../assets/icons/u36.svg'),
       en: 'Menu Management',
       url: '/menuManage/menuList',
     },
@@ -60,7 +60,7 @@ export default function Home(params) {
       id: nanoid(),
       description:
         '表单管理提供丰富的表单组件，帮助您进行高度自由的表单配置，以满足不同的需求。',
-      icon: require('../../assets/icons/u49.png'),
+      icon: require('../../assets/icons/u49.svg'),
       en: 'Form Management',
       url: '/formManage/formList',
     },
@@ -70,7 +70,7 @@ export default function Home(params) {
       id: nanoid(),
       description:
         '消息中心会通知您关于系统的各类消息，让您能及时得到各类信息的进度状态，并及时进行处理。',
-      icon: require('../../assets/icons/u50.png'),
+      icon: require('../../assets/icons/u50.svg'),
       en: 'Notification Center',
       url: '/notificationCenter/notificationList',
     },
@@ -149,7 +149,7 @@ export default function Home(params) {
                     }}
                   >
                     <div className="carousel-box__icon">
-                      <img src={item.icon} width={70}></img>
+                      <img src={item.icon}></img>
                     </div>
                     <div className="carousel-box__text">
                       <p className="text-title">{item.title}</p>

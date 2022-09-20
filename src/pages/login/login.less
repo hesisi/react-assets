@@ -101,6 +101,7 @@
       border-color: #3a63ff;
     }
     .ant-input {
+      font-size: @fontSize !important;
       font-family: 'PingFang Regular';
     }
   }
@@ -133,6 +134,7 @@
   font-size: @fontSize;
   font-family: 'PingFang Medium';
   letter-spacing: 5px;
+  margin-top: 20px;
 }
 .right-login__label {
   height: 25px;
@@ -140,9 +142,11 @@
   font-size: 18px;
   color: #0d6bff;
   margin-bottom: 25px;
+  position: absolute;
 }
 .right-form__input {
   height: 39px;
+  margin-top: 50px;
   border: none;
   border-bottom: 3px solid #cecece;
   font-size: @fontSize;
@@ -179,4 +183,33 @@
 .login-form-forgot {
   color: #0d6bff;
   font-family: 'PingFang Regular';
+}
+
+.title-reset {
+  font-family: 'PingFang Medium';
+  font-size: 36px;
+  line-height: 78px;
+  color: @color-33;
+  letter-spacing: 0;
+  font-weight: @weight-1;
+  margin-top: 68px;
+  margin-bottom: 73px;
+}
+.right-title__reset {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.error-label {
+  color: red;
+}
+
+.title-link {
+  font-size: @fontSize;
+  font-family: 'PingFang Medium';
+}
+.valid-pic {
+  width: 140px;
+  height: 89px;
 }

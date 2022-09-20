@@ -326,6 +326,12 @@ export default [
     meta: { navHidden: true },
   },
   {
+    name: '修改密码页',
+    path: '/resetPassword',
+    component: '@/pages/login/resetPassword',
+    meta: { navHidden: true },
+  },
+  {
     name: '动态报表',
     path: '/dyformManage',
     key: 'default-8',

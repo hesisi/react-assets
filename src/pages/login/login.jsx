@@ -29,8 +29,9 @@ const Login = () => {
     userLogin(params).then((res) => {
       if (res?.data?.isSuccess > 0) {
         const { data } = res.data;
-        window.localStorage.setItem('loginToken', data.token);
-        window.localStorage.setItem('username', params.username) || '';
+        window.localStorage.setItem('loginToken', data?.token || '');
+        window.localStorage.setItem('username', params?.username || '');
+        window.localStorage.setItem('accountName', data?.userName || ''); // 右上角的用户名
         if (!data.isReset) {
           history.push('resetPassword');
         } else {

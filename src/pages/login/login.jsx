@@ -29,19 +29,21 @@ const Login = () => {
     userLogin(params)
       .then((res) => {
         if (res?.data?.isSuccess > 0) {
-          window.localStorage.setItem('loginToken', res.data.data.token);
-          // TODO:修改标识
-          if (res.data.resetPassword) {
+          const { data } = res.data;
+          window.localStorage.setItem('loginToken', data.token);
+          if (!data.isReset) {
             history.push('resetPassword');
           } else {
             history.push('homeIndex');
           }
-        } else {
-          message.error(res?.data?.message);
         }
+        //  else {
+        //   message.error(res?.data?.message);
+        // }
       })
       .catch(() => {
         // 报错时，重新请求验证码
+        form.setFieldValue('code', '');
         getValidatePic();
       });
   };

@@ -109,6 +109,10 @@ const CommonLayout = (props) => {
       time: '2022-9-06 14:14:56',
     },
   ]);
+  const [username, setUserName] = useState(
+    window.localStorage.getItem('username') || '',
+  ); // 用户名
+
   const activePath = props.location.pathname;
   const curretnItem = newRoutes?.filter((item) => {
     return item.address === props.pathPrefix;
@@ -288,7 +292,9 @@ const CommonLayout = (props) => {
                   src="https://joeschmoe.io/api/v1/random"
                   className={Styles.avatar}
                 />
-                <span style={{ marginRight: '20px' }}>欢迎你，用户一</span>
+                <span style={{ marginRight: '20px' }}>
+                  欢迎你，{username || '用户'}
+                </span>
                 <DownOutlined />
               </Space>
             </div>

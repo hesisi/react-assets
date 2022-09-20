@@ -31,14 +31,13 @@ const Login = () => {
 
   // 调用接口重设密码
   const setPassword = (id, params) => {
-    getUserChangePasswd({ ...params })
-      .then((res) => {
-        localStorage.setItem('username', id);
-        history.push('login');
-      })
-      .catch(() => {
-        message.error('修改密码失败，请稍后再试');
-      });
+    getUserChangePasswd({ ...params }).then((res) => {
+      localStorage.setItem('username', id);
+      history.push('login');
+    });
+    // .catch(() => {
+    //   message.error('修改密码失败，请稍后再试');
+    // });
   };
 
   // 修改显示label

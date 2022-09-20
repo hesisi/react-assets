@@ -37,6 +37,7 @@ http.interceptors.response.use(
     // 登录失效后
     const codeArr = ['200401', '200402', '200403'];
     if (codeArr.includes(res.data.code)) {
+      window.localStorage.removeItem('loginToken');
       window.location.pathname = '/login';
       return;
     }

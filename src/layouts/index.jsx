@@ -6,7 +6,17 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-08 11:46:00
  */
-import { Breadcrumb, Layout, Menu, Avatar, Col, Row, Space } from 'antd';
+import {
+  Breadcrumb,
+  Layout,
+  Menu,
+  Avatar,
+  Col,
+  Row,
+  Space,
+  Dropdown,
+  Button,
+} from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link, history } from 'umi';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
@@ -188,6 +198,29 @@ const CommonLayout = (props) => {
     }
   };
 
+  // 退出
+  const loginOut = () => {
+    window.localStorage.removeItem('loginToken');
+    window.localStorage.removeItem('username');
+    window.location.pathname = '/login';
+  };
+
+  // 下拉框
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: '1',
+          label: (
+            <Button type="text" onClick={loginOut}>
+              退出
+            </Button>
+          ),
+        },
+      ]}
+    />
+  );
+
   return (
     <Layout className={Styles.layoutMain}>
       <Header
@@ -286,18 +319,18 @@ const CommonLayout = (props) => {
               {/* <p>99+</p> */}
             </span>
 
-            <div className={'user-detail'}>
-              <Space size={10}>
-                <Avatar
-                  src="https://joeschmoe.io/api/v1/random"
-                  className={Styles.avatar}
-                />
-                <span style={{ marginRight: '20px' }}>
-                  欢迎你，{username || '用户'}
-                </span>
-                <DownOutlined />
-              </Space>
-            </div>
+            <Dropdown overlay={menu} trigger={['click']}>
+              <div className={'user-detail'}>
+                <Space size={10}>
+                  <Avatar
+                    src="https://joeschmoe.io/api/v1/random"
+                    className={Styles.avatar}
+                  />
+                  <span>欢迎你，{username || '用户'}</span>
+                  <DownOutlined />
+                </Space>
+              </div>
+            </Dropdown>
           </Space>
         </div>
       </Header>

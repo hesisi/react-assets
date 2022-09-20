@@ -26,18 +26,24 @@ const Login = () => {
       ...values,
       uuid: validateUuid,
     };
-    userLogin(params).then((res) => {
-      if (res?.data?.isSuccess > 0) {
-        window.localStorage.setItem('loginToken', res.data.message);
-        if (res.data.resetPassword) {
-          history.push('resetPassword');
+    userLogin(params)
+      .then((res) => {
+        if (res?.data?.isSuccess > 0) {
+          window.localStorage.setItem('loginToken', res.data.data.token);
+          // TODO:修改标识
+          if (res.data.resetPassword) {
+            history.push('resetPassword');
+          } else {
+            history.push('homeIndex');
+          }
         } else {
-          history.push('homeIndex');
+          message.error(res?.data?.message);
         }
-      } else {
-        message.error(res?.data?.message);
-      }
-    });
+      })
+      .catch(() => {
+        // 报错时，重新请求验证码
+        getValidatePic();
+      });
   };
   const changeShowLabel = (lable) => {
     if (showLabel === lable && lable === 'username') {

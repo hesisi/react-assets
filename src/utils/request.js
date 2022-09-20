@@ -34,6 +34,12 @@ http.interceptors.request.use(
 // 响应拦截
 http.interceptors.response.use(
   (res) => {
+    // 登录失效后
+    // const codeArr= ['200401','200402','200403'];
+    // if (codeArr.includes(res.data.code)) {
+    //   window.location.pathname = '/login';
+    //   return;
+    // }
     if (res.request.responseType === 'blob') {
       return res;
     } else {
@@ -42,9 +48,6 @@ http.interceptors.response.use(
       }
       return res;
     }
-    // if(res.data.status === '401'){
-    // window.location.pathname = '/login'
-    // }
   },
   (err) => {
     message.error(err.message);

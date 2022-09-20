@@ -26,14 +26,14 @@ const Login = () => {
 
   // 表单提交
   const onFinish = (values) => {
-    setPassword({ id: values.username, pwd: values.password1 });
+    setPassword(values.username, { pwd: values.password1 });
   };
 
   // 调用接口重设密码
-  const setPassword = (params) => {
+  const setPassword = (id, params) => {
     getUserChangePasswd({ ...params })
       .then((res) => {
-        localStorage.setItem('username', params.id);
+        localStorage.setItem('username', id);
         history.push('login');
       })
       .catch(() => {
@@ -57,7 +57,7 @@ const Login = () => {
   // 跳过修改密码
   const jumpToLogin = () => {
     const { username } = formRef.current.getFieldsValue();
-    setPassword({ id: username, pwd: '' });
+    setPassword(username, { pwd: '' });
   };
 
   return (
@@ -197,7 +197,7 @@ const Login = () => {
               <Button
                 type="primary"
                 htmlType="submit"
-                className="right-login__btn btn-confirm"
+                className="right-login__btn"
               >
                 确认
               </Button>

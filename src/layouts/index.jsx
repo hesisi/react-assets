@@ -201,8 +201,7 @@ const CommonLayout = (props) => {
   // 退出
   const loginOut = () => {
     window.localStorage.removeItem('loginToken');
-    window.localStorage.removeItem('username');
-    window.location.pathname = '/login';
+    history.push('/login');
   };
 
   // 下拉框

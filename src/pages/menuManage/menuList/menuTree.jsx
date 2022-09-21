@@ -11,6 +11,7 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
+import { getMenuList } from '@/services/menu';
 import { getUUID } from '@/utils/utils';
 import localForage from 'localforage';
 
@@ -25,15 +26,15 @@ let defaultTrreData = {
 };
 
 function menuTree(props) {
-  let localSelectedKeys = localStorage.getItem('selectedKeys') || '[]';
-  if (localSelectedKeys && typeof localSelectedKeys === 'string') {
-    localSelectedKeys = JSON.parse(localSelectedKeys);
-  }
-  let localExpandedKeys =
-    localStorage.getItem('menuTreeOnExpand') || '["00-top"]';
-  if (localExpandedKeys && typeof localExpandedKeys === 'string') {
-    localExpandedKeys = JSON.parse(localExpandedKeys);
-  }
+  // let localSelectedKeys = localStorage.getItem('selectedKeys') || '[]';
+  // if (localSelectedKeys && typeof localSelectedKeys === 'string') {
+  //   localSelectedKeys = JSON.parse(localSelectedKeys);
+  // }
+  // let localExpandedKeys =
+  //   localStorage.getItem('menuTreeOnExpand') || '["00-top"]';
+  // if (localExpandedKeys && typeof localExpandedKeys === 'string') {
+  //   localExpandedKeys = JSON.parse(localExpandedKeys);
+  // }
 
   const formRef = useRef();
   const [treeData, setTreeData] = useState(defaultTreeParaent);
@@ -41,40 +42,44 @@ function menuTree(props) {
   const [operType, setOperType] = useState(''); //区别Modal弹出框的类型，(添加，修改，删除用的是一个Modal)
   const [searchValue, setSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedKeys, setExpandedKeys] = useState(localExpandedKeys);
-  const [selectedKeys, setSelectedKeys] = useState(localSelectedKeys);
+  const [expandedKeys, setExpandedKeys] = useState([]);
+  const [selectedKeys, setSelectedKeys] = useState([]);
 
   const getTreeNode = async () => {
     // todo: 后续接接口保存的tree data
     setIsLoading(false);
     // 获取保存treeData 初始化
-    const treeSaveData =
-      (await localForage.getItem('menuTree')) || munuDefaultTree;
-    console.log(treeSaveData, '44-------');
-    if (treeSaveData?.[0]?.children && treeSaveData?.[0].children.length) {
+    const treeSaveDataInit = await getMenuList();
+    const treeSaveData = treeSaveDataInit?.data?.data || munuDefaultTree;
+    if (treeSaveData?.children && treeSaveData?.children.length) {
       defaultTrreData.current = [];
       const temp = (data) => {
         data.forEach((item) => {
+          item.key = item.code;
+          item.address = item.path;
+          item.title = item.name;
           item['icon'] =
-            item.iconIndex >= 0
-              ? React.createElement(list[item.iconIndex])
+            (item.icon || item.iconIndex) &&
+            (item.iconIndex >= 0 || item.icon * 1 >= 0)
+              ? React.createElement(list[item.iconIndex || item.icon * 1])
               : null;
           defaultTrreData.current.push(item);
           if (item?.children?.length) {
             temp(item.children);
           }
         });
+        return data;
       };
-      temp(treeSaveData);
-      setTreeData([...treeSaveData]); // 这样才可以动态更新掉视图上的数据
-      curerntTree = [...treeSaveData];
-      props.setTree(treeSaveData);
+      const treeInit = temp([treeSaveData]);
+      setExpandedKeys([treeInit[0].key] || []);
+      setTreeData([...treeInit]); // 这样才可以动态更新掉视图上的数据
+      curerntTree = [...treeInit];
+      props.setTree([...treeInit]);
     }
   };
 
   const editTreeNodeConfig = () => {
     const form = props.config?.formValue;
-
     /* 页面初始化回填curerntTree */
     if (!form) {
       setTreeData([...curerntTree]);
@@ -131,16 +136,14 @@ function menuTree(props) {
 
   const onSelect = async (selectedKeys, info) => {
     setSelectedKeys(selectedKeys);
-    localStorage.setItem('selectedKeys', JSON.stringify(selectedKeys));
+    // localStorage.setItem('selectedKeys', JSON.stringify(selectedKeys));
     const { selectedNodes } = info;
-    console.log(selectedNodes, '118-----');
     if (!selectedNodes.length) {
       props.setForm({
         formValue: {},
       });
       return;
     }
-    console.log(defaultTrreData.current, '125----');
     const selectNodeInfo = defaultTrreData.current.filter(
       (item) => item.key === selectedNodes[0].key,
     );
@@ -169,7 +172,7 @@ function menuTree(props) {
         }
         /* 编辑 */
         if (oper === 'update') {
-          onSelect([], { selectedNodes: [{ key: item.key }] });
+          onSelect([item.key], { selectedNodes: [{ key: item.key }] });
         }
       }
       if (item.children && item.children.length) {
@@ -206,6 +209,11 @@ function menuTree(props) {
           curerntTree = newTreeDataOper;
           setTreeData(newTreeDataOper);
           props.setTree(newTreeDataOper);
+          console.log(newTreeDataOper, '212----');
+          // const firstKey = newTreeDataOper?.[0]?.children?.[0]?.key
+          onSelect([], {
+            selectedNodes: [],
+          });
           setOperType(operateIdenty);
         },
         onCancel() {},
@@ -281,6 +289,7 @@ function menuTree(props) {
         return null;
       })
       .filter((item, i, self) => item && self.indexOf(item) === i);
+
     setExpandedKeys(newExpandedKeys);
     setSearchValue(value);
     setAutoParentExpand(true);
@@ -320,7 +329,7 @@ function menuTree(props) {
                 <PlusOutlined />
               </Tooltip>
             </span>
-            {!node.isTop ? (
+            {node.code !== '00-top' ? (
               <>
                 <span
                   className="icon-edit"
@@ -347,7 +356,11 @@ function menuTree(props) {
     return data.map((item) => {
       if (item.children && item.children.length) {
         return (
-          <TreeNode key={item.key} title={<>{menu(item)}</>} icon={item?.icon}>
+          <TreeNode
+            key={item.key}
+            title={<>{menu(item, false)}</>}
+            icon={item?.icon}
+          >
             {getNodeTree(item.children)}
           </TreeNode>
         );
@@ -359,7 +372,7 @@ function menuTree(props) {
   };
 
   const onExpand = (newExpandedKeys) => {
-    localStorage.setItem('menuTreeOnExpand', JSON.stringify(newExpandedKeys));
+    // localStorage.setItem('menuTreeOnExpand', JSON.stringify(newExpandedKeys));
     setExpandedKeys(newExpandedKeys);
     setAutoParentExpand(false);
   };

@@ -14,30 +14,30 @@ import MenuTree from './menuTree';
 import MenuConfig from './menuConfig';
 import React, { useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import eventBus from '../../../utils/eventBus';
+// import eventBus from '../../../utils/eventBus';
 import localForage from 'localforage';
-import { list } from './iconBox';
 import { cloneDeep } from 'lodash';
 import ContentHeader from '@/components/contentHeader';
+import { saveMenuList } from '@/services/menu';
 
 const back = require('@/assets/icons/back2.svg');
 const { Header, Footer, Sider, Content } = Layout;
 export default function IndexPage() {
   // 如果从预览页面过来,先取预览页面数据
-  let pageDataPrev = localStorage.getItem('pageDataPrev');
-  let formDataInit = null;
-  if (pageDataPrev && typeof pageDataPrev === 'string') {
-    // formDataPrev 和 formData对应
-    pageDataPrev = JSON.parse(pageDataPrev) || {};
-    formDataInit = pageDataPrev.formDataPrev;
-  }
+  // let pageDataPrev = localStorage.getItem('pageDataPrev');
+  // let formDataInit = null;
+  // if (pageDataPrev && typeof pageDataPrev === 'string') {
+  //   // formDataPrev 和 formData对应
+  //   pageDataPrev = JSON.parse(pageDataPrev) || {};
+  //   formDataInit = pageDataPrev.formDataPrev;
+  // }
 
   const formRef = useRef(null);
   const configPanelRef = useRef(null);
   const [config, setConfig] = useState(null); // 配置面板相关
   const [submitFlag, setSubmitFlag] = useState(false); // 提交标识
   const [tree, setTree] = useState([]); // 结点数
-  const [formData, setForm] = useState(formDataInit); // 配置面板
+  const [formData, setForm] = useState({}); // 配置面板
 
   const [menuConfig, setMenuConfig] = useState({
     mode: 'horizontalAndVertical',
@@ -49,19 +49,19 @@ export default function IndexPage() {
   const menuConfigRef = useRef(null);
 
   const configSubmit = (formValue, comIcons, iconIndex) => {
-    localStorage.setItem(
-      'pageDataPrev',
-      JSON.stringify({
-        formDataPrev: {
-          ...formData,
-          formValue: {
-            ...formData.formValue,
-            ...formValue,
-            iconIndex,
-          },
-        },
-      }),
-    );
+    // localStorage.setItem(
+    //   'pageDataPrev',
+    //   JSON.stringify({
+    //     formDataPrev: {
+    //       ...formData,
+    //       formValue: {
+    //         ...formData.formValue,
+    //         ...formValue,
+    //         iconIndex,
+    //       },
+    //     },
+    //   }),
+    // );
     // 配置面板提交
     setConfig({ formValue, comIcons, iconIndex });
     setSubmitFlag(!submitFlag);
@@ -80,8 +80,9 @@ export default function IndexPage() {
         item.label = item.title;
         item['icon'] =
           item.iconIndex >= 0
-            ? React.createElement(list[item.iconIndex])
-            : null;
+            ? item.iconIndex
+            : // React.createElement(list[item.iconIndex])
+              null;
         delete item.iconIndex;
         delete item.isEdit;
         delete item.formValue;
@@ -93,9 +94,13 @@ export default function IndexPage() {
       return data;
     };
     // temp(tree);
-    eventBus.emit('setTree', temp(cloneDeep(tree)[0].children), menuConfig);
+    window.localStorage.setItem(
+      'setTree',
+      JSON.stringify(temp(cloneDeep(tree)[0].children)),
+    );
+    // eventBus.emit('setTree', temp(cloneDeep(tree)[0].children), menuConfig);
     window.localStorage.setItem('menuConfig', JSON.stringify(menuConfig)); // 存入localStorage
-    history.push('/previewPage/menuPreview');
+    window.open('/previewPage/menuPreview');
   };
 
   const previewSave = (isPreview) => {
@@ -115,7 +120,7 @@ export default function IndexPage() {
       });
   };
 
-  const saveMenuLoad = (isPreview) => {
+  const saveMenuLoad = async (isPreview) => {
     if (!(tree?.[0]?.children && tree?.[0].children.length)) {
       message.warning('请先配置菜单!');
       return;
@@ -124,56 +129,61 @@ export default function IndexPage() {
       window.localStorage.getItem('munuListData'),
     );
     const newKeys = [];
-    const temp = (data) => {
+    const sendItemsList = [];
+    let hasNewNode = false;
+    const temp = (data, parentId) => {
       // 回调处理menu所需参数label
       data.forEach((item) => {
-        newKeys.push(item.key);
-        // const findItem = munuListDataSave.find(itemMu => { return itemMu.key === item.key })
-        // if (findItem) {
-        //   munuListDataSave = munuListDataSave.filter(
-        //     (itemF) => itemF.key !== item.key,
-        //   );
-        //   munuListDataSave.push({
-        //     ...findItem,
-        //     name: item.title,
-        //     path: item.address || findItem.path,
-        //     // icon: icon 调整
-        //   });
-        //   delete item.icon;
-        // } else {
-        //   /* 新增 */
-        //   if (item.oper) {
-        //     munuListDataSave.push({
-        //       ...item,
-        //       path: item.address,
-        //       name: item.title,
-        //       //  icon
-        //     });
-        //   }
-        //   delete item.icon;
-        // }
-        delete item.icon;
+        const {
+          code,
+          icon,
+          id,
+          key,
+          name,
+          title,
+          menuname,
+          address,
+          type,
+          iconIndex,
+          prtId,
+        } = item;
+        sendItemsList.push({
+          code: code || '',
+          icon: iconIndex,
+          id,
+          name: menuname || name || title,
+          path: address || '',
+          prtId: prtId || parentId,
+          type,
+        });
+
+        if (!address && code !== '00-top') {
+          hasNewNode = true;
+        }
+        // delete item.icon;
         if (item.children?.length > 0) {
-          temp(item.children);
+          temp(item.children, item.id);
         }
       });
       return data;
     };
-    const treeDataSave = temp(cloneDeep(tree));
-
-    localForage.setItem('menuTree', treeDataSave);
-    // munuListDataSave = munuListDataSave.filter((item) => newKeys.includes(item.key));
-    // localStorage.setItem('munuListData', JSON.stringify(munuListDataSave));
+    const treeDataSave = tree?.length
+      ? temp(cloneDeep(tree), tree[0].prtId)
+      : [];
+    // localForage.setItem('menuTree', treeDataSave);
     if (isPreview) {
-      // localStorage.setItem('pageDataPrev', JSON.stringify({
-      //   formDataPrev: formData
-      // }));
       previewHandler(); // 跳转到预览页面
     } else {
-      // localStorage.removeItem('pageDataPrev');
-      localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
-      message.success('菜单保存成功!');
-      location.reload();
+      if (hasNewNode) {
+        message.warn('请为菜单设置菜单信息');
+        return;
+      }
+      const saveResult = await saveMenuList(sendItemsList);
+      if (saveResult?.data?.isSuccess !== -1) {
+        localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
+        message.success('菜单保存成功!');
+        location.reload();
+      }
     }
   };
 
@@ -217,15 +227,6 @@ export default function IndexPage() {
             </>
           }
         />
-        {/* <Row justify="space-between" align="middle" className="menu-top">
-          <Col span={4}>
-            <span className="back-wrapper" onClick={() => handleBack()}>
-              <LeftOutlined />
-              主页
-            </span>
-          </Col>
-          <Col span={4} className="menu__btn-preview"></Col>
-        </Row> */}
         <div className="menu-config">
           <Layout className={'user-cont list-layout'}>
             <Sider className={' menu-left'} width={300}>
@@ -260,14 +261,6 @@ export default function IndexPage() {
                 />
               </div>
             </Content>
-            {/* <Row wrap>
-            <Col span={6} className="menu-left" style={{ width: '300px' }}>
-
-            </Col>
-            <Col span={18}>
-
-            </Col>
-          </Row> */}
           </Layout>
         </div>
       </div>

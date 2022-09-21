@@ -49,6 +49,8 @@ import copy from 'copy-to-clipboard';
 import { EllipsisTooltip } from '@/components/tablecellEllips.jsx';
 import ContentHeader from '@/components/contentHeader';
 
+import * as formApi from '@/services/formManage';
+
 const { TextArea } = Input;
 
 const initFormInfo = {
@@ -80,11 +82,13 @@ export default function FormList() {
 
   // 获取formList
   const getFormList = () => {
+    // formApi.getFormList().then((res) => {
+    //   setDataSource(res.list);
+    // });
     const data =
       (localStorage.getItem('formList') &&
         JSON.parse(localStorage.getItem('formList'))) ||
       [];
-
     setDataSource(data);
   };
 
@@ -392,6 +396,18 @@ export default function FormList() {
     message.success('复制成功');
   };
 
+  const itemRender = (_, type, originalElement) => {
+    if (type === 'prev') {
+      return <a className="default-pagination__Previous">Previous</a>;
+    }
+
+    if (type === 'next') {
+      return <a className="default-pagination__Next">Next</a>;
+    }
+
+    return originalElement;
+  };
+
   return (
     <div className="list" style={{ paddingBottom: '20px' }}>
       <Layout className="list-layout">
@@ -481,6 +497,10 @@ export default function FormList() {
             sticky={true}
             scroll={{ x: '100%' }}
             className="default-table"
+            pagination={{
+              itemRender,
+              showSizeChanger: false,
+            }}
           />
         </Content>
       </Layout>

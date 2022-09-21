@@ -407,6 +407,8 @@ export default function FormList() {
 
     return originalElement;
   };
+  const showTotal = (total, range) =>
+    `Showing ${range[0]} to ${range[1]} of ${total} entries`;
 
   return (
     <div className="list" style={{ paddingBottom: '20px' }}>
@@ -500,6 +502,7 @@ export default function FormList() {
             pagination={{
               itemRender,
               showSizeChanger: false,
+              showTotal,
             }}
           />
         </Content>

@@ -71,6 +71,7 @@ export default function Account({ accountIdenty = 'user' }) {
   const [selectedGRowKeys, setSelectedGRowKeys] = useState([]);
   const [searchName, setSearchName] = useState('');
   const [fileList, setFileList] = useState([]);
+  const [showErrReport, setShowErrReport] = useState(false);
   const [pageInfo, setPageInfo] = useState({
     pageSize: 10,
     pageNum: 1,
@@ -323,7 +324,6 @@ export default function Account({ accountIdenty = 'user' }) {
     const formData = new FormData();
     fileList.forEach((file) => {
       formData.append('excelFile', file);
-      console.log('file-----------', file);
     });
     console.log('uplodefile', fileList);
     addUserByUpload(formData).then((res) => {
@@ -334,6 +334,7 @@ export default function Account({ accountIdenty = 'user' }) {
         getUserListByPage(searchName, pageInfo);
       } else {
         // message.error(res.data.message);
+        setShowErrReport(true);
       }
     });
   };
@@ -372,30 +373,6 @@ export default function Account({ accountIdenty = 'user' }) {
   const handleAddC = (identy = true) => {
     setUserAddC(identy);
   };
-
-  /* 一个人挂一个分组下面 */
-  // const editGroupInfo = async (groupId, userItem) => {
-  //   const initUserData = (await localForage.getItem('groupUserList')) || {};
-  //   console.log(initUserData, '222----');
-  //   const newUserData = cloneDeep(initUserData);
-  //   let copyDataKeys = Object.keys(newUserData);
-  //   copyDataKeys.forEach((item) => {
-  //     if (newUserData?.[item]) {
-  //       console.log(newUserData[item], '226----');
-  //       newUserData[item] = newUserData[item].filter(
-  //         (itemC) => itemC.id !== userItem.id,
-  //       );
-  //     }
-  //   });
-  //   if (groupId) {
-  //     console.log(newUserData[groupId], '234----');
-  //     newUserData[groupId] = newUserData?.[groupId]
-  //       ? newUserData[groupId].concat([userItem])
-  //       : [userItem];
-  //   }
-  //   console.log(newUserData, '239----');
-  //   localForage.setItem('groupUserList', newUserData);
-  // };
 
   const handleOk = () => {
     if (userAddC) {
@@ -538,12 +515,6 @@ export default function Account({ accountIdenty = 'user' }) {
             message.success('删除失败');
           }
         });
-        // const currentUser = cloneDeep(dataSource).filter(
-        //   (item) => !idArr.includes(item.id),
-        // );
-        // setDataSource(currentUser);
-        // localForage.setItem('userList', currentUser);
-        // message.success('删除成功');
       },
       onCancel() {},
     });
@@ -594,8 +565,6 @@ export default function Account({ accountIdenty = 'user' }) {
     setSearchName(value);
     getUserListByPage(value, { ...pageInfo, pageNum: 1 });
   };
-  // const handleGroupSearch = (value) => { };
-  // const onFinish = () => { };
 
   const handlePageChange = (num, pageSize) => {
     const newPageInfo = {
@@ -725,6 +694,7 @@ export default function Account({ accountIdenty = 'user' }) {
               setUserAddC(true);
               setIsModalVisible(false);
               setFileList([]);
+              setShowErrReport(false);
             }}
             className="default-modal"
             cancelText="取消"
@@ -862,6 +832,16 @@ export default function Account({ accountIdenty = 'user' }) {
                           最大文件大小限制为20MB
                         </p>
                       </Dragger>
+                      {showErrReport && (
+                        <a
+                          onClick={() => {
+                            downloadTemplate();
+                          }}
+                          style={{ fontSize: '12px', color: '#f00' }}
+                        >
+                          下载错误报告
+                        </a>
+                      )}
                     </>
                   )}
                 </div>
@@ -884,25 +864,6 @@ export default function Account({ accountIdenty = 'user' }) {
             okText="确认"
           >
             <div className="user-wrapper">
-              {/* <Table
-                rowSelection={{
-                  type: 'checkbox',
-                  ...rowGSelection,
-                }}
-                style={{ marginTop: 20 }}
-                dataSource={dataGSource}
-                columns={columnGs.filter((item) => item.key !== 'action')}
-                // loading={loading}
-                scroll={{ y: 340, x: '100%' }}
-                pagination={{
-                  total: dataGSource?.length || 0,
-                  showSizeChanger: true,
-                  showTotal: (total) => `共${total}条`,
-                  // showQuickJumper: true,
-                  // onChange: handlePageChange,
-                }}
-                rowKey={(record) => record.id}
-              /> */}
               <Form
                 className="account-add default-form-radios"
                 ref={groupFormRef}

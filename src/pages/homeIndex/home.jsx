@@ -6,12 +6,12 @@ import 'swiper/modules/pagination/pagination.min.css';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import './home.less';
-import { Divider } from 'antd';
+import { Divider, Spin } from 'antd';
 import { DownCircleOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import HomePage from '@/pages/previewPage/homePage';
 import { nanoid } from 'nanoid';
-
+import { selectUserHomePageConfig } from '../../services/homePageConfig';
 export default function Home(params) {
   const banner = [
     {
@@ -78,9 +78,18 @@ export default function Home(params) {
 
   const [curIndex, setCurIndex] = useState(-1);
   const [isHome, setIsHome] = useState(false);
-
+  const [isRequested, setIsRequested] = useState(false);
   useEffect(() => {
-    setIsHome(window.localStorage.getItem('isHome'));
+    selectUserHomePageConfig()
+      .then((res) => {
+        setIsRequested(true);
+        setIsHome(res.data.data.home);
+      })
+      .catch((err) => {
+        setIsRequested(true);
+        console.log(err);
+      });
+    // setIsHome(window.localStorage.getItem('isHome'));
   }, []);
 
   const onSlideChange = (ele) => {
@@ -96,87 +105,95 @@ export default function Home(params) {
   };
 
   return (
-    <div>
-      {isHome ? (
-        <HomePage></HomePage>
+    <>
+      {isRequested ? (
+        <>
+          {isHome ? (
+            <HomePage></HomePage>
+          ) : (
+            <div className="home-container">
+              <p className="home-title">欢迎进入Connectivity Asset</p>
+              <div className="home-carousel">
+                <Swiper
+                  //  activeIndex={banner}
+                  onSlideChange={onSlideChange}
+                  onClick={onClick}
+                  key={banner.length}
+                  pagination={{
+                    clickable: true, //设置是否可以点击
+                  }}
+                  autoplay={{
+                    delay: 2500,
+                    disableOnInteraction: false,
+                  }}
+                  centeredSlides={true}
+                  loop={true} //设置循环轮播
+                  spaceBetween={-250} //设置堆叠轮播，item之间叠的距离
+                  slidesPerView={5} //设置显示的数量
+                  zoom={true}
+                  navigation={false}
+                  // grabCursor={true}
+                  modules={[Navigation, Pagination, EffectCreative, Autoplay]}
+                  effect={'creative'} //modules上加了同时要设置
+                  creativeEffect={{
+                    prev: {
+                      //这里是设置当前item的前一项的具体属性
+                      translate: [-230, 0, 0], //偏移量
+                      scale: 0.9, //缩放量
+                      opacity: 1, //透明度
+                    },
+                    next: {
+                      //这里是设置当前item的后一项的具体属性，同上面
+                      translate: [230, 0, 0],
+                      scale: 0.9,
+                      opacity: 1,
+                    },
+                    limitProgress: 2, //显示五个堆叠的最重要的这个属性，后面依次以前面属性等比配置
+                  }}
+                >
+                  {banner.map((item, index) => (
+                    <SwiperSlide key={index} style={{ position: 'relative' }}>
+                      <div
+                        className="home-swiper"
+                        style={{
+                          backgroundImage: `url(${item.bg})`,
+                        }}
+                      >
+                        <div className="carousel-box__icon">
+                          <img src={item.icon} width={70}></img>
+                        </div>
+                        <div className="carousel-box__text">
+                          <p className="text-title">{item.title}</p>
+                          <p className="text-en">{item.en}</p>
+                          <Divider />
+                          <p className="text-des" style={{ margin: 'auto' }}>
+                            {item.description}
+                          </p>
+                          {curIndex === index ? (
+                            <DownCircleOutlined
+                              style={{ color: '#3A63FF', fontSize: '28px' }}
+                              className="text-icon"
+                              onClick={() => {
+                                enterHandler(item.url);
+                              }}
+                            />
+                          ) : (
+                            <></>
+                          )}
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </div>
+          )}
+        </>
       ) : (
-        <div className="home-container">
-          <p className="home-title">欢迎进入Connectivity Asset</p>
-          <div className="home-carousel">
-            <Swiper
-              //  activeIndex={banner}
-              onSlideChange={onSlideChange}
-              onClick={onClick}
-              key={banner.length}
-              pagination={{
-                clickable: true, //设置是否可以点击
-              }}
-              autoplay={{
-                delay: 2500,
-                disableOnInteraction: false,
-              }}
-              centeredSlides={true}
-              loop={true} //设置循环轮播
-              spaceBetween={-250} //设置堆叠轮播，item之间叠的距离
-              slidesPerView={5} //设置显示的数量
-              zoom={true}
-              navigation={false}
-              // grabCursor={true}
-              modules={[Navigation, Pagination, EffectCreative, Autoplay]}
-              effect={'creative'} //modules上加了同时要设置
-              creativeEffect={{
-                prev: {
-                  //这里是设置当前item的前一项的具体属性
-                  translate: [-230, 0, 0], //偏移量
-                  scale: 0.9, //缩放量
-                  opacity: 1, //透明度
-                },
-                next: {
-                  //这里是设置当前item的后一项的具体属性，同上面
-                  translate: [230, 0, 0],
-                  scale: 0.9,
-                  opacity: 1,
-                },
-                limitProgress: 2, //显示五个堆叠的最重要的这个属性，后面依次以前面属性等比配置
-              }}
-            >
-              {banner.map((item, index) => (
-                <SwiperSlide key={index} style={{ position: 'relative' }}>
-                  <div
-                    className="home-swiper"
-                    style={{
-                      backgroundImage: `url(${item.bg})`,
-                    }}
-                  >
-                    <div className="carousel-box__icon">
-                      <img src={item.icon} width={70}></img>
-                    </div>
-                    <div className="carousel-box__text">
-                      <p className="text-title">{item.title}</p>
-                      <p className="text-en">{item.en}</p>
-                      <Divider />
-                      <p className="text-des" style={{ margin: 'auto' }}>
-                        {item.description}
-                      </p>
-                      {curIndex === index ? (
-                        <DownCircleOutlined
-                          style={{ color: '#3A63FF', fontSize: '28px' }}
-                          className="text-icon"
-                          onClick={() => {
-                            enterHandler(item.url);
-                          }}
-                        />
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          </div>
+        <div className="home-container__spin">
+          <Spin size="large" />
         </div>
       )}
-    </div>
+    </>
   );
 }

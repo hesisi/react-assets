@@ -20,12 +20,14 @@ const http = axios.create({
 http.interceptors.request.use(
   (config) => {
     // 设置请求头
-    let token =
-      (Cookies.get('Token') && JSON.parse(Cookies.get('Token'))) || '';
-    config.headers.Authorization = `bearer ${token}`;
+    // let token =
+    //   (Cookies.get('Token') && JSON.parse(Cookies.get('Token'))) || '';
+    let token = window.localStorage.getItem('loginToken') || '';
+    config.headers.Authorization = `${token}`;
     return config;
   },
   (err) => {
+    debugger;
     return Promise.reject(err);
   },
 );
@@ -33,6 +35,13 @@ http.interceptors.request.use(
 // 响应拦截
 http.interceptors.response.use(
   (res) => {
+    // 登录失效后
+    const codeArr = ['200401', '200402', '200403'];
+    if (codeArr.includes(res.data.code)) {
+      window.localStorage.removeItem('loginToken');
+      window.location.pathname = '/login';
+      return;
+    }
     if (res.request.responseType === 'blob') {
       return res;
     } else {
@@ -41,12 +50,12 @@ http.interceptors.response.use(
       }
       return res;
     }
-    // if(res.data.status === '401'){
-    // window.location.pathname = '/login'
-    // }
   },
   (err) => {
-    message.error(err.message);
+    const { config } = err;
+    if (!config.silence) {
+      message.error(err.message);
+    }
     return Promise.reject(err);
   },
 );

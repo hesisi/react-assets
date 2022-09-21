@@ -6,7 +6,20 @@
  * @LastEditors: hesisi
  * @LastEditTime: 2022-08-08 11:46:00
  */
-import { Breadcrumb, Layout, Menu, Avatar, Col, Row, Space } from 'antd';
+import {
+  Breadcrumb,
+  Layout,
+  Menu,
+  Avatar,
+  Col,
+  Row,
+  Space,
+  Dropdown,
+  Button,
+  Tooltip,
+  Badge,
+  Image,
+} from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link, history } from 'umi';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
@@ -92,6 +105,9 @@ const CommonLayout = (props) => {
   ]);
   const [MenuList, setMenuList] = useState(newRoutes || []);
   const [navBar, setNavBar] = useState(renderNavBar || []);
+  const [accountName, setAccountName] = useState(
+    `${window.localStorage.getItem('accountName')}啊啊啊啊啊啊啊啊啊啊` || '',
+  ); // 用户名
 
   const activePath = props.location.pathname;
 
@@ -243,6 +259,32 @@ const CommonLayout = (props) => {
     setSelectKey([e.key]);
   };
 
+  // 退出
+  const loginOut = () => {
+    window.localStorage.removeItem('loginToken');
+    history.push('/login');
+  };
+
+  // 下拉框
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: '1',
+          label: (
+            <Button
+              type="text"
+              onClick={loginOut}
+              style={{ width: '100%', textAlign: 'left' }}
+            >
+              退出
+            </Button>
+          ),
+        },
+      ]}
+    />
+  );
+
   return (
     <Layout className={Styles.layoutMain}>
       <Header
@@ -322,38 +364,70 @@ const CommonLayout = (props) => {
               </div>
             </div>
           ) : null}
-          <Space size={30}>
-            <QuestionCircleOutlined
-              style={{ color: '#ffffff', fontSize: '16px' }}
-            />
-            <span
+          {/* <Space size={30}> */}
+          <div className="header__right">
+            <div>
+              <QuestionCircleOutlined
+                style={{
+                  color: '#ffffff',
+                  fontSize: '16px',
+                  marginRight: '30px',
+                  verticalAlign: 'middle',
+                  // marginTop: '5px',
+                }}
+              />
+            </div>
+
+            {/* <div
               className="bell_tips"
               onClick={showMessages}
               ref={messagesBellRef}
+              style={{ marginRight: '30px' }}
             >
-              <BellOutlined
-                style={{
-                  color: '#ffffff',
-                  fontWeight: '600',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                }}
-              />
-              <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
-              {/* <p>99+</p> */}
-            </span>
+              <Badge dot={true}  */}
+            <div
+              style={{ marginRight: '30px' }}
+              onClick={showMessages}
+              ref={messagesBellRef}
+            >
+              <Badge dot={true}>
+                <BellOutlined
+                  style={{
+                    color: '#ffffff',
+                    fontSize: '16px',
+                    cursor: 'pointer',
 
-            <div className={'user-detail'}>
-              <Space size={10}>
-                <Avatar
-                  src="https://joeschmoe.io/api/v1/random"
-                  className={Styles.avatar}
+                    verticalAlign: 'middle',
+                  }}
                 />
-                <span style={{ marginRight: '20px' }}>欢迎你，用户一</span>
-                <DownOutlined />
-              </Space>
+              </Badge>
             </div>
-          </Space>
+            {/* </Badge> */}
+
+            {/* <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
+                <p>99+</p> */}
+            {/* </div> */}
+
+            <Dropdown overlay={menu} trigger={['click']}>
+              <div className={'user-detail'}>
+                <Space size={10}>
+                  <Avatar src="https://joeschmoe.io/api/v1/random" size={18} />
+                  {/* <Avatar icon={<UserOutlined />} size={20} /> */}
+                  {/* className={Styles.avatar} */}
+
+                  <span>
+                    {/* <Tooltip title={accountName} placement="left"> */}
+                    {(accountName.length > 8
+                      ? `${accountName.slice(0, 8)}...`
+                      : accountName) || '用户'}
+                    {/* </Tooltip> */}
+                  </span>
+                  <DownOutlined />
+                </Space>
+              </div>
+            </Dropdown>
+          </div>
+          {/* </Space> */}
         </div>
       </Header>
       <Content className="layout-content">

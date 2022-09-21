@@ -2,7 +2,6 @@ import request from '../utils/request';
 const baseUrl = '/assets';
 // post请求实例
 export function saveUserHomePageConfig(params) {
-  console.log('参数', params);
   return request(`${baseUrl}/homepageManager/saveOrUpdate`, {
     method: 'post',
     data: { ...params },

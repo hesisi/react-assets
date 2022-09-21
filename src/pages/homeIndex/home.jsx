@@ -105,9 +105,9 @@ export default function Home(params) {
   };
 
   return (
-    <div>
+    <>
       {isRequested ? (
-        <div>
+        <>
           {isHome ? (
             <HomePage></HomePage>
           ) : (
@@ -188,12 +188,12 @@ export default function Home(params) {
               </div>
             </div>
           )}
-        </div>
+        </>
       ) : (
         <div className="home-container__spin">
           <Spin size="large" />
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -140,7 +140,7 @@ const homePage = () => {
   }, [dom]);
 
   return (
-    <div style={{ height: '100vh', width: '100vw' }}>
+    <div style={{ height: 'calc(100vh - 52px)', width: '100vw' }}>
       <Row className="content-box__row">
         <Col span={24}>{dom.length > 0 ? renderDom(dom) : <></>}</Col>
       </Row>

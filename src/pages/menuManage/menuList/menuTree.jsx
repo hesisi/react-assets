@@ -59,8 +59,9 @@ function menuTree(props) {
           item.address = item.path;
           item.title = item.name;
           item['icon'] =
-            item.iconIndex >= 0
-              ? React.createElement(list[item.iconIndex])
+            (item.icon || item.iconIndex) &&
+            (item.iconIndex >= 0 || item.icon * 1 >= 0)
+              ? React.createElement(list[item.iconIndex || item.icon * 1])
               : null;
           defaultTrreData.current.push(item);
           if (item?.children?.length) {

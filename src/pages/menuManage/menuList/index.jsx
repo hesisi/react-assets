@@ -78,7 +78,6 @@ export default function IndexPage() {
       // 回调处理menu所需参数label
       data.forEach((item) => {
         item.label = item.title;
-        console.log(item, '81------');
         item['icon'] =
           item.iconIndex >= 0
             ? item.iconIndex
@@ -175,7 +174,6 @@ export default function IndexPage() {
     if (isPreview) {
       previewHandler(); // 跳转到预览页面
     } else {
-      console.log(hasNewNode, '177-----');
       if (hasNewNode) {
         message.warn('请为菜单设置菜单信息');
         return;
@@ -184,7 +182,7 @@ export default function IndexPage() {
       if (saveResult?.data?.isSuccess !== -1) {
         localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
         message.success('菜单保存成功!');
-        // location.reload();
+        location.reload();
       }
     }
   };

@@ -312,25 +312,31 @@ const homePage = (props) => {
     // message.success(`${data}成功!`, 1.5);
   };
 
+  // 批量删除localStorage元素
+  const clearLocalStorage = (params) => {
+    if (params.length === 0) return;
+    params.forEach((item) => {
+      if (localStorage.getItem(item)) {
+        localStorage.removeItem(item);
+      }
+    });
+  };
+
   const deleteHandler = () => {
-    if (localStorage.getItem('isHome')) {
-      localStorage.removeItem('isHome');
-    }
-    if (localStorage.getItem('homeDom')) {
-      localStorage.removeItem('homeDom');
-    }
-    if (localStorage.getItem('homeProperty')) {
-      localStorage.removeItem('homeProperty');
-    }
     homeApi
       .deleteUserHomePageConfig()
-      .then((res) => {
-        console.log(res);
+      .then(async (res) => {
+        await clearLocalStorage([
+          'isHome',
+          'homeDom',
+          'homeProperty',
+          'layoutTemplate',
+        ]);
+        message.success('删除成功');
       })
       .catch((err) => {
         console.log(err);
       });
-    message.success('删除成功');
   };
 
   useEffect(() => {

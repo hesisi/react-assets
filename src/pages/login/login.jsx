@@ -39,7 +39,6 @@ const Login = () => {
         }
       } else {
         // 报错时，重新请求验证码
-        form.setFieldValue('code', '');
         getValidatePic();
       }
     });

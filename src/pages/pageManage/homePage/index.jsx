@@ -27,7 +27,7 @@ import LineChart from '@/components/lineChart';
 import GaugeChart from '@/components/gaugeChart';
 import ListCom from '@/components/listCom';
 import CarouselBanner from '@/components/carouselBanner';
-
+import * as homeApi from '../../../services/homePageConfig';
 const back = require('@/assets/icons/back.svg');
 const forward = require('@/assets/icons/forward.svg');
 const pic = require('@/assets/pic.jpg');
@@ -40,6 +40,9 @@ const homePage = (props) => {
   const [selectId, setSelectId] = useState('');
   const [property, setProperty] = useState({}); // 属性
   const homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
+  // const layoutTemplate = JSON.parse(
+  //   window.localStorage.getItem('layoutTemplate'),
+  // );
   const pageBuildRef = useRef(null);
   const contentSettingRef = useRef(null);
 
@@ -250,7 +253,6 @@ const homePage = (props) => {
   };
 
   const previewHandler = () => {
-    // console.log(dom);
     if (template.length > 0 && template[0] === '1-0') {
       pageBuildRef.current.preview();
       window.localStorage.removeItem('homeDom');
@@ -271,22 +273,70 @@ const homePage = (props) => {
     }
     if (data === '启用') {
       window.localStorage.setItem('isHome', true);
-      history.push('/homeIndex');
+      let params = {};
+      if (template.length > 0 && template[0] === '1-0') {
+        params = {
+          home: true,
+          layoutTemplate: JSON.stringify(
+            JSON.parse(window.localStorage.getItem('layoutTemplate')),
+          ),
+          homeDom: '',
+          homeProperty: '',
+          status: true,
+          templateType: 'CUSTOM',
+        };
+      } else {
+        params = {
+          home: true,
+          layoutTemplate: '',
+          homeDom: JSON.stringify(dom),
+          homeProperty: JSON.stringify(property),
+          status: true,
+          templateType: 'other',
+        };
+      }
+      homeApi
+        .saveUserHomePageConfig(params)
+        .then((res) => {
+          // console.log(res);
+          message.success(`${data}成功，即将跳转至首页`, 1.5);
+          setTimeout(() => {
+            history.push('/homeIndex');
+          }, 2000);
+        })
+        .catch((err) => {
+          console.log({ saveUserHomePageConfig: err });
+        });
+      // history.push('/homeIndex');
     }
-    message.success(`${data}成功!`, 1.5);
+    // message.success(`${data}成功!`, 1.5);
+  };
+
+  // 批量删除localStorage元素
+  const clearLocalStorage = (params) => {
+    if (params.length === 0) return;
+    params.forEach((item) => {
+      if (localStorage.getItem(item)) {
+        localStorage.removeItem(item);
+      }
+    });
   };
 
   const deleteHandler = () => {
-    if (localStorage.getItem('isHome')) {
-      localStorage.removeItem('isHome');
-    }
-    if (localStorage.getItem('homeDom')) {
-      localStorage.removeItem('homeDom');
-    }
-    if (localStorage.getItem('homeProperty')) {
-      localStorage.removeItem('homeProperty');
-    }
-    message.success('删除成功');
+    homeApi
+      .deleteUserHomePageConfig()
+      .then(async (res) => {
+        await clearLocalStorage([
+          'isHome',
+          'homeDom',
+          'homeProperty',
+          'layoutTemplate',
+        ]);
+        message.success('删除成功');
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {

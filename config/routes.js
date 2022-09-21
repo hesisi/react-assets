@@ -308,7 +308,8 @@ export default [
     path: '/pageManage',
     key: 'default-7',
     component: '@/layouts/pageManageLayout/index',
-    wrappers: ['@/wrappers/auth'],
+    // FIXME:
+    // wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/pageManage',
@@ -319,7 +320,8 @@ export default [
         path: '/pageManage/homePage',
         component: '@/pages/pageManage/homePage/index',
         meta: { showMenu: false, showHeader: true },
-        wrappers: ['@/wrappers/auth'],
+        // FIXME:
+        // wrappers: ['@/wrappers/auth'],
       },
     ],
   },
@@ -335,14 +337,16 @@ export default [
     path: '/previewPage/pagePreview',
     component: '@/pages/previewPage/pagePreview',
     meta: { navHidden: true },
-    wrappers: ['@/wrappers/auth'],
+    // FIXME:
+    // wrappers: ['@/wrappers/auth'],
   },
   {
     name: '首页预览',
     path: '/previewPage/homePage',
     component: '@/pages/previewPage/homePage',
     meta: { navHidden: true },
-    wrappers: ['@/wrappers/auth'],
+    // FIXME:
+    // wrappers: ['@/wrappers/auth'],
   },
   {
     name: '登录页',

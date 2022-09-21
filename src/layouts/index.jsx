@@ -17,6 +17,8 @@ import {
   Dropdown,
   Button,
   Tooltip,
+  Badge,
+  Image,
 } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { Link, history } from 'umi';
@@ -121,7 +123,7 @@ const CommonLayout = (props) => {
     },
   ]);
   const [accountName, setAccountName] = useState(
-    window.localStorage.getItem('accountName') || '',
+    `${window.localStorage.getItem('accountName')}啊啊啊啊啊啊啊啊啊啊` || '',
   ); // 用户名
 
   const activePath = props.location.pathname;
@@ -302,37 +304,44 @@ const CommonLayout = (props) => {
               </div>
             </div>
           ) : null}
-          <Space size={30}>
+          {/* <Space size={30}> */}
+          <div className="header__right">
             <QuestionCircleOutlined
-              style={{ color: '#ffffff', fontSize: '16px' }}
+              style={{
+                color: '#ffffff',
+                fontSize: '16px',
+                marginRight: '30px',
+              }}
             />
+
             <span
               className="bell_tips"
               onClick={showMessages}
               ref={messagesBellRef}
+              style={{ marginRight: '30px', marginTop: '2px' }}
             >
-              <BellOutlined
-                style={{
-                  color: '#ffffff',
-                  fontWeight: '600',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                }}
-              />
-              <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
-              {/* <p>99+</p> */}
+              <Badge dot={true}>
+                <BellOutlined
+                  style={{
+                    color: '#ffffff',
+                    fontWeight: '600',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                  }}
+                />
+              </Badge>
+
+              {/* <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
+                <p>99+</p> */}
             </span>
 
             <Dropdown overlay={menu} trigger={['click']}>
               <div className={'user-detail'}>
                 <Space size={10}>
-                  <Avatar
-                    src="https://joeschmoe.io/api/v1/random"
-                    className={Styles.avatar}
-                  />
+                  <Avatar src="https://joeschmoe.io/api/v1/random" size={20} />
+                  {/* className={Styles.avatar} */}
 
                   <span>
-                    欢迎你，
                     {/* <Tooltip title={accountName} placement="left"> */}
                     {(accountName.length > 8
                       ? `${accountName.slice(0, 8)}...`
@@ -343,7 +352,8 @@ const CommonLayout = (props) => {
                 </Space>
               </div>
             </Dropdown>
-          </Space>
+          </div>
+          {/* </Space> */}
         </div>
       </Header>
       <Content className="layout-content">

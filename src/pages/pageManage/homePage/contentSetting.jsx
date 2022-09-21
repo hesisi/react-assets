@@ -839,33 +839,37 @@ const contentSetting = forwardRef((props, ref) => {
             </Form.Item>
 
             <Form.Item label="间隙色" name="colGapColor">
-              <Input
-                onChange={(e) => onChangeColor(e, 'colGapColor')}
-                style={{ width: '15%', padding: '0px' }}
-                type="color"
-                value={`#${colColor}`}
-              />
-              <Input
-                style={{ width: '84%' }}
-                addonBefore="#"
-                value={colColor}
-                onChange={(e) => onChange(e, 'colGapColor')}
-              />
+              <Input.Group compact>
+                <Input
+                  style={{ width: '84%' }}
+                  addonBefore="#"
+                  value={colColor}
+                  onChange={(e) => onChange(e, 'colGapColor')}
+                />
+                <Input
+                  onChange={(e) => onChangeColor(e, 'colGapColor')}
+                  style={{ width: '15%', padding: '0px' }}
+                  type="color"
+                  value={`#${colColor}`}
+                />
+              </Input.Group>
             </Form.Item>
 
             <Form.Item label="背景色" name="bg">
-              <Input
-                onChange={(e) => onChangeColor(e, 'bg')}
-                style={{ width: '15%', padding: '0px' }}
-                type="color"
-                value={`#${bgColor}`}
-              />
-              <Input
-                style={{ width: '84%' }}
-                value={bgColor}
-                addonBefore="#"
-                onChange={(e) => onChange(e, 'bg')}
-              />
+              <Input.Group compact>
+                <Input
+                  style={{ width: '84%' }}
+                  value={bgColor}
+                  addonBefore="#"
+                  onChange={(e) => onChange(e, 'bg')}
+                />
+                <Input
+                  onChange={(e) => onChangeColor(e, 'bg')}
+                  style={{ width: '15%', padding: '0px' }}
+                  type="color"
+                  value={`#${bgColor}`}
+                />
+              </Input.Group>
             </Form.Item>
 
             <Form.Item label="圆角" name="radius">

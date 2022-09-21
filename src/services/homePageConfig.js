@@ -17,6 +17,7 @@ export function deleteUserHomePageConfig(params) {
 export function selectUserHomePageConfig(params) {
   return request(`${baseUrl}/homepageManager/selectOne`, {
     method: 'post',
+    silence: true,
     // data: { ...params }
   });
 }

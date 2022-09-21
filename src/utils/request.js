@@ -27,6 +27,7 @@ http.interceptors.request.use(
     return config;
   },
   (err) => {
+    debugger;
     return Promise.reject(err);
   },
 );
@@ -51,7 +52,10 @@ http.interceptors.response.use(
     }
   },
   (err) => {
-    message.error(err.message);
+    const { config } = err;
+    if (!config.silence) {
+      message.error(err.message);
+    }
     return Promise.reject(err);
   },
 );

@@ -106,7 +106,7 @@ const CommonLayout = (props) => {
   const [MenuList, setMenuList] = useState(newRoutes || []);
   const [navBar, setNavBar] = useState(renderNavBar || []);
   const [accountName, setAccountName] = useState(
-    `${window.localStorage.getItem('accountName')}啊啊啊啊啊啊啊啊啊啊` || '',
+    window.localStorage.getItem('accountName') || '',
   ); // 用户名
 
   const activePath = props.location.pathname;

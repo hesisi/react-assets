@@ -11,9 +11,11 @@ import { withRouter } from 'react-router-dom';
 import { Link, history } from 'umi';
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import routes from '../../config/routes';
-import { dealMenuList } from '../../config/routesDy';
+import { permissionCode } from '../../config/routesPermission';
+import { dealMenuList, newMenu } from '../../config/routesDy';
 import Styles from './index.less';
 import logo from '@/assets/icons/logo.png';
+import { list } from '@/pages/menuManage/menuList/iconBox';
 import {
   UserOutlined,
   CarryOutOutlined,
@@ -28,40 +30,16 @@ import {
 import './index.less';
 
 const { Header, Content, Footer, Sider } = Layout;
+let newRoutes = [];
+let renderNavBar = [];
+// let activeKey = []
+// let MenuList = []
+// let navBar = []
+let firstFw = true;
 
-const newRoutes = dealMenuList();
-const renderNavBar = [];
-newRoutes
-  .filter((item) => item.title)
-  ?.forEach((item) => {
-    // const isHave = newRoutes.find((newItem) => {
-    //   return newItem.key === item.key;
-    // });
-    // if (isHave) {
-    renderNavBar.push({
-      key: item.address || item.path,
-      label: (
-        <Link to={item.address || item.path}>{item.title || item.name}</Link>
-      ),
-      // label: item.path ? (
-      //   <Link to={item.path}>{item.name}</Link>
-      // ) : (
-      //   <div
-      //     onClick={() => {
-      //       if (item.name === '动态报表') {
-      //         window.location.href = 'http://localhost:9996/tool-datav/index';
-      //       }
-      //     }}
-      //   >
-      //     {item.name}
-      //   </div>
-      // ),
-      // meta: item.meta,
-    });
-    // }
-  });
-
-const navBar = renderNavBar.filter((e) => !e.meta?.navHidden); // 过滤掉菜单预览
+const getNewRoutes = async () => {
+  newRoutes = await dealMenuList();
+};
 
 const getMetaInfoByPath = (routesData, path, result = []) => {
   routesData.forEach((item) => {
@@ -75,10 +53,13 @@ const getMetaInfoByPath = (routesData, path, result = []) => {
 };
 
 const CommonLayout = (props) => {
-  const selectKey = `/${props.location.pathname?.split('/')[1]}`;
+  const selectKeyInit = `/${props.location.pathname?.split('/')[1]}`;
+  const { pathPrefix } = props;
   const [isShowMessage, setIsShowMessage] = useState(false);
+  const [selectKey, setSelectKey] = useState([selectKeyInit] || []);
   const messagesRef = useRef(null);
   const messagesBellRef = useRef(null);
+  // const [newRoutes, setNewRoutes] = useState([])
   const [messageList, setMessageList] = useState([
     {
       icon: <AccountBookOutlined />,
@@ -109,10 +90,95 @@ const CommonLayout = (props) => {
       time: '2022-9-06 14:14:56',
     },
   ]);
+  const [MenuList, setMenuList] = useState(newRoutes || []);
+  const [navBar, setNavBar] = useState(renderNavBar || []);
+
   const activePath = props.location.pathname;
-  const curretnItem = newRoutes?.filter((item) => {
-    return item.address === props.pathPrefix;
-  });
+
+  /* 初始化菜单数据 */
+  const initMenu = async () => {
+    await getNewRoutes();
+    newRoutes
+      .filter((item) => item.title)
+      ?.forEach((item) => {
+        // const isHave = newRoutes.find((newItem) => {
+        //   return newItem.key === item.key;
+        // });
+        // if (isHave) {
+        renderNavBar.push({
+          key: item.address || item.path,
+          // label: (
+          //   <Link to={item.address || item.path}>
+          //     {item.title || item.name}
+          //   </Link>
+          // ),
+          label: permissionCode.includes(item.code) ? (
+            <Link to={item.address || item.path}>
+              {item.title || item.name}
+            </Link>
+          ) : (
+            <div
+              onClick={() => {
+                // if (item.name === '动态报表') {
+                window.location.href = `http://${window.location.host}${
+                  item.address || item.path
+                }`;
+                // }
+              }}
+            >
+              {item.title || item.name}
+            </div>
+          ),
+          // meta: item.meta,
+        });
+        // }
+      });
+
+    // 左侧菜单树
+    renderNavBar = renderNavBar.filter((e) => !e.meta?.navHidden);
+    const navBarInit = renderNavBar; // 过滤掉菜单预览
+    firstFw = false;
+    // MenuList = MenuListInit;
+    // navBar = navBarInit;
+    // activeKey = navBarInit?.[0]?.key ? [navBarInit?.[0]?.key] : [];
+    setNavBar(navBarInit);
+    // setSelectKey(activeKey);
+  };
+
+  const handleClickOutside = (e) => {
+    if (
+      !(messagesRef?.current && messagesRef?.current?.contains(e.target)) &&
+      !(messagesBellRef?.current && messagesBellRef.current.contains(e.target))
+    ) {
+      setIsShowMessage(false);
+    }
+  };
+
+  useEffect(() => {
+    if (firstFw) {
+      initMenu();
+    }
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (newRoutes?.length) {
+      const curretnItem = newRoutes?.filter((item) => {
+        return item.address === pathPrefix;
+      });
+      const MenuListInit =
+        (curretnItem && curretnItem[0] && curretnItem[0].children) || [];
+      setMenuList(MenuListInit);
+    }
+  }, [newRoutes, pathPrefix]);
+
+  // judgeMunuChild(children[0].children)) ||
+  // [];
+
+  // 递归遍历左侧菜单
 
   const judgeMunuChild = (menuArr) => {
     let backArr = [];
@@ -126,19 +192,17 @@ const CommonLayout = (props) => {
     });
     return backArr;
   };
-  // 左侧菜单树
-  const MenuList =
-    (curretnItem && curretnItem[0] && curretnItem[0].children) || [];
-  // judgeMunuChild(children[0].children)) ||
-  // [];
 
-  // 递归遍历左侧菜单
-  const renderItems = function (list = []) {
-    return list.map((item, index) => {
+  const renderItems = function (listA = []) {
+    return listA.map((item, index) => {
       if (item.title || item.name) {
         return {
           key: item.address || item.path,
-          icon: item.icon,
+          icon:
+            (item?.icon && item.icon * 1 > 0) ||
+            (item?.icon && item?.icon === '0')
+              ? React.createElement(list[item.icon * 1])
+              : null,
           label: item.address ? (
             <Link to={item.address}>{item.title}</Link>
           ) : (
@@ -150,38 +214,33 @@ const CommonLayout = (props) => {
     });
   };
 
+  /* todo: 根据path来找meto */
   const meta = useMemo(() => {
     const path = props.location.pathname;
     const metaInfo =
       getMetaInfoByPath(routes, path, []) &&
       getMetaInfoByPath(routes, path, [])[0];
+    console.log(metaInfo, '194-----');
     return metaInfo;
   });
+
   const showMessages = () => {
     let flag = !isShowMessage;
     setIsShowMessage(flag);
   };
+
   const goToMessageCenter = () => {
     history.push({ pathname: '/notificationCenter/notificationList' });
   };
-
-  const handleClickOutside = (e) => {
-    if (
-      !(messagesRef?.current && messagesRef?.current?.contains(e.target)) &&
-      !(messagesBellRef?.current && messagesBellRef.current.contains(e.target))
-    ) {
-      setIsShowMessage(false);
-    }
-  };
-  useEffect(() => {
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
 
   const handleBreadClick = (item) => {
     if (item?.path) {
       history.push(item.path);
     }
+  };
+
+  const onHClick = (e) => {
+    setSelectKey([e.key]);
   };
 
   return (
@@ -197,7 +256,9 @@ const CommonLayout = (props) => {
         <Menu
           theme="dark"
           mode="horizontal"
-          defaultSelectedKeys={[selectKey]}
+          onClick={onHClick}
+          selectedKeys={selectKey}
+          // defaultSelectedKeys={[selectKey]}
           items={navBar}
           style={{ background: '#0D6BFF' }}
           className={Styles['menu']}
@@ -308,7 +369,10 @@ const CommonLayout = (props) => {
             width={200}
             style={{
               // height: '100%',
-              display: meta && !meta.showMenu ? 'none' : 'block',
+              display:
+                (meta && !meta?.showMenu) || meta === undefined
+                  ? 'none'
+                  : 'block',
             }}
           >
             <Menu

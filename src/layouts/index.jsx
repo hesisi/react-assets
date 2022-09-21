@@ -306,39 +306,53 @@ const CommonLayout = (props) => {
           ) : null}
           {/* <Space size={30}> */}
           <div className="header__right">
-            <QuestionCircleOutlined
-              style={{
-                color: '#ffffff',
-                fontSize: '16px',
-                marginRight: '30px',
-              }}
-            />
+            <div>
+              <QuestionCircleOutlined
+                style={{
+                  color: '#ffffff',
+                  fontSize: '16px',
+                  marginRight: '30px',
+                  verticalAlign: 'middle',
+                  // marginTop: '5px',
+                }}
+              />
+            </div>
 
-            <span
+            {/* <div
               className="bell_tips"
               onClick={showMessages}
               ref={messagesBellRef}
-              style={{ marginRight: '30px', marginTop: '2px' }}
+              style={{ marginRight: '30px' }}
+            >
+              <Badge dot={true}  */}
+            <div
+              style={{ marginRight: '30px' }}
+              onClick={showMessages}
+              ref={messagesBellRef}
             >
               <Badge dot={true}>
                 <BellOutlined
                   style={{
                     color: '#ffffff',
-                    fontWeight: '600',
                     fontSize: '16px',
                     cursor: 'pointer',
+
+                    verticalAlign: 'middle',
                   }}
                 />
               </Badge>
+            </div>
+            {/* </Badge> */}
 
-              {/* <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
+            {/* <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
                 <p>99+</p> */}
-            </span>
+            {/* </div> */}
 
             <Dropdown overlay={menu} trigger={['click']}>
               <div className={'user-detail'}>
                 <Space size={10}>
-                  <Avatar src="https://joeschmoe.io/api/v1/random" size={20} />
+                  <Avatar src="https://joeschmoe.io/api/v1/random" size={18} />
+                  {/* <Avatar icon={<UserOutlined />} size={20} /> */}
                   {/* className={Styles.avatar} */}
 
                   <span>

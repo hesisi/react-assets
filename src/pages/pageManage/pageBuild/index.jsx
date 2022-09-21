@@ -263,13 +263,19 @@ const pageBuild = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    const domArr = dom.map((e) => {
+    let domArr = dom.map((e) => {
       if (e.id === targetID) {
         e.component = renderComponent(props.component[0], e.id);
         e.componentName = props.component[0];
       }
       return e;
     });
+    if (localStorage.getItem('layoutTemplate')) {
+      domArr = JSON.parse(localStorage.getItem('layoutTemplate')).map((e) => {
+        e.component = renderComponent(e.componentName, e.id);
+        return e;
+      });
+    }
     setDom(domArr);
   }, [props.component]);
 
@@ -314,6 +320,7 @@ const pageBuild = forwardRef((props, ref) => {
     setDom(newArr);
     clearPanel();
   };
+
   return (
     <div style={{ padding: '10px', height: '100%' }}>
       <Row style={{ height: '100%' }}>

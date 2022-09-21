@@ -818,7 +818,7 @@ const contentSetting = forwardRef((props, ref) => {
         <TabPane tab="区域" key="region">
           <Form
             name="basic"
-            labelCol={{ span: 4 }}
+            labelCol={{ span: 6 }}
             wrapperCol={{ span: 16 }}
             initialValues={{
               colGap: '10',

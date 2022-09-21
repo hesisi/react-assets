@@ -308,8 +308,7 @@ export default [
     path: '/pageManage',
     key: 'default-7',
     component: '@/layouts/pageManageLayout/index',
-    // FIXME:
-    // wrappers: ['@/wrappers/auth'],
+    wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/pageManage',
@@ -320,8 +319,7 @@ export default [
         path: '/pageManage/homePage',
         component: '@/pages/pageManage/homePage/index',
         meta: { showMenu: false, showHeader: true },
-        // FIXME:
-        // wrappers: ['@/wrappers/auth'],
+        wrappers: ['@/wrappers/auth'],
       },
     ],
   },

@@ -11,6 +11,9 @@ const GaugeChart = (props) => {
       tooltip: {
         formatter: '{a} <br/>{b} : {c}%',
       },
+      grid: {
+        top: 30,
+      },
       series: [
         {
           name: 'Pressure',

@@ -256,6 +256,7 @@ const homePage = (props) => {
     if (template.length > 0 && template[0] === '1-0') {
       pageBuildRef.current.preview();
       window.localStorage.removeItem('homeDom');
+      window.localStorage.removeItem('homeProperty');
     } else {
       window.localStorage.setItem('homeDom', JSON.stringify(dom));
       window.localStorage.setItem('homeProperty', JSON.stringify(property));
@@ -267,6 +268,7 @@ const homePage = (props) => {
     if (template.length > 0 && template[0] === '1-0') {
       pageBuildRef.current.preview();
       window.localStorage.removeItem('homeDom');
+      window.localStorage.removeItem('homeProperty');
     } else {
       window.localStorage.setItem('homeDom', JSON.stringify(dom));
       window.localStorage.setItem('homeProperty', JSON.stringify(property));
@@ -298,11 +300,10 @@ const homePage = (props) => {
       homeApi
         .saveUserHomePageConfig(params)
         .then((res) => {
-          // console.log(res);
           message.success(`${data}成功，即将跳转至首页`, 1.5);
           setTimeout(() => {
             history.push('/homeIndex');
-          }, 2000);
+          }, 1000);
         })
         .catch((err) => {
           console.log({ saveUserHomePageConfig: err });
@@ -332,6 +333,7 @@ const homePage = (props) => {
           'homeProperty',
           'layoutTemplate',
         ]);
+        setTemplate([]);
         message.success('删除成功');
       })
       .catch((err) => {
@@ -340,6 +342,9 @@ const homePage = (props) => {
   };
 
   useEffect(() => {
+    if (localStorage.getItem('layoutTemplate')) {
+      setTemplate(['1-0']);
+    }
     // 从内存中获取并回显
     if (!homeDom) return;
     // 默认模板
@@ -360,6 +365,7 @@ const homePage = (props) => {
   const goToIndexPage = () => {
     history.push({ pathname: '/homeIndex' });
   };
+
   return (
     <div className="home-page">
       <Layout>

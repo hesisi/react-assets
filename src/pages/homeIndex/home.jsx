@@ -6,7 +6,7 @@ import 'swiper/modules/pagination/pagination.min.css';
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import './home.less';
-import { Divider } from 'antd';
+import { Divider, Spin } from 'antd';
 import { DownCircleOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import HomePage from '@/pages/previewPage/homePage';
@@ -189,7 +189,11 @@ export default function Home(params) {
             </div>
           )}
         </div>
-      ) : null}
+      ) : (
+        <div className="home-container__spin">
+          <Spin size="large" />
+        </div>
+      )}
     </div>
   );
 }

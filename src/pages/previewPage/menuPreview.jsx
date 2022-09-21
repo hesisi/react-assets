@@ -7,30 +7,31 @@ import {
 import { Layout, Menu, Col, Row } from 'antd';
 import React, { useEffect, useState } from 'react';
 import './menuPreview.less';
-import eventBus from '../../utils/eventBus';
-import { Link } from 'umi';
+// import eventBus from '../../utils/eventBus';
+// import { Link } from 'umi';
+import { list } from '../menuManage/menuList/iconBox';
 
-const { Header, Content, Sider } = Layout;
-let items = [];
-let config = {};
+const { Header, Sider, Content } = Layout;
+// let items = JSON.parse(localStorage.getItem('setTree')) || [];
+// let config = {};
 let treeObj = {};
 
-eventBus.addListener('setTree', (tree, menuConfig) => {
-  // 不写话第一次打开无法显示
-  items = tree;
-  config = menuConfig;
-  const temp = (data) => {
-    data.forEach((item) => {
-      treeObj[item.key] = item.address;
-      if (item.children && item.children.length) {
-        temp(item.children);
-      }
-    });
-  };
-  temp(tree);
-});
+// eventBus.addListener('setTree', (tree, menuConfig) => {
+//   // 不写话第一次打开无法显示
+//   items = tree;
+//   config = menuConfig;
+//   const temp = (data) => {
+//     data.forEach((item) => {
+//       treeObj[item.key] = item.address;
+//       if (item.children && item.children.length) {
+//         temp(item.children);
+//       }
+//     });
+//   };
+//   temp(tree);
+// });
 
-export default function menuPreview() {
+const menuPreview = () => {
   const header = ['horizontal', 'horizontalAndVertical'];
   const sider = ['inline', 'horizontalAndVertical'];
 
@@ -44,75 +45,92 @@ export default function menuPreview() {
 
   const [mode, setMode] = useState('inline');
   const [headerMode, setHeaderMode] = useState('horizontal');
-  const setMenu = () => {
-    switch (config.mode) {
-      case 'horizontal':
-        setHeaderMode('horizontal');
-        break;
-      case 'inline':
-        setMode('inline');
-        break;
-      case 'horizontalAndVertical':
-        setMode('inline');
-        setHeaderMode('horizontal');
-        break;
-      default:
-        setMode('model');
-        setHeaderMode('model');
-        break;
-    }
 
-    if (config.type === 'vertical') {
-      setMode('vertical');
-    }
+  const [config, setConfig] = useState({
+    mode: 'horizontalAndVertical',
+    theme1: 'light',
+    theme2: 'dark',
+    type: 'inline',
+  });
+  const [items, setItems] = useState([]);
+
+  // const setMenu = (config) => {
+  //   if (!config) {
+  //     return;
+  //   }
+  //   switch (config.mode) {
+  //     case 'horizontal':
+  //       setHeaderMode('horizontal');
+  //       break;
+  //     case 'inline':
+  //       setMode('inline');
+  //       break;
+  //     case 'horizontalAndVertical':
+  //       setMode('inline');
+  //       setHeaderMode('horizontal');
+  //       break;
+  //     default:
+  //       setMode('model');
+  //       setHeaderMode('model');
+  //       break;
+  //   }
+
+  //   if (config.type === 'vertical') {
+  //     setMode('vertical');
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   setMenu();
+  //   // eventBus.addListener('setTree', (tree, menuConfig) => {
+  //   //   items = tree;
+  //   //   config = menuConfig;
+  //   // });
+  // }, [config]);
+
+  const temp = (data) => {
+    data.forEach((item) => {
+      treeObj[item.key] = item.address;
+      item['icon'] =
+        (item?.icon && item.icon > 0) || item?.icon === 0
+          ? React.createElement(list[item.icon])
+          : null;
+      if (item.children && item.children.length) {
+        temp(item.children);
+      }
+    });
+    return data;
   };
 
   useEffect(() => {
-    setMenu();
-    eventBus.addListener('setTree', (tree, menuConfig) => {
-      items = tree;
-      config = menuConfig;
-    });
-  }, [config]);
+    let itemsInit = JSON.parse(localStorage.getItem('setTree')) || [];
+    itemsInit = temp(itemsInit);
+    const configInit = JSON.parse(localStorage.getItem('menuConfig')) || {};
 
-  useEffect(() => {
-    // 离开时清空menu
-    return () => {
-      items = [];
-      config = {};
-    };
+    setConfig(configInit);
+    setItems(itemsInit);
+    // setMenu(configInit);
   }, []);
 
   return (
     <Layout>
-      {/* 常规或水平模式 */}
-      <Row className="menuPriviewBack">
-        <Col span={8}>
-          <Link to="/menuManage/menuList">
-            <LeftOutlined />
-            返回
-          </Link>
-        </Col>
-      </Row>
-      {header.includes(config.mode) ? (
-        <Header
-          className={
-            config.theme2 === 'light' ? 'background-light' : 'background-dark'
+      <Header
+        className={
+          config?.theme2 === 'light' ? 'background-light' : 'background-dark'
+        }
+      >
+        <Menu
+          onClick={() => onClick()}
+          defaultSelectedKeys={[]}
+          defaultOpenKeys={[]}
+          mode={
+            config.mode === 'horizontalAndVertical' ? 'horizontal' : config.mode
           }
-        >
-          <Menu
-            onClick={onClick}
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
-            mode={headerMode}
-            items={items}
-            theme={config.theme2}
-            className="header-menu"
-          />
-        </Header>
-      ) : (
-        <></>
-      )}
+          items={items}
+          theme={config.theme2}
+          className="header-menu"
+        />
+      </Header>
       <Content
         style={{
           height: 'calc(100vh - 64px)',
@@ -135,17 +153,20 @@ export default function menuPreview() {
               width={200}
             >
               <Menu
-                onClick={onClick}
-                defaultSelectedKeys={['1']}
-                defaultOpenKeys={['sub1']}
-                mode={mode}
+                onClick={() => onClick()}
+                defaultSelectedKeys={[]}
+                defaultOpenKeys={[]}
+                mode={
+                  config.mode === 'horizontalAndVertical'
+                    ? 'inline'
+                    : config.mode
+                }
                 items={items}
                 theme={config.theme1}
               />
             </Sider>
-          ) : (
-            <></>
-          )}
+          ) : null}
+
           <Content
             style={{
               // padding: '0 24px',
@@ -171,4 +192,6 @@ export default function menuPreview() {
       </Content>
     </Layout>
   );
-}
+};
+
+export default menuPreview;

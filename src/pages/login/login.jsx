@@ -14,6 +14,8 @@ const testImg = require('../../assets/images/登录页.png');
 import { history } from 'umi';
 import { useState, useEffect } from 'react';
 import { userLogin, getUserLoginValidatePic } from '@/services/userLogin';
+import localForage from 'localforage';
+import { getMenuList } from '@/services/menu';
 const Login = () => {
   const [showLabel, setShowLabel] = useState('');
   const [validatePic, setValidatePic] = useState('');
@@ -35,11 +37,16 @@ const Login = () => {
         if (!data.isReset) {
           history.push('resetPassword');
         } else {
-          history.push('homeIndex');
+          getMenuList().then(async (res) => {
+            await localForage.setItem(
+              'menuTreePermission',
+              res?.data?.data || [],
+            );
+            history.push('homeIndex');
+          });
         }
       } else {
         // 报错时，重新请求验证码
-        form.setFieldValue('code', '');
         getValidatePic();
       }
     });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { getUUID } from '@/utils/utils';
 import localForage from 'localforage';
-
+import { getMenuList } from '@/services/menu';
 import { LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
 
 const munuDefault = [
@@ -221,7 +221,7 @@ export const munuDefaultTree = [
       {
         title: '主页管理',
         address: '/pageManage',
-        key: getUUID(),
+        key: 'default-10',
         children: [],
       },
       // {
@@ -252,13 +252,23 @@ export const munuDefaultTree = [
   },
 ];
 
+const temp = (data) => {
+  data.forEach((item) => {
+    item.key = item.code;
+    item.address = item.path;
+    item.title = item.name;
+    item.meta = {};
+    if (item.children?.length > 0) {
+      temp(item.children);
+    }
+  });
+  return data;
+};
+
 /* 获取最新的菜单配置 */
-export const dealMenuList = () => {
-  let newMenuList = JSON.parse(localStorage.getItem('munuListTreeData'));
-  newMenuList =
-    newMenuList && newMenuList.length ? newMenuList : munuDefaultTree;
-  // localForage.setItem('menuTree', munuDefaultTree);
-  // localStorage.setItem('munuListData', JSON.stringify(newMenuList));
-  localStorage.setItem('munuListTreeData', JSON.stringify(newMenuList));
-  return newMenuList[0].children;
+export const dealMenuList = async () => {
+  const menuResult = await localForage.getItem('menuTreePermission');
+  let renderTree = [];
+  renderTree = menuResult ? temp([menuResult]) : [];
+  return renderTree?.[0]?.children || [];
 };

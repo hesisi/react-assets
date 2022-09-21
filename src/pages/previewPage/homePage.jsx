@@ -8,11 +8,11 @@ import ListCom from '@/components/listCom';
 import CarouselBanner from '@/components/carouselBanner';
 import '../pageManage/homePage/index.less';
 import '../pageManage/pageBuild/index.less';
-
+import { selectUserHomePageConfig } from '../../services/homePageConfig';
 const homePage = () => {
   const [dom, setDom] = useState([]);
   const [ids, setIds] = useState([]);
-
+  const [homeProperty, setHomeProperty] = useState({});
   const renderComponent = (com, id) => {
     switch (com) {
       case 'standard-pic':
@@ -55,28 +55,55 @@ const homePage = () => {
 
   useEffect(() => {
     let homeDom = [];
-    if (JSON.parse(window.localStorage.getItem('homeDom'))?.length > 0) {
-      homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
-    } else if (
-      JSON.parse(window.localStorage.getItem('layoutTemplate'))?.length > 0
-    ) {
-      homeDom = JSON.parse(window.localStorage.getItem('layoutTemplate'));
-    }
+    selectUserHomePageConfig()
+      .then((res) => {
+        if (
+          res.data.data.homeDom !== '' &&
+          JSON.parse(res.data.data.homeDom)?.length > 0
+        ) {
+          homeDom = JSON.parse(res.data.data.homeDom);
+          setHomeProperty(JSON.parse(res.data.data.homeProperty));
+        } else if (
+          res.data.data.layoutTemplate !== '' &&
+          JSON.parse(res.data.data.layoutTemplate)?.length > 0
+        ) {
+          homeDom = JSON.parse(res.data.data.layoutTemplate);
+        }
+        if (homeDom.length === 0) return;
+        const domArr = homeDom.map((e) => {
+          e.component = renderComponent(e.componentName, e.id);
+          e.colSpan = e.col || e.colSpan;
+          // e.className = e.className || 'default-col';
+          return e;
+        });
+        setDom(domArr);
+        setIds(domArr.map((e) => e.id));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    // if (JSON.parse(window.localStorage.getItem('homeDom'))?.length > 0) {
+    //   homeDom = JSON.parse(window.localStorage.getItem('homeDom'));
+    // } else if (
+    //   JSON.parse(window.localStorage.getItem('layoutTemplate'))?.length > 0
+    // ) {
+    //   homeDom = JSON.parse(window.localStorage.getItem('layoutTemplate'));
+    // }
     //   JSON.parse(window.localStorage.getItem('homeDom')) ||
     //   JSON.parse(window.localStorage.getItem('layoutTemplate')); // DOM元素
     // console.log(
     //   homeDom,
     //   JSON.parse(window.localStorage.getItem('layoutTemplate')),
     // );
-    if (homeDom.length === 0) return;
-    const domArr = homeDom.map((e) => {
-      e.component = renderComponent(e.componentName, e.id);
-      e.colSpan = e.col || e.colSpan;
-      // e.className = e.className || 'default-col';
-      return e;
-    });
-    setDom(domArr);
-    setIds(domArr.map((e) => e.id));
+    // if (homeDom.length === 0) return;
+    // const domArr = homeDom.map((e) => {
+    //   e.component = renderComponent(e.componentName, e.id);
+    //   e.colSpan = e.col || e.colSpan;
+    //   // e.className = e.className || 'default-col';
+    //   return e;
+    // });
+    // setDom(domArr);
+    // setIds(domArr.map((e) => e.id));
   }, []);
 
   useEffect(() => {
@@ -84,9 +111,9 @@ const homePage = () => {
       e.style.cursor = 'default';
     });
 
-    const homeProperty = JSON.parse(
-      window.localStorage.getItem('homeProperty'),
-    );
+    // const homeProperty = JSON.parse(
+    //   window.localStorage.getItem('homeProperty'),
+    // );
     if (Object.keys(homeProperty).length < 1) return;
 
     // ids.forEach((e) => {
@@ -113,7 +140,7 @@ const homePage = () => {
   }, [dom]);
 
   return (
-    <div style={{ height: '100vh', width: '100vw' }}>
+    <div style={{ height: 'calc(100vh - 52px)', width: '100vw' }}>
       <Row className="content-box__row">
         <Col span={24}>{dom.length > 0 ? renderDom(dom) : <></>}</Col>
       </Row>

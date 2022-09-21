@@ -335,14 +335,16 @@ export default [
     path: '/previewPage/pagePreview',
     component: '@/pages/previewPage/pagePreview',
     meta: { navHidden: true },
-    wrappers: ['@/wrappers/auth'],
+    // FIXME:
+    // wrappers: ['@/wrappers/auth'],
   },
   {
     name: '首页预览',
     path: '/previewPage/homePage',
     component: '@/pages/previewPage/homePage',
     meta: { navHidden: true },
-    wrappers: ['@/wrappers/auth'],
+    // FIXME:
+    // wrappers: ['@/wrappers/auth'],
   },
   {
     name: '登录页',

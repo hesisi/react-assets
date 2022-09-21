@@ -11,7 +11,7 @@ import routes from './routes.js';
 
 import postCssPxToViewport from 'postcss-px-to-viewport';
 
-const baosanIp = '10.173.88.85:9201/';
+const baosanIp = '10.173.94.163:9202/';
 const liqingIp = '10.173.73.4:9202/';
 export default defineConfig({
   nodeModulesTransform: {
@@ -65,15 +65,18 @@ export default defineConfig({
         /node_modules/,
         /activityCenter/,
         /activityManage/,
+        /formManage/,
         /userManage/,
         /menuManage/,
         /layouts/,
         /previewPage/,
         /notificationCenter/,
         /components/,
+        /assets/,
       ], // 设置忽略文件，用正则做目录名匹配
       include: [/homeIndex/], // 设置需要使用的文件
       landscape: false, // 是否处理横屏情况
     }),
   ],
+  mock: {},
 });

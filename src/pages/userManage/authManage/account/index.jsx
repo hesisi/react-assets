@@ -749,6 +749,16 @@ export default function Account({ accountIdenty = 'user' }) {
                     >
                       批量添加
                     </span>
+                    {!userAddC && (
+                      <a
+                        onClick={() => {
+                          downloadTemplate();
+                        }}
+                        style={{ fontSize: '12px', float: 'right' }}
+                      >
+                        模板下载
+                      </a>
+                    )}
                   </span>
                 )}
                 <div
@@ -852,14 +862,6 @@ export default function Account({ accountIdenty = 'user' }) {
                           最大文件大小限制为20MB
                         </p>
                       </Dragger>
-                      <a
-                        onClick={() => {
-                          downloadTemplate();
-                        }}
-                        style={{ fontSize: '12px', float: 'right' }}
-                      >
-                        模板下载
-                      </a>
                     </>
                   )}
                 </div>

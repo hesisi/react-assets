@@ -123,7 +123,7 @@ const CommonLayout = (props) => {
     },
   ]);
   const [accountName, setAccountName] = useState(
-    `${window.localStorage.getItem('accountName')}啊啊啊啊啊啊啊啊啊啊` || '',
+    window.localStorage.getItem('accountName') || '',
   ); // 用户名
 
   const activePath = props.location.pathname;

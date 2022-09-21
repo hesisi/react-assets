@@ -51,12 +51,6 @@ import moment from 'moment';
 const { Dragger } = Upload;
 const { Option } = Select;
 const { confirm } = Modal;
-// const data = [
-//   { name: '耐克', id: getUUID() },
-//   { name: '阿迪达斯', id: getUUID() },
-//   { name: '李宁', id: getUUID() },
-//   { name: '贵人鸟', id: getUUID() },
-// ];
 const { Search } = Input;
 export default function Account({ accountIdenty = 'user' }) {
   const formRef = useRef(null);
@@ -68,7 +62,6 @@ export default function Account({ accountIdenty = 'user' }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalGVisible, setIsModalGVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [selectedGRowKeys, setSelectedGRowKeys] = useState([]);
   const [searchName, setSearchName] = useState('');
   const [fileList, setFileList] = useState([]);
   const [showErrReport, setShowErrReport] = useState(false);
@@ -233,14 +226,11 @@ export default function Account({ accountIdenty = 'user' }) {
   ];
 
   useEffect(async () => {
-    // const initUserData = await localForage.getItem('userList');
     getUserListByPage('', pageInfo);
     getGroupList();
-    // goupArr.current = (await localForage.getItem('userGroup')) || data;
-    // localForage.setItem('userGroup', goupArr.current);
-    // setDataSource(initUserData || []);
   }, []);
 
+  //分页获取用户列表
   const getUserListByPage = async (name, userDTO) => {
     await getUserList({ name: name, ...userDTO }).then((res) => {
       if (res?.data?.isSuccess > 0) {
@@ -257,6 +247,7 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  //获取分组列表信息
   const getGroupList = async () => {
     await getUserGroupList().then((res) => {
       if (res?.data?.isSuccess > 0) {
@@ -267,6 +258,7 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  //用户列表分组信息显示处理
   const filterGroup = (text) => {
     const Group = dataGSource.filter((item) => text.includes(item.id)) || [];
     let arr = [];
@@ -276,25 +268,18 @@ export default function Account({ accountIdenty = 'user' }) {
     return arr.join('; ');
   };
 
+  //获取已选用户
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  // const onSelectGChange = (newSelectedRowKeys) => {
-  //   setSelectedGRowKeys(newSelectedRowKeys);
-  // };
-
-  // const rowGSelection = {
-  //   selectedGRowKeys,
-  //   onChange: onSelectGChange,
-  // };
-
-  /* 用户添加， 选择用户 */
+  /* 用户添加，选择用户 */
   const handleAccountAdd = () => {
     eidtIdenty.current = false;
     setIsModalVisible(true);
   };
 
+  //获取已选择分组
   const handleGroup = () => {
     if (!selectedRowKeys?.length) {
       message.warn('请选择至少一条数据');
@@ -302,7 +287,8 @@ export default function Account({ accountIdenty = 'user' }) {
     }
     setIsModalGVisible(true);
   };
-  //批量新增的模板，下载
+
+  //批量新增模板的下载
   const downloadTemplate = () => {
     getTemplate().then((res) => {
       if (res) {
@@ -320,6 +306,7 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  //批量新增文档上传
   const handleUpload = () => {
     const formData = new FormData();
     fileList.forEach((file) => {
@@ -333,12 +320,12 @@ export default function Account({ accountIdenty = 'user' }) {
         setIsModalVisible(false);
         getUserListByPage(searchName, pageInfo);
       } else {
-        // message.error(res.data.message);
         setShowErrReport(true);
       }
     });
   };
 
+  //上传属性配置
   const props = {
     name: 'file',
     multiple: false,
@@ -374,8 +361,10 @@ export default function Account({ accountIdenty = 'user' }) {
     setUserAddC(identy);
   };
 
+  //新增or编辑确认
   const handleOk = () => {
     if (userAddC) {
+      //true为单个，false为批量
       formRef.current
         .validateFields()
         .then((values) => {
@@ -384,8 +373,6 @@ export default function Account({ accountIdenty = 'user' }) {
             const userItem = {
               ...values,
               id: currentId.current,
-              // code: values.userName,
-              // realName: values.userName,
             };
             console.log('newUser', userItem);
             updateOneUser({ ...userItem }).then((res) => {
@@ -402,15 +389,11 @@ export default function Account({ accountIdenty = 'user' }) {
                   job: undefined,
                   groupList: undefined,
                 });
-              } else {
-                // message.error(res.data.message);
               }
             });
           } else {
             const userItem = {
               ...values,
-              // code: values.userName,
-              // realName: values.userName,
             };
             console.log('newUser', userItem);
             addOneUser({ ...userItem }).then((res) => {
@@ -444,6 +427,7 @@ export default function Account({ accountIdenty = 'user' }) {
     }
   };
 
+  //批量分组确认
   const handleGOk = () => {
     groupFormRef.current.validateFields().then((values) => {
       if (!values?.groupList?.length) {
@@ -491,6 +475,7 @@ export default function Account({ accountIdenty = 'user' }) {
     setIsModalVisible(true);
   };
 
+  //批量删除
   const handleBatchDelete = () => {
     if (!selectedRowKeys?.length) {
       message.warn('请选择一条数据');
@@ -499,6 +484,7 @@ export default function Account({ accountIdenty = 'user' }) {
     handleDelete(selectedRowKeys);
   };
 
+  //单个删除
   const handleDelete = async (idArr = []) => {
     confirm({
       title: '确认删除吗',
@@ -520,6 +506,7 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  //密码重置
   const handleReset = (id) => {
     resetPasswd(id).then((res) => {
       if (res?.data?.isSuccess > 0) {
@@ -530,7 +517,8 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
-  const creatSelct = (list = [], place = '') => {
+  //生成单选选择框
+  const creatSelect = (list = [], place = '') => {
     return (
       <Select placeholder={place} allowClear>
         {list.map((x) => {
@@ -543,6 +531,8 @@ export default function Account({ accountIdenty = 'user' }) {
       </Select>
     );
   };
+
+  //生成多选选择框
   const creatMultipleSelect = (list = [], place = '') => {
     return (
       <Select mode="multiple" placeholder={place} maxTagCount={3}>
@@ -557,6 +547,7 @@ export default function Account({ accountIdenty = 'user' }) {
     );
   };
 
+  //通过用户名获取用户列表
   const handleUserSearch = (value) => {
     setPageInfo({
       ...pageInfo,
@@ -566,6 +557,7 @@ export default function Account({ accountIdenty = 'user' }) {
     getUserListByPage(value, { ...pageInfo, pageNum: 1 });
   };
 
+  //翻页，页面跳转
   const handlePageChange = (num, pageSize) => {
     const newPageInfo = {
       ...pageInfo,
@@ -763,7 +755,7 @@ export default function Account({ accountIdenty = 'user' }) {
                         </Col>
                         <Col span={12}>
                           <Form.Item label="性别" name="gender">
-                            {creatSelct(
+                            {creatSelect(
                               [
                                 { value: '男', label: '男' },
                                 { value: '女', label: '女' },
@@ -806,7 +798,7 @@ export default function Account({ accountIdenty = 'user' }) {
                       <Row>
                         <Col span={12}>
                           <Form.Item label="岗位" name="job">
-                            {creatSelct(workList, '请选择岗位')}
+                            {creatSelect(workList, '请选择岗位')}
                           </Form.Item>
                         </Col>
                         <Col span={12}>

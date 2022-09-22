@@ -4,6 +4,7 @@ import { Scrollbars } from 'react-custom-scrollbars';
 import { munuDefaultTree } from '../../../../config/routesDy';
 import { list } from './iconBox';
 import { cloneDeep } from 'lodash';
+import localForage from 'localforage';
 import {
   EditOutlined,
   DeleteOutlined,

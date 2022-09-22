@@ -13,6 +13,7 @@ import postCssPxToViewport from 'postcss-px-to-viewport';
 
 const baosanIp = '10.173.94.163:9202/';
 const liqingIp = '10.173.73.4:9202/';
+const liuyuIp = '172.16.100.238:9203/';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -45,6 +46,9 @@ export default defineConfig({
     // '/rolePermission': {
     //   target: `http://${baosanIp}`, // 田宝山
     // },
+    '/dynamicForm': {
+      target: `http://${liuyuIp}`, // 刘宇
+    },
   },
   // publicPath: '/',
 

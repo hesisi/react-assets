@@ -251,7 +251,8 @@ export default [
     path: '/formManage',
     component: '@/layouts/formManageLayout',
     key: 'default-6',
-    wrappers: ['@/wrappers/auth'],
+    // FIXME:
+    // wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/formManage',
@@ -272,7 +273,8 @@ export default [
           showMenu: false,
           showHeader: true,
         },
-        wrappers: ['@/wrappers/auth'],
+        // FIXME:
+        // wrappers: ['@/wrappers/auth'],
       },
       {
         name: '动态表单',
@@ -283,7 +285,8 @@ export default [
           showHeader: true,
           // breadcrumb: [{ label: '表单管理' }, { label: '表单列表' }],
         },
-        wrappers: ['@/wrappers/auth'],
+        // FIXME:
+        // wrappers: ['@/wrappers/auth'],
       },
       {
         name: '表单demo',
@@ -291,7 +294,8 @@ export default [
         component: '@/pages/formManage/formPreview/formPreview',
         hidden: true,
         meta: { showMenu: false, showHeader: true },
-        wrappers: ['@/wrappers/auth'],
+        // FIXME:
+        // wrappers: ['@/wrappers/auth'],
       },
       {
         name: '列表demo',
@@ -299,7 +303,8 @@ export default [
         component: '@/pages/formManage/formPreview/tablePreview',
         hidden: true,
         meta: { showMenu: false, showHeader: true },
-        wrappers: ['@/wrappers/auth'],
+        // FIXME:
+        // wrappers: ['@/wrappers/auth'],
       },
     ],
   },

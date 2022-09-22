@@ -22,6 +22,7 @@ import {
   Radio,
   Switch,
   message,
+  Spin,
 } from 'antd';
 const { Content } = Layout;
 import { useEffect, useRef, useState } from 'react';
@@ -55,8 +56,8 @@ const { TextArea } = Input;
 
 const initFormInfo = {
   formName: '',
-  formDesc: '',
-  formCode: '',
+  remark: '',
+  formId: '',
   createTime: '',
   updateTime: '',
   formStatus: 'enable',
@@ -79,17 +80,26 @@ export default function FormList() {
 
   const [urlVisible, setUrlVisible] = useState(false);
   const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // 获取formList
-  const getFormList = () => {
-    // formApi.getFormList().then((res) => {
-    //   setDataSource(res.list);
-    // });
-    const data =
-      (localStorage.getItem('formList') &&
-        JSON.parse(localStorage.getItem('formList'))) ||
-      [];
-    setDataSource(data);
+  const getFormList = (hasLoading = true) => {
+    // 删除为空的检索条件
+    const data = formRef.current.getFieldsValue();
+    for (let k in data) {
+      if (data[k] === '') {
+        delete data[k];
+      }
+    }
+    if (hasLoading) {
+      setLoading(true);
+    }
+    formApi
+      .getFormList(data)
+      .then((res) => {
+        setDataSource(res.object);
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
@@ -109,29 +119,38 @@ export default function FormList() {
 
   // 设置表单的状态
   const formStatusHandler = (record) => {
-    const arr = dataSource.map((e) => {
-      if (e.formCode === record.formCode) {
-        e.formStatus = record.formStatus === 'enable' ? 'disabled' : 'enable';
-      }
-      return e;
-    });
-    setDataSource(arr);
-    saveFormList(arr);
+    const { formId, formStatus } = record;
+    formApi
+      .changeFormStatus({
+        formId,
+        formStatus: formStatus === 'enable' ? 'disabled' : 'enable',
+      })
+      .then((res) => {
+        getFormList(false);
+      });
+    // const arr = dataSource.map((e) => {
+    //   if (e.formId === record.formId) {
+    //     e.formStatus = record.formStatus === 'enable' ? 'disabled' : 'enable';
+    //   }
+    //   return e;
+    // });
+    // setDataSource(arr);
+    // saveFormList(arr);
 
-    if (record.formStatus === 'enable') {
-      setUrlVisible(true);
-      const urlStr = `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${record.formCode}`;
-      setUrl(urlStr);
-      const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
-        (e) => {
-          if (e.formCode === record.formCode) {
-            e.formUrl = urlStr;
-          }
-          return e;
-        },
-      );
-      window.localStorage.setItem('formList', JSON.stringify(formList));
-    }
+    // if (record.formStatus === 'enable') {
+    //   setUrlVisible(true);
+    //   const urlStr = `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${record.formCode}`;
+    //   setUrl(urlStr);
+    //   const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
+    //     (e) => {
+    //       if (e.formId === record.formId) {
+    //         e.formUrl = urlStr;
+    //       }
+    //       return e;
+    //     },
+    //   );
+    //   window.localStorage.setItem('formList', JSON.stringify(formList));
+    // }
   };
 
   // 表格配置项
@@ -143,8 +162,8 @@ export default function FormList() {
     },
     {
       title: '表单编号',
-      dataIndex: 'formCode',
-      key: 'formCode',
+      dataIndex: 'formId',
+      key: 'formId',
       align: 'center',
       width: 200,
       render: (text) => {
@@ -197,6 +216,7 @@ export default function FormList() {
             unCheckedChildren="禁用"
             checked={record.formStatus === 'enable'}
             onClick={() => formStatusHandler(record)}
+            size="large"
           />
         );
       },
@@ -243,11 +263,12 @@ export default function FormList() {
       title: '确定要删除吗',
       content: '该操作不可逆，请谨慎操作！',
       onOk: () => {
-        const data = dataSource.filter(
-          (item) => item.formCode !== record.formCode,
-        );
-        setDataSource(data);
-        saveFormList(data);
+        formApi.deleteFormById({ formId: record.formId }).then((res) => {
+          getFormList();
+        });
+        // const data = dataSource.filter((item) => item.formId !== record.formId);
+        // setDataSource(data);
+        // saveFormList(data);
       },
     });
   };
@@ -267,51 +288,18 @@ export default function FormList() {
     });
   };
 
+  // 新建表单
   const handleOk = () => {
-    formRefNew.current
-      ?.validateFields()
-      .then(() => {
-        let item = null;
-        const currentTime = moment().format(timeFormat);
-        if (operateType === 'add') {
-          item = {
-            formName: formInfo.formName,
-            formDesc: formInfo.formDesc,
-            formCode: getUUID(),
-            createTime: currentTime,
-            updateTime: currentTime,
-            formStatus: 'disabled',
-            formUrl: '',
-          };
-
-          const data = cloneDeep(dataSource);
-          data.unshift(item);
-          setDataSource(data);
-          saveFormList(data);
-        } else {
-          item = {
-            formStatus: 'enable',
-            ...formInfo,
-            updateTime: currentTime,
-          };
-          const data =
-            dataSource &&
-            dataSource.map((i) => {
-              if (i.formCode === formInfo.formCode) {
-                i = item;
-              }
-              return i;
-            });
-          setDataSource(data);
-          saveFormList(data);
-        }
-
+    formRefNew?.current?.validateFields()?.then(() => {
+      const data = {
+        ...formRefNew.current.getFieldsValue(),
+        formStatus: 'disabled', // 默认禁用状态
+      };
+      formApi.createForm(data).then((res) => {
         setVisible(false);
-        setFormInfo(initFormInfo); // 清空
-
-        history.push(`/formManage/formAndTable?formCode=${item.formCode}`);
-      })
-      .catch(() => {});
+        history.push(`/formManage/formAndTable?formCode=${res.object}`);
+      });
+    });
   };
 
   // 取消表单
@@ -331,7 +319,7 @@ export default function FormList() {
     // 页面跳转方法
     history.push({
       pathname: '/formManage/formAndTable',
-      search: `formCode=${record.formCode}`,
+      search: `formCode=${record.formId}`,
     });
   };
 
@@ -344,33 +332,7 @@ export default function FormList() {
 
   // 检索
   const searchHandler = () => {
-    const { formName, formStatus } = formRef.current.getFieldsValue();
-    if (!formName && !formStatus) {
-      getFormList();
-      return;
-    }
-
-    const source =
-      (localStorage.getItem('formList') &&
-        JSON.parse(localStorage.getItem('formList'))) ||
-      [];
-
-    const data = source.filter((e) => {
-      if (formName && formStatus) {
-        return (
-          e.formName.indexOf(formName) !== -1 && e.formStatus === formStatus
-        );
-      }
-      if (formName) {
-        return e.formName.indexOf(formName) !== -1;
-      }
-      if (formStatus) {
-        return e.formStatus === formStatus;
-      }
-
-      return e.formName.indexOf(formName) !== -1 || e.formStatus === formStatus;
-    });
-    setDataSource(data);
+    getFormList();
   };
 
   // 批量删除
@@ -380,12 +342,15 @@ export default function FormList() {
       title: '确定要删除吗',
       content: '该操作不可逆，请谨慎操作！',
       onOk: () => {
-        let data = dataSource;
-        selectedRowKeys.forEach((item) => {
-          data = data.filter((e) => e.formCode !== item);
+        formApi.batchDeleteForm({ formIdList: selectedRowKeys }).then((res) => {
+          getFormList();
         });
-        setDataSource(data);
-        saveFormList(data);
+        // let data = dataSource;
+        // selectedRowKeys.forEach((item) => {
+        //   data = data.filter((e) => e.formId !== item);
+        // });
+        // setDataSource(data);
+        // saveFormList(data);
       },
     });
   };
@@ -491,20 +456,22 @@ export default function FormList() {
           {/* <Row justify="end" style={{ padding: '20px 0' }}></Row> */}
 
           {/* 列表部分 */}
-          <Table
-            columns={columns}
-            dataSource={dataSource}
-            rowKey={(record) => record.formCode}
-            rowSelection={rowSelection}
-            sticky={true}
-            scroll={{ x: '100%' }}
-            className="default-table"
-            pagination={{
-              itemRender,
-              showSizeChanger: false,
-              showTotal,
-            }}
-          />
+          <Spin spinning={loading}>
+            <Table
+              columns={columns}
+              dataSource={dataSource}
+              rowKey={(record) => record.formId}
+              rowSelection={rowSelection}
+              sticky={true}
+              scroll={{ x: '100%' }}
+              className="default-table"
+              pagination={{
+                itemRender,
+                showSizeChanger: false,
+                showTotal,
+              }}
+            />
+          </Spin>
         </Content>
       </Layout>
 
@@ -519,7 +486,12 @@ export default function FormList() {
         cancelText="取消"
         okText="确认"
       >
-        <Form layout="vertical" ref={formRefNew} name="basic">
+        <Form
+          layout="vertical"
+          ref={formRefNew}
+          name="basic"
+          initialValues={{ createType: 'canvas' }}
+        >
           <Form.Item
             label="表单名称"
             name="formName"
@@ -543,20 +515,19 @@ export default function FormList() {
             />
           </Form.Item>
 
-          <Form.Item label="创建方式">
-            <Radio.Group defaultValue="canvas" className="default-radio">
+          <Form.Item label="创建方式" name="createType">
+            <Radio.Group className="default-radio">
               <Radio value="canvas">画布创建</Radio>
               <Radio value="template">模板创建</Radio>
               <Radio value="data">数据创建</Radio>
             </Radio.Group>
           </Form.Item>
 
-          <Form.Item label="备注">
+          <Form.Item label="备注" name="remark">
             <TextArea
-              value={formInfo.formDesc}
               onChange={(e) =>
                 onChange({
-                  formDesc: e.target.value,
+                  remark: e.target.value,
                 })
               }
               placeholder="请输入"

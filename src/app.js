@@ -6,16 +6,8 @@ export function render(oldRender) {
   if (isLogin) {
     getMenuList()
       .then(async (res) => {
-        // console.log('callback', res);
-        try {
-          await localForage.setItem(
-            'menuTreePermission',
-            res?.data?.data || [],
-          );
-          oldRender && oldRender();
-        } catch {
-          oldRender && oldRender();
-        }
+        await localForage.setItem('menuTreePermission', res?.data?.data || []);
+        oldRender && oldRender();
       })
       .finally(() => {
         oldRender && oldRender();

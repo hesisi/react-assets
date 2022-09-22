@@ -28,12 +28,12 @@ export default defineConfig({
   proxy: {
     '/assets/messageData': {
       // target: config.infraApiOrigin, // 头部infra配置地址
-      target: 'http://10.173.88.85:9201/', // 韩振宇
+      target: 'http://10.173.80.130:9201/', // 韩振宇
       // target: `http://${liqingIp}`, // 田宝山
     },
     '/assets/': {
       // target: config.infraApiOrigin, // 头部infra配置地址
-      target: 'http://10.173.88.85:9201/', // 韩振宇
+      target: 'http://10.173.80.130:9201/', // 韩振宇
       // target: `http://${baosanIp}`, // 田宝山
     },
     // '/role': {

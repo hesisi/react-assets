@@ -13,13 +13,13 @@ import ConfigPanel from './configPanel';
 import MenuTree from './menuTree';
 import MenuConfig from './menuConfig';
 import React, { useState, useRef } from 'react';
+import { useDispatch } from 'umi';
 import { useHistory } from 'react-router-dom';
 // import eventBus from '../../../utils/eventBus';
 import localForage from 'localforage';
 import { cloneDeep } from 'lodash';
 import ContentHeader from '@/components/contentHeader';
 import { saveMenuList } from '@/services/menu';
-
 const back = require('@/assets/icons/back2.svg');
 const { Header, Footer, Sider, Content } = Layout;
 export default function IndexPage() {
@@ -31,7 +31,7 @@ export default function IndexPage() {
   //   pageDataPrev = JSON.parse(pageDataPrev) || {};
   //   formDataInit = pageDataPrev.formDataPrev;
   // }
-
+  const dispatch = useDispatch();
   const formRef = useRef(null);
   const configPanelRef = useRef(null);
   const [config, setConfig] = useState(null); // 配置面板相关
@@ -179,10 +179,21 @@ export default function IndexPage() {
         return;
       }
       const saveResult = await saveMenuList(sendItemsList);
+
       if (saveResult?.data?.isSuccess !== -1) {
         localStorage.setItem('munuListTreeData', JSON.stringify(treeDataSave));
         message.success('菜单保存成功!');
-        location.reload();
+        dispatch({
+          type: 'menu/getMenu',
+          payload: {},
+          callback: async (res) => {
+            await localForage.setItem(
+              'menuTreePermission',
+              res?.data?.data || [],
+            );
+            location.reload();
+          },
+        });
       }
     }
   };

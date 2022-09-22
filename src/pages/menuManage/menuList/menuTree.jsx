@@ -13,13 +13,13 @@ import {
 
 import { getMenuList } from '@/services/menu';
 import { getUUID } from '@/utils/utils';
-import localForage from 'localforage';
 
 const { TreeNode } = Tree;
 const { Search } = Input;
 const { confirm } = Modal;
-const defaultTreeParaent = munuDefaultTree;
-let curerntTree = defaultTreeParaent;
+
+const defaultTreeParaent = [];
+let curerntTree = [];
 
 let defaultTrreData = {
   current: [],
@@ -50,7 +50,10 @@ function menuTree(props) {
     setIsLoading(false);
     // 获取保存treeData 初始化
     const treeSaveDataInit = await getMenuList();
-    const treeSaveData = treeSaveDataInit?.data?.data || munuDefaultTree;
+    if (!treeSaveDataInit?.data?.data) {
+      await localForage.removeItem('menuTreePermission');
+    }
+    const treeSaveData = treeSaveDataInit?.data?.data || [];
     if (treeSaveData?.children && treeSaveData?.children.length) {
       defaultTrreData.current = [];
       const temp = (data) => {
@@ -72,8 +75,8 @@ function menuTree(props) {
         return data;
       };
       const treeInit = temp([treeSaveData]);
-      setExpandedKeys([treeInit[0].key] || []);
       setTreeData([...treeInit]); // 这样才可以动态更新掉视图上的数据
+      setExpandedKeys([treeInit[0].key] || []);
       curerntTree = [...treeInit];
       props.setTree([...treeInit]);
     }

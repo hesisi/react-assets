@@ -75,8 +75,8 @@ function menuTree(props) {
         return data;
       };
       const treeInit = temp([treeSaveData]);
-      setExpandedKeys([treeInit[0].key] || []);
       setTreeData([...treeInit]); // 这样才可以动态更新掉视图上的数据
+      setExpandedKeys([treeInit[0].key] || []);
       curerntTree = [...treeInit];
       props.setTree([...treeInit]);
     }

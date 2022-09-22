@@ -17,8 +17,9 @@ import { getUUID } from '@/utils/utils';
 const { TreeNode } = Tree;
 const { Search } = Input;
 const { confirm } = Modal;
-const defaultTreeParaent = munuDefaultTree;
-let curerntTree = defaultTreeParaent;
+
+const defaultTreeParaent = [];
+let curerntTree = [];
 
 let defaultTrreData = {
   current: [],
@@ -49,7 +50,10 @@ function menuTree(props) {
     setIsLoading(false);
     // 获取保存treeData 初始化
     const treeSaveDataInit = await getMenuList();
-    const treeSaveData = treeSaveDataInit?.data?.data || munuDefaultTree;
+    if (!treeSaveDataInit?.data?.data) {
+      await localForage.removeItem('menuTreePermission');
+    }
+    const treeSaveData = treeSaveDataInit?.data?.data || [];
     if (treeSaveData?.children && treeSaveData?.children.length) {
       defaultTrreData.current = [];
       const temp = (data) => {

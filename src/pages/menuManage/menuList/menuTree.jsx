@@ -58,10 +58,11 @@ function menuTree(props) {
           item.key = item.code;
           item.address = item.path;
           item.title = item.name;
+          item['iconIndex'] = item.icon ? item.icon * 1 : -1;
           item['icon'] =
-            (item.icon || item.iconIndex) &&
-            (item.iconIndex >= 0 || item.icon * 1 >= 0)
-              ? React.createElement(list[item.iconIndex || item.icon * 1])
+            item['iconIndex'] === 0 ||
+            (item['iconIndex'] && item['iconIndex'] >= 0)
+              ? React.createElement(list[item.iconIndex])
               : null;
           defaultTrreData.current.push(item);
           if (item?.children?.length) {
@@ -148,6 +149,7 @@ function menuTree(props) {
       (item) => item.key === selectedNodes[0].key,
     );
 
+    console.log(selectNodeInfo, '151----');
     //这里写点击tree节点的事件逻辑 选中展示节点配置信息
     props.setForm({
       formValue: {

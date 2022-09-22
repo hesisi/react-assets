@@ -13,7 +13,6 @@ import {
 
 import { getMenuList } from '@/services/menu';
 import { getUUID } from '@/utils/utils';
-import localForage from 'localforage';
 
 const { TreeNode } = Tree;
 const { Search } = Input;

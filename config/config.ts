@@ -11,7 +11,7 @@ import routes from './routes.js';
 
 import postCssPxToViewport from 'postcss-px-to-viewport';
 
-const baosanIp = '10.173.94.163:9202/';
+const baosanIp = '10.173.91.11:9201/';
 const liqingIp = '10.173.73.4:9202/';
 export default defineConfig({
   nodeModulesTransform: {
@@ -19,6 +19,7 @@ export default defineConfig({
   },
   // mode: 'history',//去掉#号
   routes,
+  dva: {},
   fastRefresh: {},
   locale: {
     default: 'zh-CN',

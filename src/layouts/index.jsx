@@ -29,6 +29,7 @@ import { dealMenuList, newMenu } from '../../config/routesDy';
 import Styles from './index.less';
 import logo from '@/assets/icons/logo.png';
 import { list } from '@/pages/menuManage/menuList/iconBox';
+import localForage from 'localforage';
 import {
   UserOutlined,
   CarryOutOutlined,
@@ -114,6 +115,7 @@ const CommonLayout = (props) => {
   /* 初始化菜单数据 */
   const initMenu = async () => {
     await getNewRoutes();
+    console.log(newRoutes, '117----');
     newRoutes
       .filter((item) => item.title)
       ?.forEach((item) => {
@@ -171,6 +173,7 @@ const CommonLayout = (props) => {
   };
 
   useEffect(() => {
+    console.log(navBar, '174---');
     if (firstFw) {
       initMenu();
     }
@@ -260,8 +263,9 @@ const CommonLayout = (props) => {
   };
 
   // 退出
-  const loginOut = () => {
+  const loginOut = async () => {
     window.localStorage.removeItem('loginToken');
+    await localForage.removeItem('menuTreePermission');
     history.push('/login');
   };
 

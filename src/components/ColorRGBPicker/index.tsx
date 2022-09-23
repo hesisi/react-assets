@@ -37,6 +37,7 @@ const ColorRGBPicker: React.FC<{
       placement="bottomLeft"
       content={
         <SketchPicker
+          presetColors={['#0D6BFF', '#0950BF', '#092652']}
           color={newColor}
           onChangeComplete={({ hex }: any) => onValChange(hex)}
         />

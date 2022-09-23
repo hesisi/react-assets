@@ -294,7 +294,7 @@ export default function Account({ accountIdenty = 'user' }) {
     getTemplate().then((res) => {
       if (res) {
         const blob = new Blob([res.data]); //处理文档流
-        const fileName = `template.xlsx`;
+        const fileName = `template.xls`;
         const elink = document.createElement('a');
         elink.download = fileName;
         elink.style.display = 'none';
@@ -366,6 +366,7 @@ export default function Account({ accountIdenty = 'user' }) {
     },
     beforeUpload: (file) => {
       setFileList([file]);
+      setShowErrReport(false);
       return false;
     },
   };

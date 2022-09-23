@@ -118,7 +118,7 @@ export default function FormList() {
   };
 
   // 设置表单的状态
-  const formStatusHandler = (record) => {
+  const formStatusHandler = (checked, event, record) => {
     const { formId, formStatus } = record;
     const urlStr = `/formManage/formPreview/table?formCode=${formId}`;
     formApi
@@ -129,10 +129,9 @@ export default function FormList() {
       })
       .then((res) => {
         getFormList();
-
         setTimeout(() => {
           // 延后一点弹窗
-          if (formStatus === 'disabled') {
+          if (checked) {
             // 切换的时候还是禁用
             setUrlVisible(true);
             setUrl(urlStr);
@@ -203,7 +202,9 @@ export default function FormList() {
             checkedChildren="启用"
             unCheckedChildren="禁用"
             checked={record.formStatus === 'enable'}
-            onClick={() => formStatusHandler(record)}
+            onClick={(checked, event) =>
+              formStatusHandler(checked, event, record)
+            }
             size="large"
           />
         );

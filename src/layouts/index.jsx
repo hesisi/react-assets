@@ -77,12 +77,10 @@ const CommonLayout = (props) => {
     },
   });
   const selectKeyInit = `/${props.location.pathname?.split('/')[1]}`;
-  const historyMenuKey = localStorage.getItem('menuKey');
+  // const historyMenuKey = localStorage.getItem('menuKey');
   const { pathPrefix } = props;
   const [isShowMessage, setIsShowMessage] = useState(false);
-  const [selectKey, setSelectKey] = useState(
-    historyMenuKey ? JSON.parse(historyMenuKey) : [],
-  );
+  const [selectKey, setSelectKey] = useState(selectKeyInit || []);
   const messagesRef = useRef(null);
   const messagesBellRef = useRef(null);
   // const [newRoutes, setNewRoutes] = useState([])
@@ -135,30 +133,30 @@ const CommonLayout = (props) => {
         // });
         // if (isHave) {
         renderNavBar.push({
-          // key: item.address || item.path,
-          key: item.id,
-          label: (
-            <Link to={item.address || item.path}>
-              {item.title || item.name}
-            </Link>
-          ),
-          // label: permissionCode.includes(item.code) ? (
+          key: item.address || item.path,
+          // key: item.id,
+          // label: (
           //   <Link to={item.address || item.path}>
           //     {item.title || item.name}
           //   </Link>
-          // ) : (
-          //   <div
-          //     onClick={() => {
-          //       // if (item.name === '动态报表') {
-          //       window.location.href = `http://${window.location.host}${
-          //         item.address || item.path
-          //       }`;
-          //       // }
-          //     }}
-          //   >
-          //     {item.title || item.name}
-          //   </div>
           // ),
+          label: permissionCode.includes(item.code) ? (
+            <Link to={item.address || item.path}>
+              {item.title || item.name}
+            </Link>
+          ) : (
+            <div
+              onClick={() => {
+                // if (item.name === '动态报表') {
+                window.location.href = `http://${window.location.host}${
+                  item.address || item.path
+                }`;
+                // }
+              }}
+            >
+              {item.title || item.name}
+            </div>
+          ),
           // meta: item.meta,
         });
         // }
@@ -171,7 +169,7 @@ const CommonLayout = (props) => {
     // MenuList = MenuListInit;
     // navBar = navBarInit;
     // activeKey = navBarInit?.[0]?.key ? [navBarInit?.[0]?.key] : [];
-    initMenuSelect(newRoutes);
+    // initMenuSelect(newRoutes);
     setNavBar(navBarInit);
     // setSelectKey(activeKey);
   };
@@ -225,7 +223,6 @@ const CommonLayout = (props) => {
   // [];
 
   // 递归遍历左侧菜单
-
   const judgeMunuChild = (menuArr) => {
     let backArr = [];
     menuArr.forEach((item) => {
@@ -243,8 +240,8 @@ const CommonLayout = (props) => {
     return listA.map((item, index) => {
       if (item.title || item.name) {
         return {
-          // key: item.address || item.path,
-          key: item.id,
+          key: item.address || item.path,
+          // key: item.id,
           icon:
             (item?.icon && item.icon * 1 > 0) ||
             (item?.icon && item?.icon === '0')
@@ -267,7 +264,6 @@ const CommonLayout = (props) => {
     const metaInfo =
       getMetaInfoByPath(routes, path, []) &&
       getMetaInfoByPath(routes, path, [])[0];
-    console.log(metaInfo, '194-----');
     return metaInfo;
   });
 
@@ -287,13 +283,13 @@ const CommonLayout = (props) => {
   };
 
   const onHClick = (e) => {
-    localStorage.setItem('menuKey', JSON.stringify([e.key]));
+    // localStorage.setItem('menuKey', JSON.stringify([e.key]));
     setSelectKey([e.key]);
   };
 
   const clearMenu = async () => {
     await localForage.removeItem('menuTreePermission');
-    localStorage.removeItem('menuKey');
+    // localStorage.removeItem('menuKey');
     firstFw = true;
     newRoutes = [];
     renderNavBar = [];

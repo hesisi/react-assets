@@ -9,9 +9,19 @@
 import { Breadcrumb, Layout, Menu } from 'antd';
 import { Link } from 'umi';
 import React from 'react';
+import { ConfigProvider } from 'antd';
+import { useModel } from 'umi';
 
 const BasicLayout = (props) => {
-  return <>{props.children}</>;
+  const { theme } = useModel('tabMenu');
+
+  ConfigProvider.config({
+    theme: {
+      primaryColor: theme,
+    },
+  });
+  // return <>{props.children}</>;
+  <ConfigProvider>{props.children}</ConfigProvider>;
 };
 
 export default BasicLayout;

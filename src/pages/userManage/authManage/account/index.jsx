@@ -65,6 +65,7 @@ export default function Account({ accountIdenty = 'user' }) {
   const [searchName, setSearchName] = useState('');
   const [fileList, setFileList] = useState([]);
   const [showErrReport, setShowErrReport] = useState(false);
+  const [errExcel, setErrExcel] = useState('');
   const [pageInfo, setPageInfo] = useState({
     pageSize: 10,
     pageNum: 1,
@@ -293,7 +294,7 @@ export default function Account({ accountIdenty = 'user' }) {
     getTemplate().then((res) => {
       if (res) {
         const blob = new Blob([res.data]); //处理文档流
-        const fileName = `user.xls`;
+        const fileName = `template.xlsx`;
         const elink = document.createElement('a');
         elink.download = fileName;
         elink.style.display = 'none';
@@ -314,14 +315,26 @@ export default function Account({ accountIdenty = 'user' }) {
     });
     console.log('uplodefile', fileList);
     addUserByUpload(formData).then((res) => {
-      if (res.data.isSuccess > 0) {
-        setFileList([]);
-        message.success('添加成功');
-        setIsModalVisible(false);
-        getUserListByPage(searchName, pageInfo);
-      } else {
-        setShowErrReport(true);
-      }
+      // if (res.data.isSuccess>0) {
+      //   setFileList([]);
+      //   message.success('添加成功');
+      //   setIsModalVisible(false);
+      //   getUserListByPage(searchName, pageInfo);
+      // } else {
+      message.success('上传完成，上传结果请查看结果文档');
+      setShowErrReport(true);
+      console.log(res);
+      const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' }); //处理文档流
+      const fileName = `result.xls`;
+      const elink = document.createElement('a');
+      elink.download = fileName;
+      elink.style.display = 'none';
+      elink.href = URL.createObjectURL(blob);
+      document.body.appendChild(elink);
+      elink.click();
+      URL.revokeObjectURL(elink.href); // 释放URL 对象
+      document.body.removeChild(elink);
+      // }
     });
   };
 
@@ -829,9 +842,12 @@ export default function Account({ accountIdenty = 'user' }) {
                           onClick={() => {
                             downloadTemplate();
                           }}
-                          style={{ fontSize: '12px', color: '#f00' }}
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--ant-primary-color)',
+                          }}
                         >
-                          下载错误报告
+                          上传完成，请查看结果报告
                         </a>
                       )}
                     </>

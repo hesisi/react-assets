@@ -422,15 +422,11 @@ export default function FormList() {
                 <Button
                   icon={<PlusCircleOutlined />}
                   onClick={handleAdd}
-                  className="primary-btn"
+                  type="primary"
                 >
                   新增表单
                 </Button>
-                <Button
-                  icon={<CloseCircleOutlined />}
-                  onClick={deleteHandler}
-                  className="default-btn"
-                >
+                <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
                   删除表单
                 </Button>
               </Space>
@@ -469,7 +465,8 @@ export default function FormList() {
                     <Button
                       icon={<SearchOutlined />}
                       onClick={searchHandler}
-                      className="primary-btn"
+                      // className="primary-btn"
+                      type="primary"
                     >
                       搜索
                     </Button>

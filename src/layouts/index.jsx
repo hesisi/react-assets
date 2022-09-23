@@ -30,6 +30,9 @@ import Styles from './index.less';
 import logo from '@/assets/icons/logo.png';
 import { list } from '@/pages/menuManage/menuList/iconBox';
 import localForage from 'localforage';
+import { ConfigProvider } from 'antd';
+import ColorRGBPicker from '@/components/ColorRGBPicker';
+import { useModel } from 'umi';
 import {
   UserOutlined,
   CarryOutOutlined,
@@ -67,6 +70,12 @@ const getMetaInfoByPath = (routesData, path, result = []) => {
 };
 
 const CommonLayout = (props) => {
+  const { theme, dispatch } = useModel('tabMenu');
+  ConfigProvider.config({
+    theme: {
+      primaryColor: theme,
+    },
+  });
   const selectKeyInit = `/${props.location.pathname?.split('/')[1]}`;
   const historyMenuKey = localStorage.getItem('menuKey');
   const { pathPrefix } = props;
@@ -318,246 +327,261 @@ const CommonLayout = (props) => {
   );
 
   return (
-    <Layout className={Styles.layoutMain}>
-      {navBar?.length ? (
-        <>
-          <Header
-            className={Styles.header}
-            style={{ display: meta && !meta.showHeader ? 'none' : 'flex' }}
-          >
-            <div className={Styles.logo}>
-              <img src={logo} />
-            </div>
+    <ConfigProvider>
+      <Layout className={Styles.layoutMain}>
+        {navBar?.length ? (
+          <>
+            <Header
+              className={Styles.header}
+              style={{ display: meta && !meta.showHeader ? 'none' : 'flex' }}
+            >
+              <div className={Styles.logo}>
+                <img src={logo} />
+              </div>
 
-            <Menu
-              theme="dark"
-              mode="horizontal"
-              onClick={onHClick}
-              selectedKeys={selectKey}
-              // defaultSelectedKeys={[selectKey]}
-              items={navBar}
-              style={{ background: '#0D6BFF' }}
-              className={Styles['menu']}
-            />
-
-            <div className="user-message">
-              {/* 消息提醒 */}
-              {isShowMessage ? (
-                <div
-                  className="messages-warp"
-                  // onMouseOut={() => handleOutMessage()}
-                >
-                  <div className="messages" ref={messagesRef}>
-                    <div className="message_header">
-                      <span>全部标记为已读</span>
-                      <div>
-                        查看全部 <RightOutlined />
+              <Menu
+                theme="dark"
+                mode="horizontal"
+                onClick={onHClick}
+                selectedKeys={selectKey}
+                // defaultSelectedKeys={[selectKey]}
+                items={navBar}
+                // style={{ background: 'var(--ant-primary-color)' }}
+                className={Styles['menu']}
+              />
+              <div className="user-message">
+                {/* 消息提醒 */}
+                {isShowMessage ? (
+                  <div
+                    className="messages-warp"
+                    // onMouseOut={() => handleOutMessage()}
+                  >
+                    <div className="messages" ref={messagesRef}>
+                      <div className="message_header">
+                        <span>全部标记为已读</span>
+                        <div>
+                          查看全部 <RightOutlined />
+                        </div>
+                      </div>
+                      <div className="message_content">
+                        {messageList.map((item) => {
+                          return (
+                            <div
+                              className="message_item"
+                              onClick={goToMessageCenter}
+                            >
+                              <div className="icon_container">
+                                <div>{item.icon}</div>
+                              </div>
+                              <div className="item">
+                                <span className="items_title">
+                                  {item.titles}
+                                </span>
+                                <div>
+                                  <span>{item.types}</span>{' '}
+                                  <span>
+                                    {item.status ? (
+                                      <a
+                                        href="#"
+                                        className="circle"
+                                        style={{
+                                          backgroundColor:
+                                            item.status === '已完成'
+                                              ? 'green'
+                                              : 'yellow',
+                                        }}
+                                      ></a>
+                                    ) : null}
+                                    {item.status}
+                                  </span>{' '}
+                                </div>
+                                <span
+                                  style={{
+                                    fontSize: '12px',
+                                    color: 'rgb(170,170,170)',
+                                  }}
+                                >
+                                  {item.time}
+                                </span>
+                              </div>
+                              <RightOutlined />
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
-                    <div className="message_content">
-                      {messageList.map((item) => {
-                        return (
-                          <div
-                            className="message_item"
-                            onClick={goToMessageCenter}
-                          >
-                            <div className="icon_container">
-                              <div>{item.icon}</div>
-                            </div>
-                            <div className="item">
-                              <span className="items_title">{item.titles}</span>
-                              <div>
-                                <span>{item.types}</span>{' '}
-                                <span>
-                                  {item.status ? (
-                                    <a
-                                      href="#"
-                                      className="circle"
-                                      style={{
-                                        backgroundColor:
-                                          item.status === '已完成'
-                                            ? 'green'
-                                            : 'yellow',
-                                      }}
-                                    ></a>
-                                  ) : null}
-                                  {item.status}
-                                </span>{' '}
-                              </div>
-                              <span
-                                style={{
-                                  fontSize: '12px',
-                                  color: 'rgb(170,170,170)',
-                                }}
-                              >
-                                {item.time}
-                              </span>
-                            </div>
-                            <RightOutlined />
-                          </div>
-                        );
-                      })}
-                    </div>
                   </div>
-                </div>
-              ) : null}
-              {/* <Space size={30}> */}
-              <div className="header__right">
-                <div>
-                  <QuestionCircleOutlined
-                    style={{
-                      color: '#ffffff',
-                      fontSize: '16px',
-                      marginRight: '30px',
-                      verticalAlign: 'middle',
-                      // marginTop: '5px',
-                    }}
-                  />
-                </div>
+                ) : null}
+                {/* <Space size={30}> */}
+                <div className="header__right">
+                  <div style={{ marginRight: '30px' }}>
+                    <ColorRGBPicker
+                      value={theme}
+                      onChange={(e) => {
+                        dispatch({
+                          type: 'CHANGE_THEME',
+                          payload: { theme: e },
+                        });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <QuestionCircleOutlined
+                      style={{
+                        color: '#ffffff',
+                        fontSize: '16px',
+                        marginRight: '30px',
+                        verticalAlign: 'middle',
+                        // marginTop: '5px',
+                      }}
+                    />
+                  </div>
 
-                {/* <div
+                  {/* <div
                   className="bell_tips"
                   onClick={showMessages}
                   ref={messagesBellRef}
                   style={{ marginRight: '30px' }}
                 >
                   <Badge dot={true}  */}
-                <div
-                  style={{ marginRight: '30px' }}
-                  onClick={showMessages}
-                  ref={messagesBellRef}
-                >
-                  <Badge dot={true}>
-                    <BellOutlined
-                      style={{
-                        color: '#ffffff',
-                        fontSize: '16px',
-                        cursor: 'pointer',
-
-                        verticalAlign: 'middle',
-                      }}
-                    />
-                  </Badge>
-                </div>
-                {/* </Badge> */}
-
-                {/* <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
-                    <p>99+</p> */}
-                {/* </div> */}
-
-                <Dropdown overlay={menu} trigger={['click']}>
-                  <div className={'user-detail'}>
-                    <Space size={10}>
-                      <Avatar
-                        src="https://joeschmoe.io/api/v1/random"
-                        size={18}
-                      />
-                      {/* <Avatar icon={<UserOutlined />} size={20} /> */}
-                      {/* className={Styles.avatar} */}
-
-                      <span>
-                        {/* <Tooltip title={accountName} placement="left"> */}
-                        {(accountName.length > 8
-                          ? `${accountName.slice(0, 8)}...`
-                          : accountName) || '用户'}
-                        {/* </Tooltip> */}
-                      </span>
-                      <DownOutlined />
-                    </Space>
-                  </div>
-                </Dropdown>
-              </div>
-              {/* </Space> */}
-            </div>
-          </Header>
-          <Content className="layout-content">
-            <Layout
-              className={Styles['site-layout-background']}
-              style={{
-                // padding: '24px 0',
-                height: '100%',
-              }}
-            >
-              <Sider
-                className={Styles['site-layout-background']}
-                width={200}
-                style={{
-                  // height: '100%',
-                  display:
-                    (meta && !meta?.showMenu) || meta === undefined
-                      ? 'none'
-                      : 'block',
-                }}
-              >
-                <Menu
-                  mode="inline"
-                  defaultOpenKeys={
-                    MenuList?.[0]?.address ? [MenuList[0].address] : []
-                  }
-                  selectedKeys={[activePath]}
-                  style={{
-                    height: '100%',
-                  }}
-                  items={renderItems(MenuList)}
-                />
-              </Sider>
-              <Content
-                style={{
-                  // padding: '0 24px',
-                  height: '100%',
-                  minHeight: 280,
-                  backgroundColor: '#f6f8fb',
-                }}
-              >
-                {meta && meta.breadcrumb ? (
-                  <Breadcrumb
-                    style={{
-                      background: '#f0f2f5',
-                      padding: '18px 30px 8px 30px',
-                      borderBottom: '4px solid #f0f0f0',
-                      color: '#555657',
-                      fontSize: '14px',
-                      fontWeight: 400,
-                      fontFamily: 'PingFangSC-Semibold',
-                    }}
+                  <div
+                    style={{ marginRight: '30px' }}
+                    onClick={showMessages}
+                    ref={messagesBellRef}
                   >
-                    {meta.breadcrumb.map((e, i) => {
-                      return (
-                        <Breadcrumb.Item
-                          key={i}
-                          className={
-                            e.active
-                              ? 'active-bread bread-normal'
-                              : e.path
-                              ? 'bread-normal bread-click'
-                              : 'bread-normal'
-                          }
-                          onClick={() => handleBreadClick(e)}
-                        >
-                          {e.label}
-                        </Breadcrumb.Item>
-                      );
-                    })}
-                  </Breadcrumb>
-                ) : (
-                  <></>
-                )}
-                <div
-                  className={
-                    meta && meta.breadcrumb
-                      ? Styles.contentWrappeB
-                      : Styles.contentWrapper
-                  }
-                  style={{ background: '#f6f8fb' }}
-                >
-                  {props.children}
+                    <Badge dot={true}>
+                      <BellOutlined
+                        style={{
+                          color: '#ffffff',
+                          fontSize: '16px',
+                          cursor: 'pointer',
+
+                          verticalAlign: 'middle',
+                        }}
+                      />
+                    </Badge>
+                  </div>
+                  {/* </Badge> */}
+
+                  {/* <p>{messageList.length > 99 ? '99+' : messageList.length}</p>
+                    <p>99+</p> */}
+                  {/* </div> */}
+
+                  <Dropdown overlay={menu} trigger={['click']}>
+                    <div className={'user-detail'}>
+                      <Space size={10}>
+                        <Avatar
+                          src="https://joeschmoe.io/api/v1/random"
+                          size={18}
+                        />
+                        {/* <Avatar icon={<UserOutlined />} size={20} /> */}
+                        {/* className={Styles.avatar} */}
+
+                        <span>
+                          {/* <Tooltip title={accountName} placement="left"> */}
+                          {(accountName.length > 8
+                            ? `${accountName.slice(0, 8)}...`
+                            : accountName) || '用户'}
+                          {/* </Tooltip> */}
+                        </span>
+                        <DownOutlined />
+                      </Space>
+                    </div>
+                  </Dropdown>
                 </div>
-              </Content>
-            </Layout>
-          </Content>
-        </>
-      ) : null}
-    </Layout>
+                {/* </Space> */}
+              </div>
+            </Header>
+            <Content className="layout-content">
+              <Layout
+                className={Styles['site-layout-background']}
+                style={{
+                  // padding: '24px 0',
+                  height: '100%',
+                }}
+              >
+                <Sider
+                  className={Styles['site-layout-background']}
+                  width={200}
+                  style={{
+                    // height: '100%',
+                    display:
+                      (meta && !meta?.showMenu) || meta === undefined
+                        ? 'none'
+                        : 'block',
+                  }}
+                >
+                  <Menu
+                    mode="inline"
+                    defaultOpenKeys={
+                      MenuList?.[0]?.address ? [MenuList[0].address] : []
+                    }
+                    selectedKeys={[activePath]}
+                    style={{
+                      height: '100%',
+                    }}
+                    items={renderItems(MenuList)}
+                  />
+                </Sider>
+                <Content
+                  style={{
+                    // padding: '0 24px',
+                    height: '100%',
+                    minHeight: 280,
+                    backgroundColor: '#f6f8fb',
+                  }}
+                >
+                  {meta && meta.breadcrumb ? (
+                    <Breadcrumb
+                      style={{
+                        background: '#f0f2f5',
+                        padding: '18px 30px 8px 30px',
+                        borderBottom: '4px solid #f0f0f0',
+                        color: '#555657',
+                        fontSize: '14px',
+                        fontWeight: 400,
+                        fontFamily: 'PingFangSC-Semibold',
+                      }}
+                    >
+                      {meta.breadcrumb.map((e, i) => {
+                        return (
+                          <Breadcrumb.Item
+                            key={i}
+                            className={
+                              e.active
+                                ? 'active-bread bread-normal'
+                                : e.path
+                                ? 'bread-normal bread-click'
+                                : 'bread-normal'
+                            }
+                            // style={{c}}
+                            onClick={() => handleBreadClick(e)}
+                          >
+                            {e.label}
+                          </Breadcrumb.Item>
+                        );
+                      })}
+                    </Breadcrumb>
+                  ) : (
+                    <></>
+                  )}
+                  <div
+                    className={
+                      meta && meta.breadcrumb
+                        ? Styles.contentWrappeB
+                        : Styles.contentWrapper
+                    }
+                    style={{ background: '#f6f8fb' }}
+                  >
+                    {props.children}
+                  </div>
+                </Content>
+              </Layout>
+            </Content>
+          </>
+        ) : null}
+      </Layout>
+    </ConfigProvider>
   );
 };
 

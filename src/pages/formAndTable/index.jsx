@@ -61,7 +61,6 @@ export default function (props) {
         setFormilyFormSchema(form);
         setFormilyTableSchema(table);
         setOthers(others);
-        console.log({ ...others });
         if (form) {
           designer.setCurrentTree(transformToTreeNode(form));
         }
@@ -159,11 +158,12 @@ export default function (props) {
       if (msg) {
         message.success(msg);
       }
+      onPreview(false); // 主动存入localStorage,方便后面的列表预览
     });
   };
 
   // 预览写入localStorage
-  const onPreview = () => {
+  const onPreview = (needDialog = true) => {
     const schemaJsonStr = transformToSchema(designer.getCurrentTree());
     let formMap =
       (localStorage.getItem('formMap') &&
@@ -180,7 +180,9 @@ export default function (props) {
       // 更新后的mp存到缓存中去
       localStorage.setItem('formMap', JSON.stringify(formMap));
     }
-    setPreviewVisible(true);
+    if (needDialog) {
+      setPreviewVisible(true);
+    }
   };
 
   return (

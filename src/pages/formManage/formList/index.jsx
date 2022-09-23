@@ -102,6 +102,8 @@ export default function FormList() {
 
   useEffect(() => {
     getFormList(); // 初始化dataSource
+    delete localStorage['tableConfig'];
+    delete localStorage['formMap'];
   }, []);
 
   // 表格选择修改
@@ -254,10 +256,10 @@ export default function FormList() {
         formApi.deleteFormById({ formId: record.formId }).then((res) => {
           getFormList();
 
-          // 删除时，一并删除预览用的本地数据
-          const formMap = JSON.parse(localStorage.getItem('formMap'));
-          delete formMap[record.formId];
-          localStorage.setItem('formMap', JSON.stringify(formMap));
+          // // 删除时，一并删除预览用的本地数据
+          // const formMap = JSON.parse(localStorage.getItem('formMap'));
+          // delete formMap[record.formId];
+          // localStorage.setItem('formMap', JSON.stringify(formMap));
         });
       },
     });
@@ -335,12 +337,12 @@ export default function FormList() {
         formApi.batchDeleteForm({ formIdList: selectedRowKeys }).then((res) => {
           getFormList();
 
-          // 删除时，一并删除预览用的本地数据
-          const formMap = JSON.parse(localStorage.getItem('formMap'));
-          selectedRowKeys.forEach((e) => {
-            delete formMap[e];
-          });
-          localStorage.setItem('formMap', JSON.stringify(formMap));
+          // // 删除时，一并删除预览用的本地数据
+          // const formMap = JSON.parse(localStorage.getItem('formMap'));
+          // selectedRowKeys.forEach((e) => {
+          //   delete formMap[e];
+          // });
+          // localStorage.setItem('formMap', JSON.stringify(formMap));
         });
       },
     });

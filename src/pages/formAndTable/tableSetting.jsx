@@ -78,6 +78,10 @@ const tableSetting = (props) => {
 
   const [loading, setLoading] = useState(false);
 
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const [echoArr, setEchoArr] = useState([]);
+
   // 检索搜索
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -155,73 +159,6 @@ const tableSetting = (props) => {
     },
   });
 
-  const tableEcho = (formInit, columnsInit) => {
-    const tableConfig = columnsInit?.tableConfig;
-    const columns = columnsInit?.columns;
-    const buttons = columnsInit?.buttonConfig;
-    // if (JSON.stringify(formInit) !== JSON.stringify(tableConfig)) {
-    const arr = [...formInit];
-    console.log('===echo', formInit, tableConfig);
-
-    formInit.forEach((item, index) => {
-      tableConfig.forEach((e, i) => {
-        if (e && e.id === item.id) {
-          const { filterEnable, isShow, sorter, searchEnable, ...others } =
-            item;
-          arr[index] = {
-            ...e,
-            ...others,
-          };
-        }
-      });
-    });
-
-    let colsArr = [];
-    let max = columns.length - 1;
-    for (let i = 0; i < arr.length; i++) {
-      // for (let j = 0; j< columns.length;j++) {
-      const index = columns.findIndex((e) => e.key === arr[i].id);
-      if (index !== -1) {
-        colsArr[index] = arr[i];
-      } else {
-        max++;
-        colsArr[max] = arr[i];
-      }
-      //  else {
-      //   colsArr[count] = arr[i];
-      // }
-      //  else {
-      //   // colsArr[count] = arr[i];
-      //   // colsArr[columns.length] = arr[i];
-      // }
-      // }
-    }
-    // console.log('最大', max);
-
-    console.log('更新后', arr, colsArr);
-
-    // if (columns === arr.length) {
-    //   for (let i = 0; i < columns.length; i++) {
-    //     for (let j = 0; j < arr.length; j++) {
-    //       if (
-    //         columns[i].dataIndex === arr[j].name ||
-    //         columns[i].dataIndex === arr[j].id
-    //       ) {
-    //         colsArr.push({ ...arr[j], ...columns[i] });
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   // TODO:会造成拖动的顺序被还原，暂未想到解决方案
-    //   colsArr = arr;
-    // }
-
-    setTable(colsArr);
-    setButtons(buttons);
-
-    // }
-  };
-
   // 从内存获取表格
   useEffect(() => {
     tableDataFetch();
@@ -287,19 +224,6 @@ const tableSetting = (props) => {
       },
     ];
     const tableShow = arr.filter((e) => e.isShow);
-    // let colsArr = [];
-    // if (columnInit) {
-    //   for (let i = 0; i < columnInit.length; i++) {
-    //     for (let j = 0; j < tableShow.length; j++) {
-    //       if (columnInit[i].dataIndex === tableShow[j].name) {
-    //         colsArr.push(tableShow[j]);
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   colsArr = tableShow;
-    // }
-
     const col = tableShow.map((e) => {
       if (e.filterEnable) {
         return {
@@ -323,45 +247,51 @@ const tableSetting = (props) => {
     setColumn(indexCol.concat(col).concat(operationCol));
   };
 
+  const isArrEqual = (arr1, arr2) => {
+    return (
+      arr1.length === arr2.length && arr1.every((ele) => arr2.includes(ele))
+    );
+  };
+
   // 根据formCode获取存在localStorage的table
   const tableDataFetch = () => {
     setLoading(true);
-    Promise.all([
-      formApi.getFormDetails({ formId: props.formCode }),
-      formApi.getFormList({ formId: props.formCode }),
-    ])
-      .then(([res1, res2]) => {
-        // formApi
-        //   .getFormDetails({ formId: props.formCode })
-        //   .then((res) => {
-        const { formPropertyValue, listPropertyValue, ...others } =
-          res1.object || null;
-        // const formilyFormSchema = formPropertyValue
-        const formItemObj = JSON.parse(formPropertyValue);
+    formApi.getFormDetails({ formId: props.formCode }).then(async (res) => {
+      const formDetail = res?.object || {};
 
-        // const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
-        // if (!formColumn) return;
-        // const formItemObj = formColumn[props.formCode]['formily-form-schema'];
+      const { formPropertyValue, listPropertyValue, ...others } = formDetail;
+
+      const formItemObj = JSON.parse(formPropertyValue);
+      await tableEcho(formDetail, formItemObj);
+    });
+  };
+
+  /**
+   * 表格回显
+   * @description
+   * 1. 表头存在顺序的回显
+   * 2. 表单新增后切换到列表配置,表头需要增加相应列
+   * @param {*} formDetail
+   * @param {*} formItemObj
+   */
+  const tableEcho = (formDetail, formItemObj) => {
+    formApi
+      .getTableDetails({
+        formId: props.formCode,
+        formTableCode: formDetail.formTableCode,
+      })
+      .then((res) => {
+        const columnsInit = res.object;
+        const tableConfig = columnsInit?.tableConfig || [];
+        const buttons = columnsInit?.buttonConfig || [];
+        setButtons(buttons);
+
         if (formItemObj) {
           setFormTree(transformToTreeNode(formItemObj));
         }
-
         let data = [];
-        const temp = (prop) => {
-          if (!prop) return [];
-          for (let k in prop) {
-            if (prop[k].properties) {
-              temp(prop[k].properties);
-            } else {
-              data.push(prop[k]);
-            }
-          }
-          return data;
-        };
 
-        let properties = temp(formItemObj?.schema?.properties);
-
-        let formItem = [];
+        // 拉平数据
         const objSetFunc = (data, arr) => {
           for (let key in data) {
             if (data[key].properties) {
@@ -402,18 +332,45 @@ const tableSetting = (props) => {
             }
           }
         };
+
+        const temp = (prop) => {
+          if (!prop) return [];
+          for (let k in prop) {
+            if (prop[k].properties) {
+              temp(prop[k].properties);
+            } else {
+              data.push(prop[k]);
+            }
+          }
+          return data;
+        };
+        let properties = temp(formItemObj?.schema?.properties);
+        let formItem = [];
         objSetFunc(properties, formItem);
 
+        const idArr1 = formItem.map((e) => e.id);
+        const idArr2 = tableConfig.map((e) => e.id);
+
+        if (tableConfig) {
+          // 存在需要回显的table的时候
+          if (isArrEqual(idArr1, idArr2)) {
+            formItem = tableConfig;
+          } else {
+            // 表单配置有新的元素的时候
+            let arr = [];
+            formItem.forEach((item) => {
+              if (!idArr2.some((e) => e === item.id)) {
+                arr.push(item);
+              }
+            });
+            formItem = [...tableConfig, ...arr];
+          }
+        }
         setTable(formItem);
         setColumnCount(formItem.length);
         setTableCol(formItem);
-        setUrl(
-          `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${props.formCode}`,
-        );
-        // const formList = JSON.parse(window.localStorage.getItem('formList'));
-        // const formTree = formList.filter((e) => e.formCode === props.formCode)[0];
-        // formApi.getFormList({ formId: props.formCode }).then((res) => {
-        const formTree = res2.object[0];
+        setUrl(`/formManage/formPreview/table?formCode=${props.formCode}`);
+
         const children = formItem.map((e) => {
           return {
             title: e.title || e.name,
@@ -421,25 +378,17 @@ const tableSetting = (props) => {
           };
         });
 
-        if (!formTree) return;
+        if (!formDetail) return;
         const tree = [
           {
-            title: `${formTree.formName}    （${children.length}）`,
-            key: formTree.formCode,
+            title: `${formDetail.formName}    （${children.length}）`,
+            key: formDetail.formId,
             children: children,
           },
         ];
         setTreeData(tree);
       })
       .finally(() => setLoading(false));
-
-    // // 如果有值回显
-    // const tableConfig = window.localStorage.getItem('tableConfig');
-    // const arr = tableConfig && JSON.parse(tableConfig);
-    // if (arr && arr[props.formCode]) {
-    //   tableEcho(formItem, arr[props.formCode]);
-    // }
-    // })
   };
 
   // 添加操作按钮
@@ -480,7 +429,6 @@ const tableSetting = (props) => {
         if (e.id === selectBtnId) {
           e = { ...ele, id: selectBtnId };
         }
-        console.log('button操作', e);
         return e;
       });
       setButtons(btns);
@@ -547,12 +495,66 @@ const tableSetting = (props) => {
       }
       return item;
     });
-    console.log('列表配置的下拉框改变的时候', tables);
     setTable(tables);
+  };
+
+  // 根据拖拽后表头设置表格
+  const tableColumnSet = (columns, arr) => {
+    let colsArr = [];
+    let max = columns.length - 1;
+    for (let i = 0; i < arr.length; i++) {
+      const index = columns.findIndex((e) => e.key === arr[i].id);
+      if (index !== -1) {
+        colsArr[index] = arr[i];
+      } else {
+        max++;
+        colsArr[max] = arr[i];
+      }
+    }
+
+    return colsArr;
   };
 
   // 列表配置保存
   const handleOk = () => {
+    let isTemplate = checkboxValue.includes('saveAsTemplate') ? true : false;
+
+    const data = {
+      tableConfig: tableColumnSet(cols.slice(1, -1), table),
+      buttonConfig: buttons,
+      status: checkboxValue.includes('active') ? 'enable' : 'disabled',
+      id: props.formCode,
+      columns: cols.slice(1, -1),
+    };
+
+    setSaveLoading(true);
+    formApi
+      .tableCreate(data)
+      .then((res) => {
+        message.success(`${res.message}, 即将返回列表页`);
+        setTimeout(() => {
+          history.push('/formManage/formList');
+        }, 1000);
+      })
+      .finally(() => {
+        setSaveLoading(false);
+        setSaveVisible(false);
+      });
+  };
+
+  // 取消列表配置保存
+  const handleCancel = () => {
+    setSaveVisible(false);
+  };
+
+  // 按钮属性表单清空
+  const btnFormReset = () => {
+    btnForm?.resetFields();
+    setIcon(btnForm.getFieldValue('icon'));
+  };
+
+  // 预览
+  const previewHandler = () => {
     const obj = window.localStorage.getItem('tableConfig')
       ? JSON.parse(window.localStorage.getItem('tableConfig'))
       : {};
@@ -569,36 +571,6 @@ const tableSetting = (props) => {
       'tableConfig',
       JSON.stringify(Object.assign(obj, data)),
     );
-    setSaveVisible(false);
-
-    // if (checkboxValue.includes('active')) {
-    const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
-      (e) => {
-        if (e.formCode === props.formCode && checkboxValue.includes('active')) {
-          e.formStatus = 'enable';
-        }
-        e.formUrl = url;
-        return e;
-      },
-    );
-    window.localStorage.setItem('formList', JSON.stringify(formList));
-    // }
-  };
-
-  // 取消列表配置保存
-  const handleCancel = () => {
-    setSaveVisible(false);
-  };
-
-  // 按钮属性表单清空
-  const btnFormReset = () => {
-    btnForm?.resetFields();
-    setIcon(btnForm.getFieldValue('icon'));
-  };
-
-  // 查看
-  const previewHandler = () => {
-    handleOk();
     setPreviewVisible(true);
   };
 
@@ -609,17 +581,13 @@ const tableSetting = (props) => {
     message.success('复制成功');
   };
 
+  // 生成Url
   const generateHandler = () => {
-    setUrlVisible(true);
-    const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
-      (e) => {
-        if (e.formCode === props.formCode) {
-          e.formUrl = url;
-        }
-        return e;
-      },
-    );
-    window.localStorage.setItem('formList', JSON.stringify(formList));
+    formApi
+      .changeFormStatus({ formId: props.formCode, formUrl: url })
+      .then(() => {
+        setUrlVisible(true);
+      });
   };
 
   // 拖拽
@@ -798,6 +766,9 @@ const tableSetting = (props) => {
             </Row>
             <Divider />
 
+            <span className="tab__text" style={{ lineHeight: '20px' }}>
+              请先配置表头属性后进行拖拽动作, 否则拖拽顺序无法保存 !
+            </span>
             <Table
               columns={column}
               dataSource={[]}
@@ -995,12 +966,12 @@ const tableSetting = (props) => {
           visible={saveVisible}
           onOk={() => {
             handleOk();
-            message.success('保存成功');
           }}
           onCancel={handleCancel}
           className="default-modal"
           okText="确认"
           cancelText="取消"
+          loading={saveLoading}
         >
           <p>是否保存当前表单？</p>
           <Checkbox.Group

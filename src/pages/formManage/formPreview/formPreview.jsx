@@ -16,32 +16,36 @@ const formPreview = (props) => {
     init();
   }, []);
 
+  // 预览的时候从localStorage取
+  const getFromLocalStorage = (formCode) => {
+    const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
+    const formItemObj = formColumn[formCode]['formily-form-schema'];
+    if (formItemObj) {
+      formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
+      setFormTree(transformToTreeNode(formItemObj));
+    }
+    setFormName(props.formName);
+  };
+
   const init = () => {
     // 表单
     setShowPageTitle(props.showPageTitle);
 
     const formCode = history?.location?.query?.formCode || props.formCode;
+    if (props.isPreview) {
+      getFromLocalStorage(formCode);
+      return;
+    }
     setLoading(true);
-    Promise.all([
-      formApi.getFormDetails({ formId: formCode }),
-      formApi.getFormList({ formId: formCode }),
-    ])
-      .then(([res1, res2]) => {
-        // const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
-        // if (!formColumn) return;
-        // const formItemObj = formColumn[formCode]['formily-form-schema'];
-        const formItemObj = JSON.parse(res1?.object?.formPropertyValue || null);
+    formApi
+      .getFormDetails({ formId: formCode })
+      .then((res) => {
+        const formItemObj = JSON.parse(res?.object?.formPropertyValue || null);
         if (formItemObj) {
           formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
           setFormTree(transformToTreeNode(formItemObj));
         }
-
-        // const formList = JSON.parse(window.localStorage.getItem('formList'));
-        // if (!formList) return;
-        // const formName =
-        //   formList.filter((e) => e.formCode === formCode)[0]?.formName || '';
-        const formName = res2.object[0].formName;
-        setFormName(formName);
+        setFormName(props.formName);
       })
       .finally(() => setLoading(false));
   };

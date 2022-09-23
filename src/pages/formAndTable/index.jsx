@@ -7,7 +7,7 @@
  * @LastEditTime: 2022-08-05 17:14:29
  */
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Tabs, Radio, message, Spin } from 'antd';
+import { Tabs, Radio, message, Spin, Modal } from 'antd';
 import moment from 'moment';
 import {
   transformToSchema,
@@ -18,7 +18,7 @@ import { tableConfig } from './designerConfig';
 import TableSetting from './tableSetting';
 import eventBus from '@/utils/eventBus';
 import * as formApi from '@/services/formManage';
-
+import FormPreview from '@/pages/formManage/formPreview/formPreview';
 const { Group, Button } = Radio;
 
 export default function (props) {
@@ -32,6 +32,7 @@ export default function (props) {
   const [formilyFormSchema, setFormilyFormSchema] = useState();
   // 保存当前设计器的table schema
   const [formilyTableSchema, setFormilyTableSchema] = useState();
+  const [previewVisible, setPreviewVisible] = useState(false);
 
   const getDesigner = (designer) => {
     setDesigner(designer);
@@ -41,19 +42,6 @@ export default function (props) {
   const formCode = useMemo(() => {
     return props.location.query.formCode;
   });
-
-  // useEffect(() => {
-  //   // const formCode = props.location.query.formCode
-  //   // setFormCode(formCode)
-  //   getFormDetails();
-  // }, []);
-
-  // // 查询表单详情
-  // const getFormDetails = () => {
-  //   formApi.getFormDetails({ formId: formCode }).then((res) => {
-  //     console.log('getFormDetails:', res);
-  //   });
-  // };
 
   useEffect(() => {
     initDesigner();
@@ -68,12 +56,12 @@ export default function (props) {
       .then((res) => {
         const { formPropertyValue, listPropertyValue, ...others } =
           res.object || null;
-        // const formilyFormSchema = formPropertyValue
         const form = JSON.parse(formPropertyValue);
         const table = JSON.parse(listPropertyValue);
         setFormilyFormSchema(form);
         setFormilyTableSchema(table);
         setOthers(others);
+        console.log({ ...others });
         if (form) {
           designer.setCurrentTree(transformToTreeNode(form));
         }
@@ -82,31 +70,6 @@ export default function (props) {
         setSaveDis(false);
         setLoading(false);
       });
-    //   setSaveDis(true);
-    // const timer = setTimeout(() => {
-    //   const formMap =
-    //     (localStorage.getItem('formMap') &&
-    //       JSON.parse(localStorage.getItem('formMap'))) ||
-    //     {};
-    //   const curretnItem = formMap[formCode];
-
-    //   const formilyFormSchema =
-    //     (curretnItem && curretnItem['formily-form-schema']) || null;
-    //   const formilyTableSchema =
-    //     (curretnItem && curretnItem['formily-table-schema']) || null;
-    //   setFormilyFormSchema(formilyFormSchema);
-    //   setFormilyTableSchema(formilyTableSchema);
-
-    //   if (formilyFormSchema) {
-    //     designer.setCurrentTree(transformToTreeNode(formilyFormSchema));
-    //     setTimeout(() => {
-    //       setSaveDis(false);
-    //     }, 0);
-    //   } else {
-    //     setSaveDis(false);
-    //   }
-    //   clearTimeout(timer);
-    // }, 1000);
   };
 
   const initDesigner = () => {
@@ -175,7 +138,7 @@ export default function (props) {
     return tableSchema;
   };
 
-  // 保存，暂时保存至localStorage中
+  // 保存
   const onSave = (msg = '') => {
     const schemaJsonStr = transformToSchema(designer.getCurrentTree());
     const formPropertyValue =
@@ -197,68 +160,80 @@ export default function (props) {
         message.success(msg);
       }
     });
+  };
 
-    // // 修改
-    // let formList =
-    //   (localStorage.getItem('formList') &&
-    //     JSON.parse(localStorage.getItem('formList'))) ||
-    //   [];
-    // let formMap =
-    //   (localStorage.getItem('formMap') &&
-    //     JSON.parse(localStorage.getItem('formMap'))) ||
-    //   {};
-    // if (formCode) {
-    //   formList = formList.map((item) => {
-    //     if (item.formCode === formCode) {
-    //       item.updateTime = moment().format('YYYY-MM-DD HH:mm:ss');
-    //       item.updateName = 'admin';
-    //     }
-    //     return item;
-    //   });
-    //   // 将更新后的list保存在缓存中
-    //   localStorage.setItem('formList', JSON.stringify(formList));
+  // 预览写入localStorage
+  const onPreview = () => {
+    const schemaJsonStr = transformToSchema(designer.getCurrentTree());
+    let formMap =
+      (localStorage.getItem('formMap') &&
+        JSON.parse(localStorage.getItem('formMap'))) ||
+      {};
+    if (formCode) {
+      formMap[formCode] = {
+        'formily-form-schema':
+          desingerType === 'form' ? schemaJsonStr : formilyFormSchema,
+        'formily-table-schema':
+          desingerType === 'form' ? formilyTableSchema : schemaJsonStr,
+      };
 
-    //   formMap[formCode] = {
-    //     'formily-form-schema':
-    //       desingerType === 'form' ? schemaJsonStr : formilyFormSchema,
-    //     'formily-table-schema':
-    //       desingerType === 'form' ? formilyTableSchema : schemaJsonStr,
-    //   };
-
-    //   // 更新后的mp存到缓存中去
-    //   localStorage.setItem('formMap', JSON.stringify(formMap));
-    // }
+      // 更新后的mp存到缓存中去
+      localStorage.setItem('formMap', JSON.stringify(formMap));
+    }
+    setPreviewVisible(true);
   };
 
   return (
-    <Spin spinning={loading} className="default-spin">
-      <div style={{ background: '#f0f2f5' }}>
-        <Group
-          defaultValue={desingerType}
-          buttonStyle="solid"
-          onChange={(e) => {
-            setDesingerType(e?.target?.value || 'form');
-            onSave();
-          }}
-          style={{ padding: '20px 30px' }}
-        >
-          <Button value="form">表单字段</Button>
-          <Button value="table">列表配置</Button>
-        </Group>
-
-        {desingerType === 'form' ? (
-          <FormDesigner
-            type={desingerType}
-            saveDis={saveDis}
-            getDesigner={getDesigner}
-            onSave={() => {
-              onSave('保存成功');
+    <>
+      <Spin spinning={loading} className="default-spin">
+        <div style={{ background: '#f0f2f5' }}>
+          <Group
+            defaultValue={desingerType}
+            buttonStyle="solid"
+            onChange={(e) => {
+              setDesingerType(e?.target?.value || 'form');
+              onSave();
             }}
+            style={{ padding: '20px 30px' }}
+          >
+            <Button value="form">表单字段</Button>
+            <Button value="table">列表配置</Button>
+          </Group>
+
+          {desingerType === 'form' ? (
+            <FormDesigner
+              type={desingerType}
+              saveDis={saveDis}
+              getDesigner={getDesigner}
+              onSave={() => {
+                onSave('保存成功');
+              }}
+              onPreview={() => {
+                onPreview();
+              }}
+            />
+          ) : (
+            <TableSetting formCode={formCode} />
+          )}
+        </div>
+      </Spin>
+      {/* 弹框: 预览 */}
+      {previewVisible ? (
+        <Modal
+          visible={previewVisible}
+          title="表单预览"
+          onCancel={() => setPreviewVisible(false)}
+          className="form-preview__modal default-modal"
+        >
+          <FormPreview
+            showPageTitle={false}
+            isPreview={true}
+            formName={others.formName}
           />
-        ) : (
-          <TableSetting formCode={formCode} />
-        )}
-      </div>
-    </Spin>
+        </Modal>
+      ) : (
+        <></>
+      )}
+    </>
   );
 }

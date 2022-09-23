@@ -26,7 +26,7 @@ import {
 import { onFormSubmitValidateEnd } from '@formily/core';
 import { history } from 'umi';
 import Icon from '@/utils/icon';
-import FormPreview from '@/pages/formManage/formPreview/formPreview';
+// import FormPreview from '@/pages/formManage/formPreview/formPreview';
 import '../index.less';
 import eventBus from '@/utils/eventBus';
 
@@ -34,13 +34,14 @@ interface ActionsWidgetProps {
   type: 'form' | 'table';
   getDesigner: (e: any) => {};
   onSave: () => {};
+  onPreview: () => {};
   saveDis?: Boolean;
 }
 
 export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
   const { type, getDesigner, onSave, saveDis = false } = props;
   const designer = useDesigner() || Engine;
-  const [previewVisible, setPreviewVisible] = useState(false);
+  // const [previewVisible, setPreviewVisible] = useState(false);
   const [formCode, setFormCode] = useState('');
   const [saveDisabled, setSaveDisabled] = useState(false);
 
@@ -62,8 +63,8 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
 
   // 预览
   const onPreview = () => {
-    onSave();
-    setPreviewVisible(true);
+    props.onPreview();
+    // setPreviewVisible(true);
   };
 
   return (
@@ -116,7 +117,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
       </Space>
 
       {/* 弹框: 预览 */}
-      {previewVisible ? (
+      {/* {previewVisible ? (
         <Modal
           visible={previewVisible}
           title="表单预览"
@@ -127,7 +128,7 @@ export const ActionsWidget: React.FC<ActionsWidgetProps> = observer((props) => {
         </Modal>
       ) : (
         <></>
-      )}
+      )} */}
     </>
   );
 });

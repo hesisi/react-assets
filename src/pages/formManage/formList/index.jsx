@@ -83,7 +83,7 @@ export default function FormList() {
   const [loading, setLoading] = useState(false);
 
   // 获取formList
-  const getFormList = (hasLoading = true) => {
+  const getFormList = () => {
     // 删除为空的检索条件
     const data = formRef.current.getFieldsValue();
     for (let k in data) {
@@ -91,9 +91,7 @@ export default function FormList() {
         delete data[k];
       }
     }
-    if (hasLoading) {
-      setLoading(true);
-    }
+    setLoading(true);
     formApi
       .getFormList(data)
       .then((res) => {
@@ -120,37 +118,25 @@ export default function FormList() {
   // 设置表单的状态
   const formStatusHandler = (record) => {
     const { formId, formStatus } = record;
+    const urlStr = `/formManage/formPreview/table?formCode=${formId}`;
     formApi
       .changeFormStatus({
         formId,
         formStatus: formStatus === 'enable' ? 'disabled' : 'enable',
+        formUrl: urlStr,
       })
       .then((res) => {
-        getFormList(false);
-      });
-    // const arr = dataSource.map((e) => {
-    //   if (e.formId === record.formId) {
-    //     e.formStatus = record.formStatus === 'enable' ? 'disabled' : 'enable';
-    //   }
-    //   return e;
-    // });
-    // setDataSource(arr);
-    // saveFormList(arr);
+        getFormList();
 
-    // if (record.formStatus === 'enable') {
-    //   setUrlVisible(true);
-    //   const urlStr = `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${record.formCode}`;
-    //   setUrl(urlStr);
-    //   const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
-    //     (e) => {
-    //       if (e.formId === record.formId) {
-    //         e.formUrl = urlStr;
-    //       }
-    //       return e;
-    //     },
-    //   );
-    //   window.localStorage.setItem('formList', JSON.stringify(formList));
-    // }
+        setTimeout(() => {
+          // 延后一点弹窗
+          if (formStatus === 'disabled') {
+            // 切换的时候还是禁用
+            setUrlVisible(true);
+            setUrl(urlStr);
+          }
+        }, 500);
+      });
   };
 
   // 表格配置项
@@ -259,16 +245,20 @@ export default function FormList() {
 
   // 删除
   const handleDelete = (record) => {
+    const formMap = localStorage.getItem('formMap');
+    console.log('formMap', JSON.parse(formMap));
     Modal.confirm({
       title: '确定要删除吗',
       content: '该操作不可逆，请谨慎操作！',
       onOk: () => {
         formApi.deleteFormById({ formId: record.formId }).then((res) => {
           getFormList();
+
+          // 删除时，一并删除预览用的本地数据
+          const formMap = JSON.parse(localStorage.getItem('formMap'));
+          delete formMap[record.formId];
+          localStorage.setItem('formMap', JSON.stringify(formMap));
         });
-        // const data = dataSource.filter((item) => item.formId !== record.formId);
-        // setDataSource(data);
-        // saveFormList(data);
       },
     });
   };
@@ -344,13 +334,14 @@ export default function FormList() {
       onOk: () => {
         formApi.batchDeleteForm({ formIdList: selectedRowKeys }).then((res) => {
           getFormList();
+
+          // 删除时，一并删除预览用的本地数据
+          const formMap = JSON.parse(localStorage.getItem('formMap'));
+          selectedRowKeys.forEach((e) => {
+            delete formMap[e];
+          });
+          localStorage.setItem('formMap', JSON.stringify(formMap));
         });
-        // let data = dataSource;
-        // selectedRowKeys.forEach((item) => {
-        //   data = data.filter((e) => e.formId !== item);
-        // });
-        // setDataSource(data);
-        // saveFormList(data);
       },
     });
   };

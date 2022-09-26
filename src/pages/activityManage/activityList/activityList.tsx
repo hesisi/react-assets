@@ -40,11 +40,12 @@ import Dialog from './Dialog';
 import '@/assets/style/layout.less';
 import { nanoid } from 'nanoid';
 import { key } from 'localforage';
+import { findActivityList } from '@/services/activityManage';
 
 interface DataType {
   /**流程名称*/
-  proessName: string;
-  id?: string | number;
+  processName: string;
+  processId?: string | number;
   /**流程状态*/
   status?: string;
   remarks?: string;
@@ -76,20 +77,20 @@ export default function Page() {
   const columns: ColumnsType<DataType> = [
     {
       title: '流程名称',
-      dataIndex: 'proessName',
-      key: 'proessName',
+      dataIndex: 'processName',
+      key: 'processName',
     },
     {
       title: '分组',
-      dataIndex: 'proessGroup',
-      key: 'proessGroup',
-      render: (proessGroup) => {
+      dataIndex: 'processGroup ',
+      key: 'processGroup ',
+      render: (processGroup) => {
         return (
           <span>
             {
               _processGroup[
                 _processGroup.findIndex((item: any) => {
-                  return item.typeIndex === proessGroup;
+                  return item.typeIndex === processGroup;
                 })
               ]?.typeName
             }
@@ -99,8 +100,8 @@ export default function Page() {
     },
     {
       title: '流程编号',
-      dataIndex: 'id',
-      key: 'id',
+      dataIndex: 'processId',
+      key: 'processId',
       align: 'center',
       width: 200,
       render: (text) => {
@@ -196,6 +197,7 @@ export default function Page() {
     },
   ];
   const [selectedRowKeys, setSelectedRowKeys] = useState([]); // 选中项
+  const [listParams, setListParams] = useState([]); //列表查询
 
   // 表格选择修改
   const onSelectChange = (newSelectedRowKeys: any) => {
@@ -210,7 +212,9 @@ export default function Page() {
 
   /**编辑*/
   const handleEdit = (record: any) => {
-    history.push(`/activityManage/activityConfig?flowID=${record.id}`);
+    history.push(
+      `/activityManage/activityConfig?processName=${record.processName}&processId=${record.processId}`,
+    );
   };
   // 删除
   const handleDelete = (record: any) => {
@@ -220,7 +224,7 @@ export default function Page() {
       onOk: () => {
         if (!flowData) return;
         const data = JSON.parse(flowData).filter(
-          (item: any) => item.id !== record.id,
+          (item: any) => item.processId !== record.processId,
         );
         setTableData(data);
         window.localStorage.setItem('flowGroup', JSON.stringify(data));
@@ -231,7 +235,7 @@ export default function Page() {
   const statusHandler = (record: any, status: string) => {
     if (!flowData) return;
     const arr = JSON.parse(flowData).map((e: any) => {
-      if (e.id === record.id) {
+      if (e.processId === record.processId) {
         e.status = status;
       }
       return e;
@@ -242,23 +246,29 @@ export default function Page() {
 
   useEffect(() => {
     const flowData = window.localStorage.getItem('flowGroup');
-    if (flowData) {
-      const data = JSON.parse(flowData).map((x: any, index: number) => {
-        return {
-          ...x,
-          key: index,
-          sequence: index + 1,
-        };
-      });
-      setTableData(data);
-    }
+
+    // if (flowData) {
+    //   const data = JSON.parse(flowData).map((x: any, index: number) => {
+    //     return {
+    //       ...x,
+    //       key: index,
+    //       sequence: index + 1,
+    //     };
+    //   });
+    //   setTableData(data);
+    // }
+
+    tableUpdate();
+    // setListParams()
   }, []);
 
   const addProcess = () => {
     setIsModalVisible(true);
   };
-  const handleOk = (id?: any) => {
-    history.push(`/activityManage/activityConfig?flowID=${id}`);
+  const handleOk = (id?: any, name?: any) => {
+    history.push(
+      `/activityManage/activityConfig?isCreate=true&processName=${name}&processId=${id}`,
+    );
   };
   // 清除表单检索
   const resetHandler = () => {
@@ -270,7 +280,7 @@ export default function Page() {
   // 检索
   const searchHandler = () => {
     const { name, status } = formRef.current.getFieldsValue();
-
+    console.log('name~~~~');
     if (!name && !status) {
       tableUpdate();
       return;
@@ -280,20 +290,29 @@ export default function Page() {
     const arr = JSON.parse(flowData).filter((e: any) => {
       console.log(e);
       if (name) {
-        return e.proessName?.indexOf(name) !== -1;
+        return e.processName?.indexOf(name) !== -1;
       } else if (status) {
         return e.status === status;
       } else if (name && status) {
-        return e.proessName?.indexOf(name) !== -1 && e.status === status;
+        return e.processName?.indexOf(name) !== -1 && e.status === status;
       }
-      return e.proessName?.indexOf(name) !== -1 || e.status === status;
+      return e.processName?.indexOf(name) !== -1 || e.status === status;
     });
     setTableData(arr);
   };
 
   const tableUpdate = () => {
-    const flowData: any = window.localStorage.getItem('flowGroup');
-    setTableData(JSON.parse(flowData));
+    let params = {
+      pageNum: 0,
+      pageSize: 0,
+    };
+    findActivityList(params).then((res: any) => {
+      if (res?.data?.isSuccess > 0) {
+        let { list } = res?.data?.data?.list;
+        console.log(res?.data?.data?.list);
+        setTableData(list);
+      }
+    });
   };
 
   // 弹窗消失后更新列表
@@ -311,7 +330,7 @@ export default function Page() {
         if (!flowData) return;
         let data = JSON.parse(flowData);
         selectedRowKeys.forEach((item) => {
-          data = data.filter((e: any) => e.id !== item);
+          data = data.filter((e: any) => e.processId !== item);
         });
         setTableData(data);
         window.localStorage.setItem('flowGroup', JSON.stringify(data));
@@ -321,14 +340,15 @@ export default function Page() {
 
   /**更改状态*/
   const handleChangeStatus = (data: DataType) => {
-    const temp = tableData.map((x) => {
-      if (x.id === data.id) {
-        x.status = data.status === 'enable' ? 'disabled' : 'enable';
-      }
-      return x;
-    });
-    window.localStorage.setItem('flowGroup', JSON.stringify(temp));
-    setTableData(temp);
+    // todo
+    // const temp = tableData.map((x) => {
+    //   if (x.processId === data.processId) {
+    //     x.status = data.status === 'enable' ? 'disabled' : 'enable';
+    //   }
+    //   return x;
+    // });
+    // window.localStorage.setItem('flowGroup', JSON.stringify(temp));
+    // setTableData(temp);
   };
   return (
     <div className="list">
@@ -409,7 +429,7 @@ export default function Page() {
             rowSelection={rowSelection}
             columns={columns}
             dataSource={tableData}
-            rowKey={(record: any) => record.id}
+            rowKey={(record: any) => record.processId}
             style={{ marginTop: '20px' }}
             scroll={{ x: '100%' }}
             bordered={false}

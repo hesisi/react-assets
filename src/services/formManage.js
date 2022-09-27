@@ -95,10 +95,33 @@ export function getTableDetails(params) {
   }).then((res) => res.data);
 }
 
-// 保存动态表单的列表配置信息
+// 编辑动态表单的列表配置信息
 export function tableSave(params) {
-  return request(`${baseUrl}/table/save`, {
+  return request(`${baseUrl}/tableData/save`, {
     method: 'POST',
     data: { ...params },
+  }).then((res) => res.data);
+}
+
+// 新建动态表单的列表配置信息
+export function tableAdd(params) {
+  return request(`${baseUrl}/tableData/create`, {
+    method: 'POST',
+    data: { ...params },
+  }).then((res) => res.data);
+}
+
+/*  */
+export function getTableList(params) {
+  return request(`${baseUrl}/tableData/getList`, {
+    method: 'POST',
+    data: { ...params },
+  }).then((res) => res.data);
+}
+
+export function deleteTable(params) {
+  return request(`${baseUrl}/tableData/batchDelete`, {
+    method: 'POST',
+    data: params,
   }).then((res) => res.data);
 }

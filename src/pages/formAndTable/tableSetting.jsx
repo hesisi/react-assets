@@ -82,6 +82,13 @@ const tableSetting = (props) => {
 
   const [echoArr, setEchoArr] = useState([]);
 
+  /* table 预览 */
+  const tablePreviewData = useRef(null);
+  const [tableMCode, setTableMCode] = useState(null);
+  const tableMobanCode = useRef(null);
+
+  /* tabel configRef */
+
   // 检索搜索
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -256,12 +263,14 @@ const tableSetting = (props) => {
   // 根据formCode获取存在localStorage的table
   const tableDataFetch = () => {
     setLoading(true);
+    tableMobanCode.current = [];
     formApi.getFormDetails({ formId: props.formCode }).then(async (res) => {
       const formDetail = res?.object || {};
-
       const { formPropertyValue, listPropertyValue, ...others } = formDetail;
-
+      console.log(formPropertyValue, '265----');
       const formItemObj = JSON.parse(formPropertyValue);
+      tableMobanCode.current = formDetail.formTableCode;
+      setTableMCode(formDetail.formTableCode);
       await tableEcho(formDetail, formItemObj);
     });
   };
@@ -346,6 +355,7 @@ const tableSetting = (props) => {
         };
         let properties = temp(formItemObj?.schema?.properties);
         let formItem = [];
+
         objSetFunc(properties, formItem);
 
         const idArr1 = formItem.map((e) => e.id);
@@ -523,7 +533,7 @@ const tableSetting = (props) => {
       tableConfig: tableColumnSet(cols.slice(1, -1), table),
       buttonConfig: buttons,
       status: checkboxValue.includes('active') ? 'enable' : 'disabled',
-      id: props.formCode,
+      id: props.formCode, // 表单id
       columns: cols.slice(1, -1),
     };
 
@@ -571,7 +581,43 @@ const tableSetting = (props) => {
       'tableConfig',
       JSON.stringify(Object.assign(obj, data)),
     );
+    tablePreviewData.current = null;
     setPreviewVisible(true);
+  };
+
+  const saveTableData = (tableData) => {
+    tablePreviewData.current = tableData;
+  };
+
+  /* 预览保存 */
+  const handlePreviewOk = (newItem, identy, callback) => {
+    if (tableMobanCode?.current) {
+      const colunmsKeys = [];
+      tablePreviewData.current.colNew.forEach((item) => {
+        if (item.dataIndex !== 'index' && item.dataIndex !== 'operation') {
+          colunmsKeys.push(item.dataIndex);
+        }
+      });
+      let sendItem = {
+        formId: props.formCode,
+        formTableCode: tableMobanCode.current,
+        tableList: {},
+      };
+      const backObj = {};
+      colunmsKeys.forEach((itemK) => {
+        backObj[itemK] = newItem[itemK] ? newItem[itemK] : '';
+      });
+      sendItem.tableList = backObj;
+      const sendMethod =
+        identy === 'add' ? formApi.tableAdd : formApi.tableSave;
+      if (identy !== 'add') {
+        sendItem['tableDataCode'] = newItem.tableDataCode;
+      }
+      sendMethod(sendItem).then((res) => {
+        callback && callback();
+        message.success('保存成功');
+      });
+    }
   };
 
   // 复制url
@@ -990,10 +1036,20 @@ const tableSetting = (props) => {
             visible={previewVisible}
             title="列表预览"
             onCancel={() => setPreviewVisible(false)}
+            // onOk={() => {
+            //   handlePreviewOk();
+            // }}
             width="90%"
             className="table-preview__modal default-modal"
           >
-            <TablePreview formCode={props.formCode} showPageTitle={false} />
+            <TablePreview
+              formCode={props.formCode}
+              tableMobanCode={tableMCode}
+              handlePreviewOk={handlePreviewOk}
+              column={column}
+              showPageTitle={false}
+              saveTableData={saveTableData}
+            />
           </Modal>
         ) : (
           <></>

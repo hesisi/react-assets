@@ -45,8 +45,10 @@ const tablePreview = (props) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+  const tableMobanCode = useRef(null);
+  const tablePreviewData = useRef(null);
 
-  const { saveTableData, handlePreviewOk } = props;
+  const { saveTableData } = props;
 
   // 检索搜索
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -128,8 +130,8 @@ const tablePreview = (props) => {
   /* 分页查询预览数据 */
   const fetchList = (searchIdenty = false, searchKey) => {
     const sentItem = {
-      formId: props.formCode,
-      formTableCode: props.tableMobanCode,
+      formId: formCode,
+      formTableCode: tableMobanCode.current,
     };
     if (searchIdenty) {
       sentItem['searchKey'] = searchKey;
@@ -140,32 +142,55 @@ const tablePreview = (props) => {
   };
 
   useEffect(() => {
-    // 表单
-    const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
-    if (!formColumn) return;
-    const formItemObj = formColumn[formCode]['formily-form-schema'];
-    if (formItemObj) {
-      formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
+    tablePreviewData.current = null;
+    formApi.getFormDetails({ formId: formCode }).then(async (res) => {
+      const formDetail = res?.object || {};
+      const { formPropertyValue, listPropertyValue, ...others } = formDetail;
+      const formItemObj = JSON.parse(formPropertyValue);
+      tableMobanCode.current = formDetail.formTableCode;
       setFormTree(transformToTreeNode(formItemObj));
-    }
+      formApi
+        .getTableDetails({
+          formId: formCode,
+          formTableCode: tableMobanCode.current,
+        })
+        .then((res) => {
+          const columnsInit = res.object;
+          const tableConfig = columnsInit?.tableConfig || [];
+          const buttons = columnsInit?.buttonConfig || [];
+          setButtons(buttons);
+          setTable(tableConfig);
+          const colNew = setTableCol(tableConfig, columnsInit?.columns || []);
+          fetchList();
+          setShowPageTitle(props.showPageTitle);
+        });
+    });
+
+    // 表单
+    // const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
+    // if (!formColumn) return;
+    // const formItemObj = formColumn[formCode]['formily-form-schema'];
+    // if (formItemObj) {
+    //   formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
+    //   setFormTree(transformToTreeNode(formItemObj));
+    // }
 
     // 表格
-    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
+    // const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
 
-    const data = tableConfig && tableConfig[formCode];
-    if (data) {
-      setButtons(data.buttonConfig);
-      setTable(data.tableConfig);
-      const colNew = setTableCol(data.tableConfig, data.columns);
-    }
+    // const data = tableConfig && tableConfig[formCode];
+    // if (data) {
+    //   setButtons(data.buttonConfig);
+    //   setTable(data.tableConfig);
+    //   const colNew = setTableCol(data.tableConfig, data.columns);
+    // }
 
     /* 获取预览table展示数据 */
-    fetchList();
+    // fetchList();
     // const tableList = JSON.parse(window.localStorage.getItem('tableList'));
     // if (tableList && tableList[formCode]) {
     //   setDataSource(tableList[formCode]);
     // }
-    setShowPageTitle(props.showPageTitle);
   }, []);
 
   // 行删除
@@ -355,16 +380,42 @@ const tablePreview = (props) => {
       // window.localStorage.setItem('tableList', JSON.stringify({ [`${formCode}`]: arr }))
       const obj = JSON.parse(window.localStorage.getItem('tableList')) ?? {};
       saveFormList({ ...obj, [`${formCode}`]: arr });
-
-      handlePreviewOk &&
-        handlePreviewOk(newItem, index === -1 ? 'add' : 'edit', () => {
-          /* 请求列表 */
-          fetchList();
-        });
+      handlePreviewOk(newItem, index === -1 ? 'add' : 'edit', () => {
+        /* 请求列表 */
+        fetchList();
+      });
       formCancel();
     });
   };
-
+  const handlePreviewOk = (newItem, identy, callback) => {
+    if (tableMobanCode?.current) {
+      const colunmsKeys = [];
+      tablePreviewData.current.colNew.forEach((item) => {
+        if (item.dataIndex !== 'index' && item.dataIndex !== 'operation') {
+          colunmsKeys.push(item.dataIndex);
+        }
+      });
+      let sendItem = {
+        formId: formCode,
+        formTableCode: tableMobanCode.current,
+        tableList: {},
+      };
+      const backObj = {};
+      colunmsKeys.forEach((itemK) => {
+        backObj[itemK] = newItem[itemK] ? newItem[itemK] : '';
+      });
+      sendItem.tableList = backObj;
+      const sendMethod =
+        identy === 'add' ? formApi.tableAdd : formApi.tableSave;
+      if (identy !== 'add') {
+        sendItem['tableDataCode'] = newItem.tableDataCode;
+      }
+      sendMethod(sendItem).then((res) => {
+        callback && callback();
+        message.success('保存成功');
+      });
+    }
+  };
   // 表格选择修改
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -452,6 +503,12 @@ const tablePreview = (props) => {
   };
 
   useEffect(() => {
+    tablePreviewData.current = {
+      // buttonConfig,
+      // tableConfig,
+      colNew: column,
+      tableData: dataSource,
+    };
     saveTableData &&
       saveTableData({
         // buttonConfig,

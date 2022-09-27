@@ -270,7 +270,9 @@ const tableSetting = (props) => {
       console.log(formPropertyValue, '265----');
       const formItemObj = JSON.parse(formPropertyValue);
       tableMobanCode.current = formDetail.formTableCode;
+
       setTableMCode(formDetail.formTableCode);
+
       await tableEcho(formDetail, formItemObj);
     });
   };
@@ -590,35 +592,6 @@ const tableSetting = (props) => {
   };
 
   /* 预览保存 */
-  const handlePreviewOk = (newItem, identy, callback) => {
-    if (tableMobanCode?.current) {
-      const colunmsKeys = [];
-      tablePreviewData.current.colNew.forEach((item) => {
-        if (item.dataIndex !== 'index' && item.dataIndex !== 'operation') {
-          colunmsKeys.push(item.dataIndex);
-        }
-      });
-      let sendItem = {
-        formId: props.formCode,
-        formTableCode: tableMobanCode.current,
-        tableList: {},
-      };
-      const backObj = {};
-      colunmsKeys.forEach((itemK) => {
-        backObj[itemK] = newItem[itemK] ? newItem[itemK] : '';
-      });
-      sendItem.tableList = backObj;
-      const sendMethod =
-        identy === 'add' ? formApi.tableAdd : formApi.tableSave;
-      if (identy !== 'add') {
-        sendItem['tableDataCode'] = newItem.tableDataCode;
-      }
-      sendMethod(sendItem).then((res) => {
-        callback && callback();
-        message.success('保存成功');
-      });
-    }
-  };
 
   // 复制url
   const copyUrl = () => {
@@ -1044,8 +1017,8 @@ const tableSetting = (props) => {
           >
             <TablePreview
               formCode={props.formCode}
-              tableMobanCode={tableMCode}
-              handlePreviewOk={handlePreviewOk}
+              // tableMobanCode={tableMCode}
+              // handlePreviewOk={handlePreviewOk}
               column={column}
               showPageTitle={false}
               saveTableData={saveTableData}

@@ -28,6 +28,7 @@ import GaugeChart from '@/components/gaugeChart';
 import ListCom from '@/components/listCom';
 import CarouselBanner from '@/components/carouselBanner';
 import * as homeApi from '../../../services/homePageConfig';
+import ContentHeader from '@/components/contentHeader';
 const back = require('@/assets/icons/back.svg');
 const forward = require('@/assets/icons/forward.svg');
 const pic = require('@/assets/pic.jpg');
@@ -369,88 +370,41 @@ const homePage = (props) => {
   return (
     <div className="home-page">
       <Layout>
-        <Header className="home-page__header">
-          <Row gutter={10}>
-            <Col span={4}>
-              <Space>
-                <div className="back" onClick={goToIndexPage}>
-                  <LeftOutlined /> <span>主页</span>
-                </div>
-
-                {/* <img
-                  src={back}
-                  style={{ marginTop: '-5px' }}
-                  className="icon"
-                />
-                <img
-                  src={forward}
-                  style={{ marginTop: '-5px' }}
-                  className="icon"
-                />
-                <ScissorOutlined className="icon" />
-                <CopyOutlined className="icon" /> */}
-              </Space>
-            </Col>
-            <Col span={14} className="header-config">
-              <Space>
-                {/* <div>
-                  收缩查看：
-                  <Select defaultValue="100%" style={{ width: 120 }}>
-                    {shrinks.map((e, i) => {
-                      return (
-                        <Option value={e} key={i}>
-                          {e}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                </div>
-                <RedoOutlined className="icon" />
-                <span className="header-config__text">主页配置面板</span> */}
-              </Space>
-            </Col>
-            <Col span={5} className="header_button">
-              <Space>
-                {/* <Button type="primary">返回</Button> */}
-                {/* <Button type="primary">保存</Button>
-                <Button type="primary" onClick={previewHandler}>
-                  预览
-                </Button>
-                <Button type="primary">删除</Button> */}
-                {/* <Button type="primary">启用</Button> */}
-                <Button
-                  type="primary"
-                  icon={<SaveOutlined />}
-                  onClick={() => saveHandler('保存')}
-                >
-                  保存
-                </Button>
-                <Button
-                  type="default"
-                  icon={<EyeOutlined />}
-                  onClick={previewHandler}
-                >
-                  预览
-                </Button>
-                <Button
-                  type="default"
-                  icon={<CheckCircleOutlined />}
-                  onClick={() => saveHandler('启用')}
-                >
-                  启用
-                </Button>
-                <Button
-                  type="default"
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => deleteHandler('启用')}
-                >
-                  删除
-                </Button>
-              </Space>
-            </Col>
-          </Row>
-        </Header>
-
+        <ContentHeader
+          title="主页管理"
+          opreateArea={
+            <>
+              <Button
+                type="primary"
+                icon={<SaveOutlined />}
+                onClick={() => saveHandler('保存')}
+              >
+                保存
+              </Button>
+              <Button
+                type="default"
+                icon={<EyeOutlined />}
+                onClick={previewHandler}
+              >
+                预览
+              </Button>
+              <Button
+                type="default"
+                icon={<CheckCircleOutlined />}
+                onClick={() => saveHandler('启用')}
+              >
+                启用
+              </Button>
+              <Button
+                type="default"
+                icon={<CloseCircleOutlined />}
+                onClick={() => deleteHandler('启用')}
+              >
+                删除
+              </Button>
+            </>
+          }
+        />
         <Layout>
           {/* <Sider className="home-page__sider" width={300}>
             <ConfigSider />

@@ -341,15 +341,11 @@ export default function Page() {
                 <Button
                   icon={<PlusOutlined />}
                   onClick={addProcess}
-                  className="primary-btn"
+                  type="primary"
                 >
                   新增流程
                 </Button>
-                <Button
-                  icon={<DeleteOutlined />}
-                  onClick={deleteHandler}
-                  className="default-btn"
-                >
+                <Button icon={<DeleteOutlined />} onClick={deleteHandler}>
                   删除流程
                 </Button>
               </Space>
@@ -387,7 +383,7 @@ export default function Page() {
                       icon={<SearchOutlined />}
                       onClick={searchHandler}
                       style={{ borderRadius: '5px' }}
-                      className="primary-btn"
+                      type="primary"
                     >
                       搜索
                     </Button>
@@ -395,7 +391,6 @@ export default function Page() {
                       icon={<MinusCircleOutlined />}
                       onClick={resetHandler}
                       style={{ borderRadius: '5px' }}
-                      className="default-btn"
                     >
                       清除
                     </Button>

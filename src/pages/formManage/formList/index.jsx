@@ -429,6 +429,11 @@ export default function FormList() {
                 <Button icon={<CloseCircleOutlined />} onClick={deleteHandler}>
                   删除表单
                 </Button>
+                <Button
+                  onClick={() => history.push('/formManage/designerMobile')}
+                >
+                  移动端表单生成
+                </Button>
               </Space>
             </Col>
 

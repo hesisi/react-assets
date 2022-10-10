@@ -5,6 +5,7 @@ export default (props) => {
   if (isLogin) {
     return props.children;
   } else {
-    return <Redirect to="/login" />;
+    // return <Redirect to="/login" />;
+    return props.children;
   }
 };

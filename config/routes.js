@@ -301,6 +301,15 @@ export default [
         meta: { showMenu: false, showHeader: true },
         wrappers: ['@/wrappers/auth'],
       },
+
+      {
+        name: '移动端表单设计器',
+        path: '/formManage/designerMobile',
+        component: '@/pages/designerMobile',
+        hidden: true,
+        meta: { showMenu: false, showHeader: true },
+        wrappers: ['@/wrappers/auth'],
+      },
     ],
   },
   {

@@ -221,7 +221,7 @@ export default [
     path: '/activityManage',
     component: '@/layouts/activityManageLayout',
     key: 'default-5',
-    wrappers: ['@/wrappers/auth'],
+    // wrappers: ['@/wrappers/auth'],
     routes: [
       {
         path: '/activityManage',
@@ -235,14 +235,14 @@ export default [
           showMenu: false,
           showHeader: true,
         },
-        wrappers: ['@/wrappers/auth'],
+        // wrappers: ['@/wrappers/auth'],
       },
       {
         name: '流程配置',
         path: '/activityManage/activityConfig',
         component: '@/pages/activityManage/activityConfig',
         meta: { showMenu: false, showHeader: true },
-        wrappers: ['@/wrappers/auth'],
+        // wrappers: ['@/wrappers/auth'],
       },
     ],
   },

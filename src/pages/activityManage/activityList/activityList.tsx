@@ -308,7 +308,7 @@ export default function Page() {
     };
     findActivityList(params).then((res: any) => {
       if (res?.data?.isSuccess > 0) {
-        let { list } = res?.data?.data?.list;
+        let list = res?.data?.data?.list;
         console.log(res?.data?.data?.list);
         setTableData(list);
       }

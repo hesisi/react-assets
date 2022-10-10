@@ -13,7 +13,7 @@ import postCssPxToViewport from 'postcss-px-to-viewport';
 
 const baosanIp = '10.173.94.163:9202/';
 const liqingIp = '10.173.73.4:9202/';
-const liuyuIp = '172.16.100.238:9203/';
+const liuyuIp = '10.173.80.191:9203/';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -29,13 +29,13 @@ export default defineConfig({
   proxy: {
     '/assets/messageData': {
       // target: config.infraApiOrigin, // 头部infra配置地址
-      // target: 'http://10.173.73.250:9202/', // 韩振宇
-      target: `http://${liqingIp}`, // 田宝山
+      // target: 'https://c409030w93.zicp.fun/', // 韩振宇
+      target: `http://${liuyuIp}`, // 田宝山
     },
     '/assets/': {
       // target: config.infraApiOrigin, // 头部infra配置地址
-      // target: 'http://10.173.73.250:9202/', // 韩振宇
-      target: `http://${baosanIp}`, // 田宝山
+      // target: 'https://c409030w93.zicp.fun/', // 韩振宇
+      target: `http://${liuyuIp}`, // 田宝山
     },
     // '/role': {
     //   target: `http://${baosanIp}`, // 田宝山

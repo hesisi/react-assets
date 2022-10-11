@@ -35,13 +35,23 @@ function LeftArea() {
   const { comp, setComp } = useContext(designerContext);
   const onClick = (config) => {
     console.log('click component', config);
-    setComp((current) => [
-      ...current,
-      {
-        ...config,
-        designerMobileId: randomRange(),
+    setComp(
+      (current) => {
+        const randomId = randomRange();
+        return {
+          ...current,
+          [randomId]: {
+            ...config,
+            designerMobileId: randomId,
+          },
+        };
       },
-    ]);
+      // ...current,
+      // {
+      //   ...config,
+      //   designerMobileId: randomRange(),
+      // },
+    );
   };
 
   return (

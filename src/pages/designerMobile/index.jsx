@@ -10,9 +10,12 @@ const { Header, Content } = Layout;
 
 export const designerContext = createContext();
 function DesignerMobile() {
-  const [comp, setComp] = useState([]);
+  const [comp, setComp] = useState({});
+  const [nowOperateId, setNowOperateId] = useState(null);
   return (
-    <designerContext.Provider value={{ comp, setComp }}>
+    <designerContext.Provider
+      value={{ comp, setComp, nowOperateId, setNowOperateId }}
+    >
       <div className="des-mobile-header">
         <Space>
           <Button

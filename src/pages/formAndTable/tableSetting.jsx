@@ -18,6 +18,7 @@ import {
   Modal,
   Radio,
   message,
+  Spin,
 } from 'antd';
 const { TabPane } = Tabs;
 const { Panel } = Collapse;
@@ -36,6 +37,8 @@ import { getUUID } from '@/utils/utils.js';
 import TablePreview from '@/pages/formManage/formPreview/tablePreview';
 import copy from 'copy-to-clipboard';
 import Sortable from 'sortablejs';
+
+import * as formApi from '@/services/formManage';
 
 let cols = [];
 const tableSetting = (props) => {
@@ -72,6 +75,19 @@ const tableSetting = (props) => {
     'active',
     'saveAsTemplate',
   ]);
+
+  const [loading, setLoading] = useState(false);
+
+  const [saveLoading, setSaveLoading] = useState(false);
+
+  const [echoArr, setEchoArr] = useState([]);
+
+  /* table 预览 */
+  const tablePreviewData = useRef(null);
+  const [tableMCode, setTableMCode] = useState(null);
+  const tableMobanCode = useRef(null);
+
+  /* tabel configRef */
 
   // 检索搜索
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -150,73 +166,6 @@ const tableSetting = (props) => {
     },
   });
 
-  const tableEcho = (formInit, columnsInit) => {
-    const tableConfig = columnsInit?.tableConfig;
-    const columns = columnsInit?.columns;
-    const buttons = columnsInit?.buttonConfig;
-    // if (JSON.stringify(formInit) !== JSON.stringify(tableConfig)) {
-    const arr = [...formInit];
-    console.log('===echo', formInit, tableConfig);
-
-    formInit.forEach((item, index) => {
-      tableConfig.forEach((e, i) => {
-        if (e && e.id === item.id) {
-          const { filterEnable, isShow, sorter, searchEnable, ...others } =
-            item;
-          arr[index] = {
-            ...e,
-            ...others,
-          };
-        }
-      });
-    });
-
-    let colsArr = [];
-    let max = columns.length - 1;
-    for (let i = 0; i < arr.length; i++) {
-      // for (let j = 0; j< columns.length;j++) {
-      const index = columns.findIndex((e) => e.key === arr[i].id);
-      if (index !== -1) {
-        colsArr[index] = arr[i];
-      } else {
-        max++;
-        colsArr[max] = arr[i];
-      }
-      //  else {
-      //   colsArr[count] = arr[i];
-      // }
-      //  else {
-      //   // colsArr[count] = arr[i];
-      //   // colsArr[columns.length] = arr[i];
-      // }
-      // }
-    }
-    // console.log('最大', max);
-
-    console.log('更新后', arr, colsArr);
-
-    // if (columns === arr.length) {
-    //   for (let i = 0; i < columns.length; i++) {
-    //     for (let j = 0; j < arr.length; j++) {
-    //       if (
-    //         columns[i].dataIndex === arr[j].name ||
-    //         columns[i].dataIndex === arr[j].id
-    //       ) {
-    //         colsArr.push({ ...arr[j], ...columns[i] });
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   // TODO:会造成拖动的顺序被还原，暂未想到解决方案
-    //   colsArr = arr;
-    // }
-
-    setTable(colsArr);
-    setButtons(buttons);
-
-    // }
-  };
-
   // 从内存获取表格
   useEffect(() => {
     tableDataFetch();
@@ -282,19 +231,6 @@ const tableSetting = (props) => {
       },
     ];
     const tableShow = arr.filter((e) => e.isShow);
-    // let colsArr = [];
-    // if (columnInit) {
-    //   for (let i = 0; i < columnInit.length; i++) {
-    //     for (let j = 0; j < tableShow.length; j++) {
-    //       if (columnInit[i].dataIndex === tableShow[j].name) {
-    //         colsArr.push(tableShow[j]);
-    //       }
-    //     }
-    //   }
-    // } else {
-    //   colsArr = tableShow;
-    // }
-
     const col = tableShow.map((e) => {
       if (e.filterEnable) {
         return {
@@ -318,105 +254,153 @@ const tableSetting = (props) => {
     setColumn(indexCol.concat(col).concat(operationCol));
   };
 
+  const isArrEqual = (arr1, arr2) => {
+    return (
+      arr1.length === arr2.length && arr1.every((ele) => arr2.includes(ele))
+    );
+  };
+
   // 根据formCode获取存在localStorage的table
   const tableDataFetch = () => {
-    const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
-    if (!formColumn) return;
-    const formItemObj = formColumn[props.formCode]['formily-form-schema'];
-    if (formItemObj) {
-      setFormTree(transformToTreeNode(formItemObj));
-    }
+    setLoading(true);
+    tableMobanCode.current = [];
+    formApi.getFormDetails({ formId: props.formCode }).then(async (res) => {
+      const formDetail = res?.object || {};
+      const { formPropertyValue, listPropertyValue, ...others } = formDetail;
+      console.log(formPropertyValue, '265----');
+      const formItemObj = JSON.parse(formPropertyValue);
+      tableMobanCode.current = formDetail.formTableCode;
 
-    let data = [];
-    const temp = (prop) => {
-      if (!prop) return [];
-      for (let k in prop) {
-        if (prop[k].properties) {
-          temp(prop[k].properties);
-        } else {
-          data.push(prop[k]);
-        }
-      }
-      return data;
-    };
+      setTableMCode(formDetail.formTableCode);
 
-    let properties = temp(formItemObj?.schema?.properties);
-
-    let formItem = [];
-    const objSetFunc = (data, arr) => {
-      for (let key in data) {
-        if (data[key].properties) {
-          // 存在外层布局的时候
-          for (let k in data[key].properties) {
-            arr.push({
-              ...data[key].properties[k],
-              name:
-                data[key].properties[k].name || data[key]['x-designable-id'], // name对应的属性名
-              label: data[key].properties[k].title, // 表格列名称（title绝对会有，name不一定有）
-              type: data[key].properties[k]['x-component'],
-              rules: [
-                {
-                  required: data[key].properties[k]?.required || false,
-                  message: `please input ${data[key].properties[k].title}`,
-                },
-              ],
-              id: data[key].properties[k]['x-designable-id'],
-              ...config.columnInit,
-            });
-          }
-        } else {
-          arr.push({
-            ...data[key],
-            name: data[key].name || data[key]['x-designable-id'], // name对应的属性名
-            label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
-            type: data[key]['x-component'],
-            rules: [
-              {
-                required: data[key]?.required || false,
-                message: `please input ${data[key].title}`,
-              },
-            ],
-            id: data[key]['x-designable-id'],
-            ...config.columnInit,
-          });
-        }
-      }
-    };
-    objSetFunc(properties, formItem);
-
-    setTable(formItem);
-    setColumnCount(formItem.length);
-
-    const formList = JSON.parse(window.localStorage.getItem('formList'));
-    const formTree = formList.filter((e) => e.formCode === props.formCode)[0];
-    const children = formItem.map((e) => {
-      return {
-        title: e.title || e.name,
-        key: e.id,
-      };
+      await tableEcho(formDetail, formItemObj);
     });
-    setTableCol(formItem);
+  };
 
-    if (!formTree) return;
-    const tree = [
-      {
-        title: `${formTree.formName}    （${children.length}）`,
-        key: formTree.formCode,
-        children: children,
-      },
-    ];
-    setTreeData(tree);
+  /**
+   * 表格回显
+   * @description
+   * 1. 表头存在顺序的回显
+   * 2. 表单新增后切换到列表配置,表头需要增加相应列
+   * @param {*} formDetail
+   * @param {*} formItemObj
+   */
+  const tableEcho = (formDetail, formItemObj) => {
+    formApi
+      .getTableDetails({
+        formId: props.formCode,
+        formTableCode: formDetail.formTableCode,
+      })
+      .then((res) => {
+        const columnsInit = res.object;
+        const tableConfig = columnsInit?.tableConfig || [];
+        const buttons = columnsInit?.buttonConfig || [];
+        setButtons(buttons);
 
-    setUrl(
-      `${window.location.protocol}//${window.location.host}/formManage/formPreview/table?formCode=${props.formCode}`,
-    );
+        if (formItemObj) {
+          setFormTree(transformToTreeNode(formItemObj));
+        }
+        let data = [];
 
-    // 如果有值回显
-    const tableConfig = window.localStorage.getItem('tableConfig');
-    const arr = tableConfig && JSON.parse(tableConfig);
-    if (arr && arr[props.formCode]) {
-      tableEcho(formItem, arr[props.formCode]);
-    }
+        // 拉平数据
+        const objSetFunc = (data, arr) => {
+          for (let key in data) {
+            if (data[key].properties) {
+              // 存在外层布局的时候
+              for (let k in data[key].properties) {
+                arr.push({
+                  ...data[key].properties[k],
+                  name:
+                    data[key].properties[k].name ||
+                    data[key]['x-designable-id'], // name对应的属性名
+                  label: data[key].properties[k].title, // 表格列名称（title绝对会有，name不一定有）
+                  type: data[key].properties[k]['x-component'],
+                  rules: [
+                    {
+                      required: data[key].properties[k]?.required || false,
+                      message: `please input ${data[key].properties[k].title}`,
+                    },
+                  ],
+                  id: data[key].properties[k]['x-designable-id'],
+                  ...config.columnInit,
+                });
+              }
+            } else {
+              arr.push({
+                ...data[key],
+                name: data[key].name || data[key]['x-designable-id'], // name对应的属性名
+                label: data[key].title, // 表格列名称（title绝对会有，name不一定有）
+                type: data[key]['x-component'],
+                rules: [
+                  {
+                    required: data[key]?.required || false,
+                    message: `please input ${data[key].title}`,
+                  },
+                ],
+                id: data[key]['x-designable-id'],
+                ...config.columnInit,
+              });
+            }
+          }
+        };
+
+        const temp = (prop) => {
+          if (!prop) return [];
+          for (let k in prop) {
+            if (prop[k].properties) {
+              temp(prop[k].properties);
+            } else {
+              data.push(prop[k]);
+            }
+          }
+          return data;
+        };
+        let properties = temp(formItemObj?.schema?.properties);
+        let formItem = [];
+
+        objSetFunc(properties, formItem);
+
+        const idArr1 = formItem.map((e) => e.id);
+        const idArr2 = tableConfig.map((e) => e.id);
+
+        if (tableConfig) {
+          // 存在需要回显的table的时候
+          if (isArrEqual(idArr1, idArr2)) {
+            formItem = tableConfig;
+          } else {
+            // 表单配置有新的元素的时候
+            let arr = [];
+            formItem.forEach((item) => {
+              if (!idArr2.some((e) => e === item.id)) {
+                arr.push(item);
+              }
+            });
+            formItem = [...tableConfig, ...arr];
+          }
+        }
+        setTable(formItem);
+        setColumnCount(formItem.length);
+        setTableCol(formItem);
+        setUrl(`/formManage/formPreview/table?formCode=${props.formCode}`);
+
+        const children = formItem.map((e) => {
+          return {
+            title: e.title || e.name,
+            key: e.id,
+          };
+        });
+
+        if (!formDetail) return;
+        const tree = [
+          {
+            title: `${formDetail.formName}    （${children.length}）`,
+            key: formDetail.formId,
+            children: children,
+          },
+        ];
+        setTreeData(tree);
+      })
+      .finally(() => setLoading(false));
   };
 
   // 添加操作按钮
@@ -457,7 +441,6 @@ const tableSetting = (props) => {
         if (e.id === selectBtnId) {
           e = { ...ele, id: selectBtnId };
         }
-        console.log('button操作', e);
         return e;
       });
       setButtons(btns);
@@ -524,12 +507,66 @@ const tableSetting = (props) => {
       }
       return item;
     });
-    console.log('列表配置的下拉框改变的时候', tables);
     setTable(tables);
+  };
+
+  // 根据拖拽后表头设置表格
+  const tableColumnSet = (columns, arr) => {
+    let colsArr = [];
+    let max = columns.length - 1;
+    for (let i = 0; i < arr.length; i++) {
+      const index = columns.findIndex((e) => e.key === arr[i].id);
+      if (index !== -1) {
+        colsArr[index] = arr[i];
+      } else {
+        max++;
+        colsArr[max] = arr[i];
+      }
+    }
+
+    return colsArr;
   };
 
   // 列表配置保存
   const handleOk = () => {
+    let isTemplate = checkboxValue.includes('saveAsTemplate') ? true : false;
+
+    const data = {
+      tableConfig: tableColumnSet(cols.slice(1, -1), table),
+      buttonConfig: buttons,
+      status: checkboxValue.includes('active') ? 'enable' : 'disabled',
+      id: props.formCode, // 表单id
+      columns: cols.slice(1, -1),
+    };
+
+    setSaveLoading(true);
+    formApi
+      .tableCreate(data)
+      .then((res) => {
+        message.success(`${res.message}, 即将返回列表页`);
+        setTimeout(() => {
+          history.push('/formManage/formList');
+        }, 1000);
+      })
+      .finally(() => {
+        setSaveLoading(false);
+        setSaveVisible(false);
+      });
+  };
+
+  // 取消列表配置保存
+  const handleCancel = () => {
+    setSaveVisible(false);
+  };
+
+  // 按钮属性表单清空
+  const btnFormReset = () => {
+    btnForm?.resetFields();
+    setIcon(btnForm.getFieldValue('icon'));
+  };
+
+  // 预览
+  const previewHandler = () => {
     const obj = window.localStorage.getItem('tableConfig')
       ? JSON.parse(window.localStorage.getItem('tableConfig'))
       : {};
@@ -546,38 +583,15 @@ const tableSetting = (props) => {
       'tableConfig',
       JSON.stringify(Object.assign(obj, data)),
     );
-    setSaveVisible(false);
-
-    // if (checkboxValue.includes('active')) {
-    const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
-      (e) => {
-        if (e.formCode === props.formCode && checkboxValue.includes('active')) {
-          e.formStatus = 'enable';
-        }
-        e.formUrl = url;
-        return e;
-      },
-    );
-    window.localStorage.setItem('formList', JSON.stringify(formList));
-    // }
-  };
-
-  // 取消列表配置保存
-  const handleCancel = () => {
-    setSaveVisible(false);
-  };
-
-  // 按钮属性表单清空
-  const btnFormReset = () => {
-    btnForm?.resetFields();
-    setIcon(btnForm.getFieldValue('icon'));
-  };
-
-  // 查看
-  const previewHandler = () => {
-    handleOk();
+    tablePreviewData.current = null;
     setPreviewVisible(true);
   };
+
+  const saveTableData = (tableData) => {
+    tablePreviewData.current = tableData;
+  };
+
+  /* 预览保存 */
 
   // 复制url
   const copyUrl = () => {
@@ -586,17 +600,13 @@ const tableSetting = (props) => {
     message.success('复制成功');
   };
 
+  // 生成Url
   const generateHandler = () => {
-    setUrlVisible(true);
-    const formList = JSON.parse(window.localStorage.getItem('formList'))?.map(
-      (e) => {
-        if (e.formCode === props.formCode) {
-          e.formUrl = url;
-        }
-        return e;
-      },
-    );
-    window.localStorage.setItem('formList', JSON.stringify(formList));
+    formApi
+      .changeFormStatus({ formId: props.formCode, formUrl: url })
+      .then(() => {
+        setUrlVisible(true);
+      });
   };
 
   // 拖拽
@@ -617,391 +627,421 @@ const tableSetting = (props) => {
   };
 
   return (
-    <div className="table-setting">
-      <Row
-        justify="end"
-        style={{
-          padding: '10px 15px 10px',
-          background: 'white',
-          marginBottom: '10px',
-          borderRadius: '5px',
-          border: '1px solid rgba(225,229,236,1)',
-        }}
-      >
-        <Space size={10}>
-          <Button
-            icon={<Icon icon="FundProjectionScreenOutlined" />}
-            className="primary-btn"
-            onClick={generateHandler}
-          >
-            生成URL
-          </Button>
-          <Button
-            icon={<Icon icon="SaveOutlined" />}
-            onClick={previewHandler}
-            className="primary-btn"
-          >
-            预览
-          </Button>
-          <Button
-            icon={<Icon icon="SaveOutlined" />}
-            onClick={() => {
-              setSaveVisible(true);
-            }}
-            className="primary-btn"
-          >
-            保存
-          </Button>
-          <Button
-            icon={<Icon icon="ArrowLeftOutlined" />}
-            className="default-btn"
-            onClick={() => {
-              history.push('/formManage/formList');
-            }}
-          >
-            返回
-          </Button>
-        </Space>
-      </Row>
-
-      <Row>
-        {/* 大纲部分 */}
-        <Col
-          span={4}
+    <Spin spinning={loading}>
+      <div className="table-setting">
+        <Row
+          justify="end"
           style={{
-            border: '1px solid rgba(225,229,236,1)',
-            borderRight: 0,
-            padding: '10px',
-            borderRadius: '5px',
+            padding: '10px 15px 10px',
             background: 'white',
+            marginBottom: '10px',
+            borderRadius: '5px',
+            border: '1px solid rgba(225,229,236,1)',
           }}
         >
-          <p className="table-col__title">大纲</p>
-          {treeData.length > 0 ? (
-            <Tree
-              defaultExpandedKeys={[`${props.formCode}`]}
-              defaultExpandAll={true}
-              defaultExpandParent
-              treeData={treeData}
-            />
-          ) : (
-            <></>
-          )}
-        </Col>
+          <Space size={10}>
+            <Button
+              icon={<Icon icon="FundProjectionScreenOutlined" />}
+              className="primary-btn"
+              onClick={generateHandler}
+            >
+              生成URL
+            </Button>
+            <Button
+              icon={<Icon icon="SaveOutlined" />}
+              onClick={previewHandler}
+              className="primary-btn"
+            >
+              预览
+            </Button>
+            <Button
+              icon={<Icon icon="SaveOutlined" />}
+              onClick={() => {
+                setSaveVisible(true);
+              }}
+              className="primary-btn"
+            >
+              保存
+            </Button>
+            <Button
+              icon={<Icon icon="ArrowLeftOutlined" />}
+              className="default-btn"
+              onClick={() => {
+                history.push('/formManage/formList');
+              }}
+            >
+              返回
+            </Button>
+          </Space>
+        </Row>
 
-        {/* 表格部分 */}
-        <Col
-          span={15}
-          style={{
-            border: '1px solid rgba(225,229,236,1)',
-            borderRight: 0,
-            padding: '20px',
-            borderRadius: '5px',
-            background: 'white',
-          }}
-        >
-          <Button
-            icon={<Icon icon="SaveOutlined" />}
-            className="primary-btn"
-            onClick={buttonAdd}
+        <Row>
+          {/* 大纲部分 */}
+          <Col
+            span={4}
+            style={{
+              border: '1px solid rgba(225,229,236,1)',
+              borderRight: 0,
+              padding: '10px',
+              borderRadius: '5px',
+              background: 'white',
+            }}
           >
-            添加按钮
-          </Button>
-          <Divider />
-          {/* button和搜索 */}
-          <Row justify="space-between">
-            <Col span={19}>
-              <Space size={10} wrap>
-                <Button
-                  icon={<Icon icon="PlusOutlined" />}
-                  className="primary-btn"
-                >
-                  {/* onClick={formAdd} */}
-                  新建
-                </Button>
-                <Button
-                  icon={<Icon icon="DeleteOutlined" />}
-                  className="primary-btn"
-                >
-                  删除
-                </Button>
-                {buttons &&
-                  buttons.map((e) => {
-                    return (
-                      <Tag
-                        closable
-                        key={e.id}
-                        className="button-tag"
-                        onClose={() => {
-                          buttonsDelete(e.id);
-                        }}
-                      >
-                        {e.icon ? (
-                          e.position === 'front' ? (
-                            <Button
-                              onClick={() => buttonSelect(e)}
-                              className="add-btn"
-                            >
-                              <Icon icon={e.icon} />
-                              {e.label}
-                            </Button>
+            <p className="table-col__title">大纲</p>
+            {treeData.length > 0 ? (
+              <Tree
+                defaultExpandedKeys={[`${props.formCode}`]}
+                defaultExpandAll={true}
+                defaultExpandParent
+                treeData={treeData}
+              />
+            ) : (
+              <></>
+            )}
+          </Col>
+
+          {/* 表格部分 */}
+          <Col
+            span={15}
+            style={{
+              border: '1px solid rgba(225,229,236,1)',
+              borderRight: 0,
+              padding: '20px',
+              borderRadius: '5px',
+              background: 'white',
+            }}
+          >
+            <Button
+              icon={<Icon icon="SaveOutlined" />}
+              className="primary-btn"
+              onClick={buttonAdd}
+            >
+              添加按钮
+            </Button>
+            <Divider />
+            {/* button和搜索 */}
+            <Row justify="space-between">
+              <Col span={19}>
+                <Space size={10} wrap>
+                  <Button
+                    icon={<Icon icon="PlusOutlined" />}
+                    className="primary-btn"
+                  >
+                    {/* onClick={formAdd} */}
+                    新建
+                  </Button>
+                  <Button
+                    icon={<Icon icon="DeleteOutlined" />}
+                    className="primary-btn"
+                  >
+                    删除
+                  </Button>
+                  {buttons &&
+                    buttons.map((e) => {
+                      return (
+                        <Tag
+                          closable
+                          key={e.id}
+                          className="button-tag"
+                          onClose={() => {
+                            buttonsDelete(e.id);
+                          }}
+                        >
+                          {e.icon ? (
+                            e.position === 'front' ? (
+                              <Button
+                                onClick={() => buttonSelect(e)}
+                                className="add-btn"
+                              >
+                                <Icon icon={e.icon} />
+                                {e.label}
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => buttonSelect(e)}
+                                className="add-btn"
+                              >
+                                {e.label}
+                                <Icon icon={e.icon} />
+                              </Button>
+                            )
                           ) : (
                             <Button
                               onClick={() => buttonSelect(e)}
                               className="add-btn"
                             >
                               {e.label}
-                              <Icon icon={e.icon} />
                             </Button>
-                          )
-                        ) : (
-                          <Button
-                            onClick={() => buttonSelect(e)}
-                            className="add-btn"
-                          >
-                            {e.label}
-                          </Button>
-                        )}
-                      </Tag>
-                    );
-                  })}
-              </Space>
-            </Col>
+                          )}
+                        </Tag>
+                      );
+                    })}
+                </Space>
+              </Col>
 
-            <Col span={5} style={{ textAlign: 'right' }}>
-              <Search placeholder="请输入内容" />
-            </Col>
-          </Row>
-          <Divider />
+              <Col span={5} style={{ textAlign: 'right' }}>
+                <Search placeholder="请输入内容" />
+              </Col>
+            </Row>
+            <Divider />
 
-          <Table
-            columns={column}
-            dataSource={dataSource}
-            pagination={{ position: ['none', 'none'] }}
-            style={{ marginTop: '20px' }}
-            rowKey={(record) => record.id}
-            scroll={{ x: 'max-content' }}
-            className="default-table"
-          />
-        </Col>
+            <span className="tab__text" style={{ lineHeight: '20px' }}>
+              请先配置表头属性后进行拖拽动作, 否则拖拽顺序无法保存 !
+            </span>
+            <Table
+              columns={column}
+              dataSource={[]}
+              pagination={{ position: ['none', 'none'] }}
+              style={{ marginTop: '20px' }}
+              // rowKey={(record) => record.id}
+              scroll={{ x: 'max-content' }}
+              className="default-table"
+            />
+          </Col>
 
-        {/* 配置项部分 */}
-        <Col
-          span={5}
-          style={{
-            border: '1px solid rgba(225,229,236,1)',
-            padding: '10px',
-            borderRadius: '5px',
-            background: 'white',
-          }}
-        >
-          <Tabs
-            tabPosition="top"
-            activeKey={tabsActiveKey}
-            onTabClick={onTabClick}
+          {/* 配置项部分 */}
+          <Col
+            span={5}
+            style={{
+              border: '1px solid rgba(225,229,236,1)',
+              padding: '10px',
+              borderRadius: '5px',
+              background: 'white',
+            }}
           >
-            {/* 列表配置 */}
-            <TabPane tab="列表配置" key="table">
-              <span className="tab__text">
-                列表显示的字段建议不超过7个，当前已显示{columnCount}个。
-              </span>
-              {/* 字段折叠面板 */}
-              <Collapse accordion style={{ background: '#fafafa' }}>
-                {table &&
-                  table.map((e) => {
-                    console.log('操作面板', e);
-                    return (
-                      <Panel header={e.label} key={e.id}>
-                        <Form
-                          initialValues={{
-                            isShow: e.isShow,
-                            sorter: e.sorter,
-                            searchEnable: e.searchEnable,
-                            filterEnable: e.filterEnable,
+            <Tabs
+              tabPosition="top"
+              activeKey={tabsActiveKey}
+              onTabClick={onTabClick}
+            >
+              {/* 列表配置 */}
+              <TabPane tab="列表配置" key="table">
+                <span className="tab__text">
+                  列表显示的字段建议不超过7个，当前已显示{columnCount}个。
+                </span>
+                {/* 字段折叠面板 */}
+                <Collapse accordion style={{ background: '#fafafa' }}>
+                  {table &&
+                    table.map((e) => {
+                      return (
+                        <Panel header={e.label} key={e.id}>
+                          <Form
+                            initialValues={{
+                              isShow: e.isShow,
+                              sorter: e.sorter,
+                              searchEnable: e.searchEnable,
+                              filterEnable: e.filterEnable,
+                            }}
+                          >
+                            <Form.Item label="在列表显示" name="isShow">
+                              <Select
+                                onChange={(ele) =>
+                                  selectChange(e, ele, 'isShow')
+                                }
+                                value={e.isShow}
+                              >
+                                {config.selectList.isShow.map((e) => {
+                                  return (
+                                    <Select.Option
+                                      value={e.value}
+                                      key={e.value}
+                                    >
+                                      {e.label}
+                                    </Select.Option>
+                                  );
+                                })}
+                              </Select>
+                            </Form.Item>
+
+                            <Form.Item label="是否可排序" name="sorter">
+                              <Select
+                                onChange={(ele) =>
+                                  selectChange(e, ele, 'sorter')
+                                }
+                                value={e.sorter}
+                              >
+                                {config.selectList.sortEnable.map((e) => {
+                                  return (
+                                    <Select.Option
+                                      value={e.value}
+                                      key={e.value}
+                                    >
+                                      {e.label}
+                                    </Select.Option>
+                                  );
+                                })}
+                              </Select>
+                            </Form.Item>
+
+                            <Form.Item label="是否可搜索" name="searchEnable">
+                              <Select
+                                onChange={(ele) =>
+                                  selectChange(e, ele, 'searchEnable')
+                                }
+                                value={e.searchEnable}
+                              >
+                                {config.selectList.searchEnable.map((e) => {
+                                  return (
+                                    <Select.Option
+                                      value={e.value}
+                                      key={e.value}
+                                    >
+                                      {e.label}
+                                    </Select.Option>
+                                  );
+                                })}
+                              </Select>
+                            </Form.Item>
+
+                            <Form.Item label="在筛选栏显示" name="filterEnable">
+                              <Select
+                                onChange={(ele) =>
+                                  selectChange(e, ele, 'filterEnable')
+                                }
+                                value={e.filterEnable}
+                              >
+                                {config.selectList.filterEnable.map((e) => {
+                                  return (
+                                    <Select.Option
+                                      value={e.value}
+                                      key={e.value}
+                                    >
+                                      {e.label}
+                                    </Select.Option>
+                                  );
+                                })}
+                              </Select>
+                            </Form.Item>
+                          </Form>
+                        </Panel>
+                      );
+                    })}
+                </Collapse>
+              </TabPane>
+
+              {/* 按钮属性 */}
+              <TabPane tab="按钮属性" key="button" forceRender={true}>
+                <Form
+                  initialValues={config.buttonInit}
+                  form={btnForm}
+                  onFinish={(e) => onFinish(e, 'btn')}
+                >
+                  <Form.Item label="按钮文本" name="label">
+                    <Input />
+                  </Form.Item>
+
+                  <Form.Item label="按钮位置" name="position">
+                    <Radio.Group>
+                      <Radio value="front">前</Radio>
+                      <Radio value="end">后</Radio>
+                    </Radio.Group>
+                  </Form.Item>
+
+                  <Form.Item label="按钮图标" name="icon">
+                    <Space>
+                      <Popover
+                        content={content}
+                        title="icon"
+                        visible={btnPopoverVisible}
+                        placement="bottom"
+                        overlayStyle={{ width: '360px' }}
+                      >
+                        <Button
+                          type="link"
+                          style={{ paddingLeft: 0 }}
+                          onClick={() => {
+                            setBtnPopoverVisible(true);
                           }}
                         >
-                          <Form.Item label="在列表显示" name="isShow">
-                            <Select
-                              onChange={(ele) => selectChange(e, ele, 'isShow')}
-                              value={e.isShow}
-                            >
-                              {config.selectList.isShow.map((e) => {
-                                return (
-                                  <Select.Option value={e.value} key={e.value}>
-                                    {e.label}
-                                  </Select.Option>
-                                );
-                              })}
-                            </Select>
-                          </Form.Item>
+                          选择图标
+                        </Button>
+                      </Popover>
+                      {icon ? <Icon icon={icon} /> : <></>}
+                    </Space>
+                  </Form.Item>
 
-                          <Form.Item label="是否可排序" name="sorter">
-                            <Select
-                              onChange={(ele) => selectChange(e, ele, 'sorter')}
-                              value={e.sorter}
-                            >
-                              {config.selectList.sortEnable.map((e) => {
-                                return (
-                                  <Select.Option value={e.value} key={e.value}>
-                                    {e.label}
-                                  </Select.Option>
-                                );
-                              })}
-                            </Select>
-                          </Form.Item>
+                  <Form.Item label="按钮事件" name="method">
+                    <TextArea />
+                  </Form.Item>
 
-                          <Form.Item label="是否可搜索" name="searchEnable">
-                            <Select
-                              onChange={(ele) =>
-                                selectChange(e, ele, 'searchEnable')
-                              }
-                              value={e.searchEnable}
-                            >
-                              {config.selectList.searchEnable.map((e) => {
-                                return (
-                                  <Select.Option value={e.value} key={e.value}>
-                                    {e.label}
-                                  </Select.Option>
-                                );
-                              })}
-                            </Select>
-                          </Form.Item>
-
-                          <Form.Item label="在筛选栏显示" name="filterEnable">
-                            <Select
-                              onChange={(ele) =>
-                                selectChange(e, ele, 'filterEnable')
-                              }
-                              value={e.filterEnable}
-                            >
-                              {config.selectList.filterEnable.map((e) => {
-                                return (
-                                  <Select.Option value={e.value} key={e.value}>
-                                    {e.label}
-                                  </Select.Option>
-                                );
-                              })}
-                            </Select>
-                          </Form.Item>
-                        </Form>
-                      </Panel>
-                    );
-                  })}
-              </Collapse>
-            </TabPane>
-
-            {/* 按钮属性 */}
-            <TabPane tab="按钮属性" key="button" forceRender={true}>
-              <Form
-                initialValues={config.buttonInit}
-                form={btnForm}
-                onFinish={(e) => onFinish(e, 'btn')}
-              >
-                <Form.Item label="按钮文本" name="label">
-                  <Input />
-                </Form.Item>
-
-                <Form.Item label="按钮位置" name="position">
-                  <Radio.Group>
-                    <Radio value="front">前</Radio>
-                    <Radio value="end">后</Radio>
-                  </Radio.Group>
-                </Form.Item>
-
-                <Form.Item label="按钮图标" name="icon">
-                  <Space>
-                    <Popover
-                      content={content}
-                      title="icon"
-                      visible={btnPopoverVisible}
-                      placement="bottom"
-                      overlayStyle={{ width: '360px' }}
-                    >
-                      <Button
-                        type="link"
-                        style={{ paddingLeft: 0 }}
-                        onClick={() => {
-                          setBtnPopoverVisible(true);
-                        }}
-                      >
-                        选择图标
+                  <Form.Item wrapperCol={{ offset: 5, span: 16 }}>
+                    <Space size={10}>
+                      <Button type="primary" htmlType="submit">
+                        Submit
                       </Button>
-                    </Popover>
-                    {icon ? <Icon icon={icon} /> : <></>}
-                  </Space>
-                </Form.Item>
+                      <Button htmlType="button" onClick={btnFormReset}>
+                        Reset
+                      </Button>
+                    </Space>
+                  </Form.Item>
+                </Form>
+              </TabPane>
+            </Tabs>
+          </Col>
+        </Row>
 
-                <Form.Item label="按钮事件" name="method">
-                  <TextArea />
-                </Form.Item>
-
-                <Form.Item wrapperCol={{ offset: 5, span: 16 }}>
-                  <Space size={10}>
-                    <Button type="primary" htmlType="submit">
-                      Submit
-                    </Button>
-                    <Button htmlType="button" onClick={btnFormReset}>
-                      Reset
-                    </Button>
-                  </Space>
-                </Form.Item>
-              </Form>
-            </TabPane>
-          </Tabs>
-        </Col>
-      </Row>
-
-      <Modal
-        title="确认保存"
-        visible={saveVisible}
-        onOk={() => {
-          handleOk();
-          message.success('保存成功');
-        }}
-        onCancel={handleCancel}
-        className="default-modal"
-        okText="确认"
-        cancelText="取消"
-      >
-        <p>是否保存当前表单？</p>
-        <Checkbox.Group
-          options={config.options}
-          defaultValue={['active', 'saveAsTemplate']}
-          onChange={(checked) => {
-            setCheckBoxValue(checked);
-          }}
-          value={checkboxValue}
-        />
-      </Modal>
-
-      {/* 弹框: 预览 */}
-      {previewVisible ? (
         <Modal
-          visible={previewVisible}
-          title="列表预览"
-          onCancel={() => setPreviewVisible(false)}
-          width="90%"
-          className="table-preview__modal default-modal"
+          title="确认保存"
+          visible={saveVisible}
+          onOk={() => {
+            handleOk();
+          }}
+          onCancel={handleCancel}
+          className="default-modal"
+          okText="确认"
+          cancelText="取消"
+          loading={saveLoading}
         >
-          <TablePreview formCode={props.formCode} showPageTitle={false} />
+          <p>是否保存当前表单？</p>
+          <Checkbox.Group
+            options={config.options}
+            defaultValue={['active', 'saveAsTemplate']}
+            onChange={(checked) => {
+              setCheckBoxValue(checked);
+            }}
+            value={checkboxValue}
+          />
         </Modal>
-      ) : (
-        <></>
-      )}
 
-      {/* 弹框: 生成url */}
-      <Modal
-        visible={urlVisible}
-        title="生成URL"
-        onCancel={() => setUrlVisible(false)}
-        okText="复制地址"
-        cancelText="取消"
-        onOk={copyUrl}
-        className="default-modal"
-      >
-        <Input addonBefore="当前的URL地址：" value={url} />
-      </Modal>
-    </div>
+        {/* 弹框: 预览 */}
+        {previewVisible ? (
+          <Modal
+            visible={previewVisible}
+            title="列表预览"
+            onCancel={() => setPreviewVisible(false)}
+            // onOk={() => {
+            //   handlePreviewOk();
+            // }}
+            width="90%"
+            className="table-preview__modal default-modal"
+          >
+            <TablePreview
+              formCode={props.formCode}
+              // tableMobanCode={tableMCode}
+              // handlePreviewOk={handlePreviewOk}
+              column={column}
+              showPageTitle={false}
+              saveTableData={saveTableData}
+            />
+          </Modal>
+        ) : (
+          <></>
+        )}
+
+        {/* 弹框: 生成url */}
+        <Modal
+          visible={urlVisible}
+          title="生成URL"
+          onCancel={() => setUrlVisible(false)}
+          okText="复制地址"
+          cancelText="取消"
+          onOk={copyUrl}
+          className="default-modal"
+        >
+          <Input addonBefore="当前的URL地址：" value={url} />
+        </Modal>
+      </div>
+    </Spin>
   );
 };
 

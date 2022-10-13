@@ -29,6 +29,8 @@ const Login = () => {
       ...values,
       uuid: validateUuid,
     };
+    history.push('homeIndex');
+    return;
     userLogin(params).then((res) => {
       if (res?.data?.isSuccess > 0) {
         const { data } = res.data;

@@ -10,6 +10,7 @@ import {
   Divider,
   PageHeader,
   Tag,
+  message,
 } from 'antd';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './preview.less';
@@ -18,6 +19,7 @@ import { transformToTreeNode } from '@designable/formily-transformer';
 import Icon from '@/utils/icon';
 import { nanoid } from 'nanoid';
 import { history } from 'umi';
+import * as formApi from '@/services/formManage';
 const { Search } = Input;
 
 const tablePreview = (props) => {
@@ -34,6 +36,7 @@ const tablePreview = (props) => {
 
   const formRef = useRef(null);
   const tableRef = useRef(null);
+  const currentRecord = useRef(null);
   const formCode = useMemo(() => {
     return props.location?.query?.formCode || props.formCode;
   });
@@ -42,6 +45,10 @@ const tablePreview = (props) => {
   const [searchText, setSearchText] = useState('');
   const [searchedColumn, setSearchedColumn] = useState('');
   const searchInput = useRef(null);
+  const tableMobanCode = useRef(null);
+  const tablePreviewData = useRef(null);
+
+  const { saveTableData } = props;
 
   // 检索搜索
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -120,31 +127,70 @@ const tablePreview = (props) => {
     },
   });
 
-  useEffect(() => {
-    // 表单
-    const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
-    if (!formColumn) return;
-    const formItemObj = formColumn[formCode]['formily-form-schema'];
-    if (formItemObj) {
-      formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
-      setFormTree(transformToTreeNode(formItemObj));
+  /* 分页查询预览数据 */
+  const fetchList = (searchIdenty = false, searchKey) => {
+    const sentItem = {
+      formId: formCode,
+      formTableCode: tableMobanCode.current,
+    };
+    if (searchIdenty) {
+      sentItem['searchKey'] = searchKey;
     }
+    formApi.getTableList(sentItem).then((res) => {
+      setDataSource(res?.object || []);
+    });
+  };
+
+  useEffect(() => {
+    tablePreviewData.current = null;
+    formApi.getFormDetails({ formId: formCode }).then(async (res) => {
+      const formDetail = res?.object || {};
+      const { formPropertyValue, listPropertyValue, ...others } = formDetail;
+      const formItemObj = JSON.parse(formPropertyValue);
+      tableMobanCode.current = formDetail.formTableCode;
+      setFormTree(transformToTreeNode(formItemObj));
+      formApi
+        .getTableDetails({
+          formId: formCode,
+          formTableCode: tableMobanCode.current,
+        })
+        .then((res) => {
+          const columnsInit = res.object;
+          const tableConfig = columnsInit?.tableConfig || [];
+          const buttons = columnsInit?.buttonConfig || [];
+          setButtons(buttons);
+          setTable(tableConfig);
+          const colNew = setTableCol(tableConfig, columnsInit?.columns || []);
+          fetchList();
+          setShowPageTitle(props.showPageTitle);
+        });
+    });
+
+    // 表单
+    // const formColumn = JSON.parse(window.localStorage.getItem('formMap'));
+    // if (!formColumn) return;
+    // const formItemObj = formColumn[formCode]['formily-form-schema'];
+    // if (formItemObj) {
+    //   formItemObj.form = { ...formItemObj.form, layout: 'vertical' };
+    //   setFormTree(transformToTreeNode(formItemObj));
+    // }
 
     // 表格
-    const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
-    const data = tableConfig && tableConfig[formCode];
-    if (data) {
-      setButtons(data.buttonConfig);
-      setTable(data.tableConfig);
-      setTableCol(data.tableConfig, data.columns);
-    }
+    // const tableConfig = JSON.parse(window.localStorage.getItem('tableConfig'));
 
-    const tableList = JSON.parse(window.localStorage.getItem('tableList'));
-    if (tableList && tableList[formCode]) {
-      setDataSource(tableList[formCode]);
-    }
+    // const data = tableConfig && tableConfig[formCode];
+    // if (data) {
+    //   setButtons(data.buttonConfig);
+    //   setTable(data.tableConfig);
+    //   const colNew = setTableCol(data.tableConfig, data.columns);
+    // }
 
-    setShowPageTitle(props.showPageTitle);
+    /* 获取预览table展示数据 */
+    // fetchList();
+    // const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+    // if (tableList && tableList[formCode]) {
+    //   setDataSource(tableList[formCode]);
+    // }
   }, []);
 
   // 行删除
@@ -153,43 +199,49 @@ const tablePreview = (props) => {
       title: '确定要删除吗',
       content: '该操作不可逆，请谨慎操作！',
       onOk: () => {
-        const data =
-          dataSource.length > 0
-            ? dataSource
-            : JSON.parse(window.localStorage.getItem('tableList'))[formCode];
-
-        const tableList = JSON.parse(window.localStorage.getItem('tableList'));
-        if (index === 0 && data.length === 1) {
-          setDataSource([]);
-          // saveFormList();
-          for (let k in tableList) {
-            if (k === formCode) {
-              tableList[k] = [];
-            }
-          }
-          saveFormList(tableList);
-          // window.localStorage.setItem('dataSource', []);
-        } else {
-          const arr = data.filter((e, i) => i !== index);
-          setDataSource(arr);
-          for (let k in tableList) {
-            if (k === formCode) {
-              tableList[k] = arr;
-            }
-          }
-          saveFormList(tableList);
-          // window.localStorage.setItem('dataSource', JSON.stringify(arr));
-        }
+        // rowDelete
+        // const data =
+        //   dataSource.length > 0
+        //     ? dataSource
+        //     : JSON.parse(window.localStorage.getItem('tableList'))[formCode];
+        deletePreviewData([record.tableDataCode]);
+        // const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+        // if (index === 0 && data.length === 1) {
+        //   setDataSource([]);
+        //   // saveFormList();
+        //   for (let k in tableList) {
+        //     if (k === formCode) {
+        //       tableList[k] = [];
+        //     }
+        //   }
+        //   saveFormList(tableList);
+        //   // window.localStorage.setItem('dataSource', []);
+        // } else {
+        //   const arr = data.filter((e, i) => i !== index);
+        //   setDataSource(arr);
+        //   for (let k in tableList) {
+        //     if (k === formCode) {
+        //       tableList[k] = arr;
+        //     }
+        //   }
+        //   saveFormList(tableList);
+        //   // window.localStorage.setItem('dataSource', JSON.stringify(arr));
+        // }
       },
     });
   };
 
   // 行编辑
   const rowEdit = (_, record, index) => {
+    currentRecord.current = record;
     setFormVisible(true);
     setIndex(index);
-    const form = formRef.current.form;
-    form.setValues(record);
+    setTimeout(() => {
+      if (formRef?.current?.form) {
+        const form = formRef.current.form;
+        form.setValues(record);
+      }
+    }, 0);
   };
 
   // 设置表格
@@ -253,8 +305,6 @@ const tablePreview = (props) => {
       }
     }
     const cols = colsArr.map((e) => {
-      // console.log('表头', e);
-
       if (e.filterEnable) {
         return {
           title: e.label,
@@ -274,7 +324,9 @@ const tablePreview = (props) => {
     });
 
     // 设置表格
-    setColumn(indexCol.concat(cols).concat(operationCol));
+    const colunsNew = indexCol.concat(cols).concat(operationCol);
+    setColumn(colunsNew);
+    return colunsNew;
   };
 
   // 取消列表配置保存
@@ -290,6 +342,7 @@ const tablePreview = (props) => {
 
   // 表单取消
   const formCancel = () => {
+    currentRecord.current = null;
     setFormVisible(false);
     formRef.current.form.reset();
   };
@@ -300,31 +353,69 @@ const tablePreview = (props) => {
     form.validate().then(() => {
       // 表单提交
       let arr = [...dataSource];
-
+      let newItem = null;
       if (index === -1) {
-        arr.push({
+        newItem = {
           ...JSON.parse(JSON.stringify(form.values)),
           id: nanoid(),
-        });
+        };
+        arr.push(newItem);
         console.log('确认添加', arr);
       } else {
         // 编辑
+        newItem = {
+          ...JSON.parse(JSON.stringify(form.values)),
+          tableDataCode: currentRecord.current.tableDataCode,
+          id: arr[index].id,
+        };
         arr[index] = {
           ...JSON.parse(JSON.stringify(form.values)),
           id: arr[index].id,
         };
       }
 
-      setDataSource(arr);
+      // setDataSource(arr);
       // 数据有异步问题，暂存localStorage
       // window.localStorage.setItem('dataSource', JSON.stringify(arr));
       // window.localStorage.setItem('tableList', JSON.stringify({ [`${formCode}`]: arr }))
       const obj = JSON.parse(window.localStorage.getItem('tableList')) ?? {};
       saveFormList({ ...obj, [`${formCode}`]: arr });
+      handlePreviewOk(newItem, index === -1 ? 'add' : 'edit', () => {
+        /* 请求列表 */
+        fetchList();
+      });
       formCancel();
     });
   };
-
+  const handlePreviewOk = (newItem, identy, callback) => {
+    if (tableMobanCode?.current) {
+      const colunmsKeys = [];
+      tablePreviewData.current.colNew.forEach((item) => {
+        if (item.dataIndex !== 'index' && item.dataIndex !== 'operation') {
+          colunmsKeys.push(item.dataIndex);
+        }
+      });
+      let sendItem = {
+        formId: formCode,
+        formTableCode: tableMobanCode.current,
+        tableList: {},
+      };
+      const backObj = {};
+      colunmsKeys.forEach((itemK) => {
+        backObj[itemK] = newItem[itemK] ? newItem[itemK] : '';
+      });
+      sendItem.tableList = backObj;
+      const sendMethod =
+        identy === 'add' ? formApi.tableAdd : formApi.tableSave;
+      if (identy !== 'add') {
+        sendItem['tableDataCode'] = newItem.tableDataCode;
+      }
+      sendMethod(sendItem).then((res) => {
+        callback && callback();
+        message.success('保存成功');
+      });
+    }
+  };
   // 表格选择修改
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
@@ -343,14 +434,26 @@ const tablePreview = (props) => {
       title: '确定要删除吗',
       content: '该操作不可逆，请谨慎操作！',
       onOk: () => {
-        let data = dataSource;
-        selectedRowKeys.forEach((item) => {
-          data = data.filter((e) => e.id !== item);
-        });
-        setDataSource(data);
+        // let data = dataSource;
+        // selectedRowKeys.forEach((item) => {
+        //   data = data.filter((e) => e.id !== item);
+        // });
+        // setDataSource(data);
+        deletePreviewData(selectedRowKeys);
         // saveFormList(data);
       },
     });
+  };
+
+  const deletePreviewData = (idArr = []) => {
+    formApi
+      .deleteTable({
+        tableDataCodeList: idArr,
+      })
+      .then((res) => {
+        message.success('删除成功');
+        fetchList();
+      });
   };
 
   // 保存至缓存中
@@ -360,43 +463,60 @@ const tablePreview = (props) => {
 
   // 只搜索可搜索列
   const onSearch = (str) => {
-    if (!str) {
-      // 清空搜索值时，重设表格
-      const tableList = JSON.parse(window.localStorage.getItem('tableList'));
-      setDataSource(tableList[formCode]);
-      return;
-    }
+    fetchList(true, str);
+    // if (!str) {
+    //   // 清空搜索值时，重设表格
+    //   const tableList = JSON.parse(window.localStorage.getItem('tableList'));
+    //   setDataSource(tableList[formCode]);
+    //   return;
+    // }
 
-    const arr1 = table.filter((e) => !e.searchEnable)?.map((e) => e.id); // 可搜索的字段
-    const arr2 = dataSource.map((item) => {
-      // 过滤表格数据不可搜索字段
-      for (let k in item) {
-        if (arr1.includes(k)) {
-          delete item[k];
-        }
-      }
-      return item;
-    });
-    const arr3 = [];
-    arr2.forEach((item) => {
-      // 判断表格数据可搜索字段是否和搜索值有重叠部分
-      for (let k in item) {
-        if (item[k].toString().indexOf(str) !== -1 && k !== 'id') {
-          arr3.push(item);
-        }
-      }
-    });
-    const arr4 = [];
-    dataSource.forEach((item, index) => {
-      // 去重搜索结果，比对id返回正确的行数据
-      [...new Set(arr3)].forEach((e, i) => {
-        if (e.id === item.id) {
-          arr4.push(item);
-        }
-      });
-    });
-    setDataSource(arr4);
+    // const arr1 = table.filter((e) => !e.searchEnable)?.map((e) => e.id); // 可搜索的字段
+    // const arr2 = dataSource.map((item) => {
+    //   // 过滤表格数据不可搜索字段
+    //   for (let k in item) {
+    //     if (arr1.includes(k)) {
+    //       delete item[k];
+    //     }
+    //   }
+    //   return item;
+    // });
+    // const arr3 = [];
+    // arr2.forEach((item) => {
+    //   // 判断表格数据可搜索字段是否和搜索值有重叠部分
+    //   for (let k in item) {
+    //     if (item[k].toString().indexOf(str) !== -1 && k !== 'id') {
+    //       arr3.push(item);
+    //     }
+    //   }
+    // });
+    // const arr4 = [];
+    // dataSource.forEach((item, index) => {
+    //   // 去重搜索结果，比对id返回正确的行数据
+    //   [...new Set(arr3)].forEach((e, i) => {
+    //     if (e.id === item.id) {
+    //       arr4.push(item);
+    //     }
+    //   });
+    // });
+    // setDataSource(arr4);
   };
+
+  useEffect(() => {
+    tablePreviewData.current = {
+      // buttonConfig,
+      // tableConfig,
+      colNew: column,
+      tableData: dataSource,
+    };
+    saveTableData &&
+      saveTableData({
+        // buttonConfig,
+        // tableConfig,
+        colNew: column,
+        tableData: dataSource,
+      });
+  }, [column]);
 
   return (
     <div className="table-preview">
@@ -487,7 +607,7 @@ const tablePreview = (props) => {
           columns={column}
           dataSource={dataSource}
           style={{ marginTop: '20px', padding: '0 40px' }}
-          rowKey={(record) => record.id}
+          rowKey={(record) => record.tableDataCode}
           rowSelection={rowSelection}
           scroll={{ x: 'max-content' }}
           className="default-table"

@@ -19,6 +19,12 @@ export default [
     redirect: '/login',
   },
   {
+    name: '预览移动端表单',
+    path: '/formManage/previewMobile',
+    component: '@/pages/designerMobile/preview',
+    hidden: true,
+  },
+  {
     name: '主页',
     path: '/homeIndex',
     component: '@/layouts/homeIndex/index',

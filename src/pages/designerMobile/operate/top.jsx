@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Button, Radio } from 'antd';
 import { EditOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { OperateContext } from '.';
 
 function OperateTop() {
-  const [status, setStatus] = useState('edit');
+  const { nowStatus, setNowStatus } = useContext(OperateContext);
   return (
     <div className="des-mobile-con-oper-top">
       <div></div>
       <div>
         <Radio.Group
           size="small"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
+          value={nowStatus}
+          onChange={(e) => setNowStatus(e.target.value)}
         >
           <Radio.Button value="edit">
             <EditOutlined />

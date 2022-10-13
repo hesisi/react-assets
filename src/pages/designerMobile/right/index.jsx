@@ -1,18 +1,36 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { designerContext } from './..';
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Checkbox, Form, Input, Switch } from 'antd';
+import { fieldConfigs, componentConfigs } from './config';
 
 function RightArea() {
   const formRef = React.createRef();
+  const [comConfigs, setComConfigs] = useState([]);
   const { comp, setComp, nowOperateId } = useContext(designerContext);
 
   useEffect(() => {
     console.log({ nowOperateId });
-    console.log('formRef.current', comp[nowOperateId]?.properties);
-    !comp[nowOperateId]?.properties && formRef.current.resetFields();
-    nowOperateId &&
-      formRef.current.setFieldsValue(comp[nowOperateId]?.properties || {});
+    //清空属性配置表单
+    formRef.current.resetFields();
+    //给表单重新赋值
+    if (!nowOperateId) return;
+    //类型不同，右侧需要配置的组件属性不同
+    setComConfigs(componentConfigs(comp[nowOperateId]?.type));
+    //给当前选中的表单配置过的属性赋值
+    formRef.current.setFieldsValue(comp[nowOperateId]?.properties || {});
   }, [nowOperateId]);
+
+  const columnsDom = (config) => {
+    const { type } = config;
+    switch (type) {
+      case 'input':
+        return <Input />;
+      case 'textarea':
+        return <Input.TextArea />;
+      case 'switch':
+        return <Switch />;
+    }
+  };
 
   const onFieldsChange = (changedFields, allFields) => {
     nowOperateId &&
@@ -38,21 +56,28 @@ function RightArea() {
           colon={false}
           labelAlign="left"
           size="middle"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
+          labelCol={{ span: 10 }}
+          wrapperCol={{ span: 14 }}
           onFieldsChange={onFieldsChange}
           initialValues={{ ...(comp[nowOperateId]?.properties || null) }}
           autoComplete="off"
         >
-          <Form.Item label="字段标识" name="prop">
-            <Input />
-          </Form.Item>
-          <Form.Item label="标题" name="label">
-            <Input />
-          </Form.Item>
-          <Form.Item label="描述" name="description">
-            <Input.TextArea />
-          </Form.Item>
+          <div className="des-mobile-con-area-subtitle">字段属性</div>
+          <div className="des-mobile-con-area-formItem">
+            {fieldConfigs.map((item) => (
+              <Form.Item key={item.name} label={item.label} name={item.name}>
+                {columnsDom(item)}
+              </Form.Item>
+            ))}
+          </div>
+          <div className="des-mobile-con-area-subtitle">组件属性</div>
+          <div className="des-mobile-con-area-formItem">
+            {comConfigs.map((item) => (
+              <Form.Item key={item.name} label={item.label} name={item.name}>
+                {columnsDom(item)}
+              </Form.Item>
+            ))}
+          </div>
         </Form>
       </div>
     </div>

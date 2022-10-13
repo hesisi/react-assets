@@ -54,7 +54,14 @@
   }
 
   .des-mobile-con-config {
-    padding: 10px 20px;
+    // padding: 10px 20px;
+    .des-mobile-con-area-subtitle {
+      background-color: #f0f0f0;
+      padding: 5px 10px;
+    }
+    .des-mobile-con-area-formItem {
+      padding: 10px 20px;
+    }
   }
 }
 
@@ -96,7 +103,6 @@
 
         .des-mobile-formItem {
           position: relative;
-          border: 2px solid #fff;
           .des-mobile-formItem-cover {
             position: absolute;
             top: 0;
@@ -104,6 +110,9 @@
             right: 0;
             bottom: 0;
             z-index: 9;
+            &.formItem-cover-nowOperating {
+              border: 2px solid #1890ff;
+            }
           }
           .des-mobile-formItem-delete {
             position: absolute;
@@ -113,8 +122,8 @@
             background-color: #1890ff;
             width: 20px;
             height: 20px;
-            bottom: -23px;
-            right: -2px;
+            bottom: -22px;
+            right: 2px;
             z-index: 99;
             border-radius: 2px;
             cursor: pointer;
@@ -122,9 +131,10 @@
               background-color: #40a9ff;
             }
           }
-          &.formItem-nowOperating {
-            border: 2px solid #1890ff;
-          }
+        }
+        .des-mobile-con-oper-preview {
+          width: 100%;
+          height: 100%;
         }
       }
     }

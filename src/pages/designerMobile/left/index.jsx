@@ -7,26 +7,19 @@ const components = [
   {
     type: 'input',
     name: '输入框',
+    component: 'InputC',
     icon: 'IdcardOutlined',
   },
   {
     type: 'textarea',
     name: '多行输入',
+    component: 'TextAreaC',
     icon: 'IdcardOutlined',
   },
   {
-    type: 'password',
-    name: '密码输入',
-    icon: 'IdcardOutlined',
-  },
-  {
-    type: 'number',
-    name: '数字输入',
-    icon: 'IdcardOutlined',
-  },
-  {
-    type: 'number',
-    name: '数字输入',
+    type: 'picker',
+    name: '单选框',
+    component: 'PickerC',
     icon: 'IdcardOutlined',
   },
 ];

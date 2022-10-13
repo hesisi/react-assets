@@ -14,7 +14,7 @@ const { Header, Content, Sider } = Layout;
 const { confirm } = Modal;
 import Modeler from 'bpmn-js/lib/Modeler';
 
-import { xmlStr } from '../xml/Xml1';
+// import { xmlStr } from '../xml/Xml1';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import './index.less';
@@ -50,14 +50,17 @@ import { nanoid } from 'nanoid';
 import moment from 'moment';
 
 // import flowbg from '@/assets/flow_bg.png'
+import { saveActivity, startActivity, getXml } from '@/services/activityManage';
 
-export default function IndexPage() {
+export default function IndexPage(props) {
   const location = useLocation();
   const refContainer = useRef();
   const refPanel = useRef();
   const [modeler, setModeler] = useState(null);
   const [group, setGroup] = useState([]);
   const [flowMsg, setFlowMsg] = useState(null);
+  const isCreate = props?.location?.query?.isCreate;
+
   useEffect(() => {
     // console.log('-------------->');
     // console.log(flowMsg);
@@ -74,7 +77,7 @@ export default function IndexPage() {
   const getFlow = (group) => {
     let _flow = {};
     if (group) {
-      _flow = group.find((x) => x.id === location.query.flowID);
+      _flow = group.find((x) => x.processId === location.query.processId);
     } else {
       _flow = null;
     }
@@ -110,7 +113,7 @@ export default function IndexPage() {
         bindTo: document.body,
       },
     });
-    // console.log(flow);
+    console.log('flow++++++++++++++', flow);
     const propertiesPanel = new PropertiesPanel({
       container: refPanel.current,
       modeler,
@@ -118,8 +121,11 @@ export default function IndexPage() {
       forms: forms,
       setFlowMsg: updateFlow,
     });
-    // console.log(flow?.xml)
-    modeler.importXML(flow?.xml || xmlStr);
+    let xml = getCurrentXml();
+    console.log('currentXML++++++++++++++++++++', xml);
+
+    // todo 有时候xml无法被bpmn解析
+    modeler.importXML(xml);
     setModeler(modeler);
   }, [flow]);
 
@@ -129,7 +135,7 @@ export default function IndexPage() {
   async function exportDiagram() {
     try {
       var result = await modeler.saveXML({ format: true });
-      // console.log('DIAGRAM', result.xml);
+      console.log('DIAGRAM', result.xml);
       const _flow = { ...flowMsg };
       _flow.xml = result.xml;
       _flow.creatTime = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -139,18 +145,62 @@ export default function IndexPage() {
         : '';
       // window.localStorage.setItem('flow',JSON.stringify(_flow));
       const tempGroup = group.map((x) => {
-        if (x.id === _flow.id) {
+        if (x.processId === _flow.processId) {
           x = { ..._flow };
         }
         return x;
       });
       window.localStorage.setItem('flowGroup', JSON.stringify(tempGroup));
       // history.push('/activityManage');
+      let processId = window.localStorage.getItem('processId');
       message.success('保存成功');
+      const parmas = {
+        bpmnDataStr: _flow.xml,
+        bpmnName: _flow.processName,
+        // todo
+        processId: processId,
+      };
+      console.log(parmas);
+      console.log(_flow);
+
+      saveActivity(parmas).then((res) => {
+        if (res.data.isSuccess > 0) {
+          message.success('保存成功');
+          startActivity({
+            processId: res.data?.data,
+            userId: 'caiiyun',
+          }).then((res) => {
+            if (res.data.isSuccess > 0) {
+              message.success('启动流程成功');
+            }
+          });
+        }
+      });
     } catch (err) {
       console.error('could not save BPMN 2.0 diagram', err);
     }
   }
+  const getCurrentXml = () => {
+    let processName = props?.location?.query?.processName;
+    let processId = props?.location?.query?.processId;
+
+    if (isCreate) {
+      let xmlTemp = xmlStr(processId, processName);
+      return xmlTemp;
+    } else {
+      getXml(processName)
+        .then((res) => {
+          if (res?.data.isSuccess > 0) {
+            const { data } = res.data;
+            return data.xml;
+          } else {
+          }
+        })
+        .catch((err) => {
+          message.error(err);
+        });
+    }
+  };
 
   const handleDel = () => {
     confirm({
@@ -164,6 +214,18 @@ export default function IndexPage() {
         console.log('Cancel');
       },
     });
+  };
+
+  const xmlStr = (processId, name) => {
+    return `<?xml version="1.0" encoding="UTF-8"?>
+      <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="sid-38422fae-e03e-43a3-bef4-bd33b32041b2" targetNamespace="http://bpmn.io/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="5.1.2">
+        <process id="${processId}" name="${name}" isExecutable="true" >
+        </process>
+        <bpmndi:BPMNDiagram id="BpmnDiagram_1">
+          <bpmndi:BPMNPlane id="BpmnPlane_1" bpmnElement="Process_1" >
+          </bpmndi:BPMNPlane>
+        </bpmndi:BPMNDiagram>
+      </definitions>`;
   };
 
   return (
@@ -182,7 +244,7 @@ export default function IndexPage() {
               返回
             </Link>
           </Col>
-          <Col span={8}>{flowMsg?.proessName}</Col>
+          <Col span={8}>{flowMsg?.processName}</Col>
           <Col span={8} style={{ textAlign: 'right' }}>
             <Button
               icon={<SaveOutlined />}

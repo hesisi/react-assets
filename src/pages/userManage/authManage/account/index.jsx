@@ -51,12 +51,6 @@ import moment from 'moment';
 const { Dragger } = Upload;
 const { Option } = Select;
 const { confirm } = Modal;
-// const data = [
-//   { name: '耐克', id: getUUID() },
-//   { name: '阿迪达斯', id: getUUID() },
-//   { name: '李宁', id: getUUID() },
-//   { name: '贵人鸟', id: getUUID() },
-// ];
 const { Search } = Input;
 export default function Account({ accountIdenty = 'user' }) {
   const formRef = useRef(null);
@@ -68,9 +62,10 @@ export default function Account({ accountIdenty = 'user' }) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalGVisible, setIsModalGVisible] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-  const [selectedGRowKeys, setSelectedGRowKeys] = useState([]);
   const [searchName, setSearchName] = useState('');
   const [fileList, setFileList] = useState([]);
+  const [showErrReport, setShowErrReport] = useState(false);
+  const [errExcel, setErrExcel] = useState('');
   const [pageInfo, setPageInfo] = useState({
     pageSize: 10,
     pageNum: 1,
@@ -232,14 +227,11 @@ export default function Account({ accountIdenty = 'user' }) {
   ];
 
   useEffect(async () => {
-    // const initUserData = await localForage.getItem('userList');
     getUserListByPage('', pageInfo);
     getGroupList();
-    // goupArr.current = (await localForage.getItem('userGroup')) || data;
-    // localForage.setItem('userGroup', goupArr.current);
-    // setDataSource(initUserData || []);
   }, []);
 
+  //分页获取用户列表
   const getUserListByPage = async (name, userDTO) => {
     await getUserList({ name: name, ...userDTO }).then((res) => {
       if (res?.data?.isSuccess > 0) {
@@ -256,6 +248,7 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  //获取分组列表信息
   const getGroupList = async () => {
     await getUserGroupList().then((res) => {
       if (res?.data?.isSuccess > 0) {
@@ -266,6 +259,7 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  //用户列表分组信息显示处理
   const filterGroup = (text) => {
     const Group = dataGSource.filter((item) => text.includes(item.id)) || [];
     let arr = [];
@@ -275,25 +269,18 @@ export default function Account({ accountIdenty = 'user' }) {
     return arr.join('; ');
   };
 
+  //获取已选用户
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  // const onSelectGChange = (newSelectedRowKeys) => {
-  //   setSelectedGRowKeys(newSelectedRowKeys);
-  // };
-
-  // const rowGSelection = {
-  //   selectedGRowKeys,
-  //   onChange: onSelectGChange,
-  // };
-
-  /* 用户添加， 选择用户 */
+  /* 用户添加，选择用户 */
   const handleAccountAdd = () => {
     eidtIdenty.current = false;
     setIsModalVisible(true);
   };
 
+  //获取已选择分组
   const handleGroup = () => {
     if (!selectedRowKeys?.length) {
       message.warn('请选择至少一条数据');
@@ -301,12 +288,13 @@ export default function Account({ accountIdenty = 'user' }) {
     }
     setIsModalGVisible(true);
   };
-  //批量新增的模板，下载
+
+  //批量新增模板的下载
   const downloadTemplate = () => {
     getTemplate().then((res) => {
       if (res) {
         const blob = new Blob([res.data]); //处理文档流
-        const fileName = `user.xls`;
+        const fileName = `template.xls`;
         const elink = document.createElement('a');
         elink.download = fileName;
         elink.style.display = 'none';
@@ -319,25 +307,38 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
+  //批量新增文档上传
   const handleUpload = () => {
     const formData = new FormData();
     fileList.forEach((file) => {
       formData.append('excelFile', file);
-      console.log('file-----------', file);
     });
     console.log('uplodefile', fileList);
     addUserByUpload(formData).then((res) => {
-      if (res.data.isSuccess > 0) {
-        setFileList([]);
-        message.success('添加成功');
-        setIsModalVisible(false);
-        getUserListByPage(searchName, pageInfo);
-      } else {
-        // message.error(res.data.message);
-      }
+      // if (res.data.isSuccess>0) {
+      //   setFileList([]);
+      //   message.success('添加成功');
+      //   setIsModalVisible(false);
+      //   getUserListByPage(searchName, pageInfo);
+      // } else {
+      message.success('上传完成，上传结果请查看结果文档');
+      setShowErrReport(true);
+      console.log(res);
+      const blob = new Blob([res.data], { type: 'application/vnd.ms-excel' }); //处理文档流
+      const fileName = `result.xls`;
+      const elink = document.createElement('a');
+      elink.download = fileName;
+      elink.style.display = 'none';
+      elink.href = URL.createObjectURL(blob);
+      document.body.appendChild(elink);
+      elink.click();
+      URL.revokeObjectURL(elink.href); // 释放URL 对象
+      document.body.removeChild(elink);
+      // }
     });
   };
 
+  //上传属性配置
   const props = {
     name: 'file',
     multiple: false,
@@ -365,6 +366,7 @@ export default function Account({ accountIdenty = 'user' }) {
     },
     beforeUpload: (file) => {
       setFileList([file]);
+      setShowErrReport(false);
       return false;
     },
   };
@@ -373,32 +375,10 @@ export default function Account({ accountIdenty = 'user' }) {
     setUserAddC(identy);
   };
 
-  /* 一个人挂一个分组下面 */
-  // const editGroupInfo = async (groupId, userItem) => {
-  //   const initUserData = (await localForage.getItem('groupUserList')) || {};
-  //   console.log(initUserData, '222----');
-  //   const newUserData = cloneDeep(initUserData);
-  //   let copyDataKeys = Object.keys(newUserData);
-  //   copyDataKeys.forEach((item) => {
-  //     if (newUserData?.[item]) {
-  //       console.log(newUserData[item], '226----');
-  //       newUserData[item] = newUserData[item].filter(
-  //         (itemC) => itemC.id !== userItem.id,
-  //       );
-  //     }
-  //   });
-  //   if (groupId) {
-  //     console.log(newUserData[groupId], '234----');
-  //     newUserData[groupId] = newUserData?.[groupId]
-  //       ? newUserData[groupId].concat([userItem])
-  //       : [userItem];
-  //   }
-  //   console.log(newUserData, '239----');
-  //   localForage.setItem('groupUserList', newUserData);
-  // };
-
+  //新增or编辑确认
   const handleOk = () => {
     if (userAddC) {
+      //true为单个，false为批量
       formRef.current
         .validateFields()
         .then((values) => {
@@ -407,8 +387,6 @@ export default function Account({ accountIdenty = 'user' }) {
             const userItem = {
               ...values,
               id: currentId.current,
-              // code: values.userName,
-              // realName: values.userName,
             };
             console.log('newUser', userItem);
             updateOneUser({ ...userItem }).then((res) => {
@@ -425,15 +403,11 @@ export default function Account({ accountIdenty = 'user' }) {
                   job: undefined,
                   groupList: undefined,
                 });
-              } else {
-                // message.error(res.data.message);
               }
             });
           } else {
             const userItem = {
               ...values,
-              // code: values.userName,
-              // realName: values.userName,
             };
             console.log('newUser', userItem);
             addOneUser({ ...userItem }).then((res) => {
@@ -467,6 +441,7 @@ export default function Account({ accountIdenty = 'user' }) {
     }
   };
 
+  //批量分组确认
   const handleGOk = () => {
     groupFormRef.current.validateFields().then((values) => {
       if (!values?.groupList?.length) {
@@ -514,6 +489,7 @@ export default function Account({ accountIdenty = 'user' }) {
     setIsModalVisible(true);
   };
 
+  //批量删除
   const handleBatchDelete = () => {
     if (!selectedRowKeys?.length) {
       message.warn('请选择一条数据');
@@ -522,6 +498,7 @@ export default function Account({ accountIdenty = 'user' }) {
     handleDelete(selectedRowKeys);
   };
 
+  //单个删除
   const handleDelete = async (idArr = []) => {
     confirm({
       title: '确认删除吗',
@@ -538,17 +515,12 @@ export default function Account({ accountIdenty = 'user' }) {
             message.success('删除失败');
           }
         });
-        // const currentUser = cloneDeep(dataSource).filter(
-        //   (item) => !idArr.includes(item.id),
-        // );
-        // setDataSource(currentUser);
-        // localForage.setItem('userList', currentUser);
-        // message.success('删除成功');
       },
       onCancel() {},
     });
   };
 
+  //密码重置
   const handleReset = (id) => {
     resetPasswd(id).then((res) => {
       if (res?.data?.isSuccess > 0) {
@@ -559,7 +531,8 @@ export default function Account({ accountIdenty = 'user' }) {
     });
   };
 
-  const creatSelct = (list = [], place = '') => {
+  //生成单选选择框
+  const creatSelect = (list = [], place = '') => {
     return (
       <Select placeholder={place} allowClear>
         {list.map((x) => {
@@ -572,6 +545,8 @@ export default function Account({ accountIdenty = 'user' }) {
       </Select>
     );
   };
+
+  //生成多选选择框
   const creatMultipleSelect = (list = [], place = '') => {
     return (
       <Select mode="multiple" placeholder={place} maxTagCount={3}>
@@ -586,6 +561,7 @@ export default function Account({ accountIdenty = 'user' }) {
     );
   };
 
+  //通过用户名获取用户列表
   const handleUserSearch = (value) => {
     setPageInfo({
       ...pageInfo,
@@ -594,9 +570,8 @@ export default function Account({ accountIdenty = 'user' }) {
     setSearchName(value);
     getUserListByPage(value, { ...pageInfo, pageNum: 1 });
   };
-  // const handleGroupSearch = (value) => { };
-  // const onFinish = () => { };
 
+  //翻页，页面跳转
   const handlePageChange = (num, pageSize) => {
     const newPageInfo = {
       ...pageInfo,
@@ -725,6 +700,7 @@ export default function Account({ accountIdenty = 'user' }) {
               setUserAddC(true);
               setIsModalVisible(false);
               setFileList([]);
+              setShowErrReport(false);
             }}
             className="default-modal"
             cancelText="取消"
@@ -749,6 +725,16 @@ export default function Account({ accountIdenty = 'user' }) {
                     >
                       批量添加
                     </span>
+                    {!userAddC && (
+                      <a
+                        onClick={() => {
+                          downloadTemplate();
+                        }}
+                        style={{ fontSize: '12px', float: 'right' }}
+                      >
+                        模板下载
+                      </a>
+                    )}
                   </span>
                 )}
                 <div
@@ -783,7 +769,7 @@ export default function Account({ accountIdenty = 'user' }) {
                         </Col>
                         <Col span={12}>
                           <Form.Item label="性别" name="gender">
-                            {creatSelct(
+                            {creatSelect(
                               [
                                 { value: '男', label: '男' },
                                 { value: '女', label: '女' },
@@ -826,7 +812,7 @@ export default function Account({ accountIdenty = 'user' }) {
                       <Row>
                         <Col span={12}>
                           <Form.Item label="岗位" name="job">
-                            {creatSelct(workList, '请选择岗位')}
+                            {creatSelect(workList, '请选择岗位')}
                           </Form.Item>
                         </Col>
                         <Col span={12}>
@@ -852,14 +838,19 @@ export default function Account({ accountIdenty = 'user' }) {
                           最大文件大小限制为20MB
                         </p>
                       </Dragger>
-                      <a
-                        onClick={() => {
-                          downloadTemplate();
-                        }}
-                        style={{ fontSize: '12px', float: 'right' }}
-                      >
-                        模板下载
-                      </a>
+                      {showErrReport && (
+                        <a
+                          onClick={() => {
+                            downloadTemplate();
+                          }}
+                          style={{
+                            fontSize: '12px',
+                            color: 'var(--ant-primary-color)',
+                          }}
+                        >
+                          上传完成，请查看结果报告
+                        </a>
+                      )}
                     </>
                   )}
                 </div>
@@ -882,25 +873,6 @@ export default function Account({ accountIdenty = 'user' }) {
             okText="确认"
           >
             <div className="user-wrapper">
-              {/* <Table
-                rowSelection={{
-                  type: 'checkbox',
-                  ...rowGSelection,
-                }}
-                style={{ marginTop: 20 }}
-                dataSource={dataGSource}
-                columns={columnGs.filter((item) => item.key !== 'action')}
-                // loading={loading}
-                scroll={{ y: 340, x: '100%' }}
-                pagination={{
-                  total: dataGSource?.length || 0,
-                  showSizeChanger: true,
-                  showTotal: (total) => `共${total}条`,
-                  // showQuickJumper: true,
-                  // onChange: handlePageChange,
-                }}
-                rowKey={(record) => record.id}
-              /> */}
               <Form
                 className="account-add default-form-radios"
                 ref={groupFormRef}

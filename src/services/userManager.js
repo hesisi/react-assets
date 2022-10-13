@@ -19,6 +19,7 @@ export function addUserByUpload(params) {
   return request(`${basePreix}/user/upload`, {
     method: 'post',
     data: params,
+    responseType: 'blob',
   });
 }
 //删除用户

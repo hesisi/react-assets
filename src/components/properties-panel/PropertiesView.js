@@ -64,7 +64,6 @@ export default class PropertiesView extends Component {
       console.log('节点变化');
       const { element } = e;
       if (element?.type === 'bpmn:UserTask' || element?.type === 'bpmn:Task') {
-        // console.log(element)
         this.updateApproverNode(element);
       }
     });
@@ -77,7 +76,6 @@ export default class PropertiesView extends Component {
     /**监听添加节点*/
     modeler.on('shape.added', (e) => {
       console.log('创建节点');
-      // const { element } = e;
       // if(element?.type==='bpmn:UserTask' || element?.type === 'bpmn:Task'){
       //   this.addApproverNode(element)
       // }
@@ -201,7 +199,7 @@ export default class PropertiesView extends Component {
               {selectedElements.length > 0 ? null : (
                 <Form.Item label="流程名称" name="name">
                   <Input
-                    defaultValue={flowMsg?.proessName}
+                    defaultValue={flowMsg?.processName}
                     allowClear
                     disabled
                   />

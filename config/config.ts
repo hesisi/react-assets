@@ -11,8 +11,9 @@ import routes from './routes.js';
 
 import postCssPxToViewport from 'postcss-px-to-viewport';
 
-const baosanIp = '10.173.95.161:9201/';
-const liqingIp = '10.173.95.161:9201/';
+const baosanIp = '10.173.88.85:9201/';
+const liqingIp = '10.173.73.4:9202/';
+const liuyangIp = '10.173.89.142:9202/';
 export default defineConfig({
   nodeModulesTransform: {
     type: 'none',
@@ -36,6 +37,11 @@ export default defineConfig({
       // target: config.infraApiOrigin, // 头部infra配置地址
       // target: 'http://10.173.73.250:9202/', // 韩振宇
       target: `http://${baosanIp}`, // 田宝山
+    },
+    '/department/': {
+      // target: config.infraApiOrigin, // 头部infra配置地址
+      // target: 'http://10.173.73.250:9202/', // 韩振宇
+      target: `http://${liuyangIp}`, // 田宝山
     },
     // '/role': {
     //   target: `http://${baosanIp}`, // 田宝山

@@ -9,6 +9,7 @@ import { nanoid } from 'nanoid';
 import moment from 'moment';
 import TypeDialog from './TypeDialog';
 import { useForm } from '@formily/react';
+import { createActivity } from '@/services/activityManage';
 
 export default function Dialog(props: any) {
   const formRef = React.createRef<FormInstance>();
@@ -37,31 +38,41 @@ export default function Dialog(props: any) {
 
   const onFinish = (values: any) => {
     const flowGroup = window.localStorage.getItem('flowGroup');
-    const flowData = {
-      ...values,
-      id: nanoid(),
-      status: 'disabled',
-      creatTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-      updateTime: '',
-    };
-    if (flowGroup) {
-      const temp = JSON.parse(flowGroup);
-      temp.push(flowData); //TODO:记得修改
-      window.localStorage.setItem('flowGroup', JSON.stringify(temp));
-      // console.log(flowData)
-      handleOk(flowData.id);
-    } else {
-      window.localStorage.setItem(
-        'flowGroup',
-        JSON.stringify([flowData]), //TODO:记得修改
-      );
-      handleOk(flowData.id);
-    }
+    const { processName } = values;
+    createActivity(processName).then((res?: any) => {
+      if (res.data.isSuccess > 0) {
+        let processId = res.data.data.processId;
+        window.localStorage.setItem('bpmnxml', res.data.data.xml);
+        window.localStorage.setItem('processId', res.data.data.processId);
+        const flowData = {
+          ...values,
+          processId: processId,
+          status: 'disabled',
+          creatTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+          updateTime: '',
+        };
+        if (flowGroup) {
+          const temp = JSON.parse(flowGroup);
+          temp.push(flowData); //TODO:记得修改
+          window.localStorage.setItem('flowGroup', JSON.stringify(temp));
+          // console.log(flowData)
+          handleOk(flowData.processId, flowData.processName);
+        } else {
+          window.localStorage.setItem(
+            'flowGroup',
+            JSON.stringify([flowData]), //TODO:记得修改
+          );
+          handleOk(flowData.processId, flowData.processName);
+        }
+        setIsModalVisible(false);
+      }
+    });
+
     // const temp = { ...values };
     // temp.id = nanoid();
     // console.log(temp);
     // window.localStorage.setItem('flow', JSON.stringify(temp));
-    setIsModalVisible(false);
+
     // handleOk(temp.id); //TODO:记得修改
   };
   const confirm = () => {
@@ -99,14 +110,14 @@ export default function Dialog(props: any) {
       >
         <Form.Item
           label="流程名称"
-          name="proessName"
+          name="processName"
           rules={[{ required: true, message: '请输入流程名称!' }]}
         >
           <Input placeholder={'请输入流程名称'} />
         </Form.Item>
         <Form.Item
           label="流程分组"
-          name="proessGroup"
+          name="processGroup"
           rules={[{ required: true, message: '请选择流程分组!' }]}
           style={{ display: 'inline-block' }}
         >
